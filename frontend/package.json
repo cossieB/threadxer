@@ -1,0 +1,23 @@
+{
+  "name": "threadxer-frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "solid-js": "^1.7.8",
+    "@solidjs/router": "^0.8.3",
+    "@tanstack/solid-query": "^4.36.1",
+    "solid-transition-group": "^0.2.3"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.2",
+    "vite": "^4.4.5",
+    "vite-plugin-solid": "^2.7.0",
+    "sass": "^1.69.3"
+  }
+}
