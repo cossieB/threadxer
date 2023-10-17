@@ -1,10 +1,10 @@
 import { sql } from "drizzle-orm";
-import { pgTable, uuid, varchar, text, timestamp, jsonb, integer, unique, primaryKey, boolean } from "drizzle-orm/pg-core";
+import { pgTable, uuid, varchar, text, timestamp, jsonb, integer, unique, primaryKey, boolean, foreignKey } from "drizzle-orm/pg-core";
 
 export const Account = pgTable('accounts', {
     userId: uuid('user_id').primaryKey().defaultRandom(),
     username: varchar('username', {length: 50}).unique().notNull(),
-    usernameLower: varchar('username', {length: 50}).unique().notNull(),
+    usernameLower: varchar('username_lower', {length: 50}).unique().notNull(),
     email: text('email').unique().notNull(),
     emailVerified: timestamp('email_verified', {mode: 'date', withTimezone: true}), 
     lastLogin: timestamp('last_login', {mode: 'date', withTimezone: true}),
@@ -19,15 +19,25 @@ export const User = pgTable('users', {
     banner: text('banner')
 })
 
-export const Post = pgTable('post', {
+export const Post = pgTable('posts', {
     postId: uuid('post_id').primaryKey().defaultRandom(),
     text: varchar('text', {length: 255}),
     dateCreated: timestamp('date_created', {withTimezone: true}).defaultNow().notNull(),
     views: integer('views'),
-    reply_to: uuid('reply_to').references(() => Post.postId, {onDelete: 'set null', onUpdate: 'cascade'}),
-    quoted_post: uuid('quoting').references(() => Post.postId, {onDelete: 'set null', onUpdate: 'cascade'}),
+    replyTo: uuid('reply_to'),
+    didReply: boolean('did_reply').notNull().default(false),
+    quotedPost: uuid('quoting'),
     didQuote: boolean('did_quote').notNull().default(false)
-})
+}, t => ({
+    replyForeignKey: foreignKey({
+        columns: [t.replyTo],
+        foreignColumns: [t.postId]
+    }),
+    quoteForeignKey: foreignKey({
+        columns: [t.quotedPost],
+        foreignColumns: [t.postId]
+    })
+}))
 
 export const Repost = pgTable('reposts', {
     repostId: uuid('repost_id').primaryKey().defaultRandom(),
