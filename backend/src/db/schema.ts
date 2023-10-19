@@ -8,7 +8,7 @@ export const Account = pgTable('accounts', {
     email: text('email').unique().notNull(),
     emailVerified: timestamp('email_verified', {mode: 'date', withTimezone: true}), 
     lastLogin: timestamp('last_login', {mode: 'date', withTimezone: true}),
-    passwordHash: text('password'),
+    passwordHash: text('password').notNull(),
 })
 
 export const User = pgTable('users', {
