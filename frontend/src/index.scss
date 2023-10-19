@@ -1,0 +1,43 @@
+@import '~/styles/animations';
+
+body {
+    margin: 0;
+    background-color: black;
+    height: 100vh;
+}
+
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+        monospace;
+}
+.popup {
+    position: fixed;
+    top: 0;
+    right: 0;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    color: black;
+    z-index: 999;
+    --time: 0;
+    >div {
+        position: relative;
+        --popClr: 120;
+        max-width: 21rem;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        // color: hsl(283, 100%, 50%);
+        background: linear-gradient(hsl(var(--popClr), 100%, 75%), hsl(var(--popClr), 100%, 33%));
+        box-shadow: 0 0 5px black;
+        overflow: hidden;
+        &::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: calc(var(--time) / 5 * 100%);
+            height: 3px;
+            background-color: red;
+            transition: width 1000ms linear;
+        }
+    }
+}

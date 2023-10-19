@@ -1,35 +1,26 @@
-import { createSignal } from 'solid-js'
-import solidLogo from './assets/solid.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Route, Routes } from '@solidjs/router';
+import Home from './routes/Home';
+import CreatePost from './routes/CreatePost';
+import Navbar from './components/Navbar';
+import { createEffect, createResource } from 'solid-js';
+import { SignUp } from './components/auth/SignUp';
+import { Login } from './components/auth/Login';
 
 function App() {
-  const [count, setCount] = createSignal(0)
+    createEffect(() => {
+        
+    })
+    return (
+        <>
+            <Navbar />
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/auth/signup" element={<SignUp />} />
+                    <Route path="/auth/login" element={<Login />} />
+                    <Route path="/create" element={<CreatePost />} />
+                </Routes>
+        </>
+    );
+};
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} class="logo" alt="Vite logo" />
-        </a>
-        <a href="https://solidjs.com" target="_blank">
-          <img src={solidLogo} class="logo solid" alt="Solid logo" />
-        </a>
-      </div>
-      <h1>Vite + Solid</h1>
-      <div class="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count()}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p class="read-the-docs">
-        Click on the Vite and Solid logos to learn more
-      </p>
-    </>
-  )
-}
-
-export default App
+export default App;
