@@ -11,18 +11,32 @@ function getOnChange<UserInputElement extends INPUTS>(props: Pick<Props<UserInpu
     }
 }
 export function FormInput<T>(props: Props<HTMLInputElement, T>) {
-    const merged = mergeProps({ label: props.name, required: true }, props)
+    const merged = mergeProps({
+        label: props.name,
+        required: true,
+        validationErrors: [] as string[]
+    }, props)
+    const errored = () => merged.validationErrors.length > 0
     return (
-        <div class={styles.formControl}>
-            <input {...props} onchange={getOnChange(props)} type={props.type ?? 'text'} autocomplete="off" name={merged.name} id={merged.name} required={merged.required} placeholder=" " value={merged.value} />
-            <label for={merged.name}>
-                {titleCase(merged.label)}
-                <Show when={merged.required}>
-                    *
-                </Show>
-            </label>
-            <span></span>
-        </div>
+        <>
+            <div class={styles.formControl} classList={{[styles.error]: errored()}}>
+                <input {...props} onchange={getOnChange(props)} type={props.type ?? 'text'} autocomplete="off" name={merged.name} id={merged.name} required={merged.required} placeholder=" " value={merged.value} />
+                <label for={merged.name}>
+                    {titleCase(merged.label)}
+                    <Show when={merged.required}>
+                        *
+                    </Show>
+                </label>
+            </div>
+            <Show when={merged.validationErrors.length > 0}>
+                <ul>
+                    <For each={merged.validationErrors}>
+                        {error => <li> {error} </li>
+                        }
+                    </For>
+                </ul>
+            </Show>
+        </>
     )
 }
 
@@ -93,5 +107,6 @@ type INPUTS = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
 type InputProps<X extends INPUTS> = JSX.InputHTMLAttributes<X>
 type Props<X extends INPUTS = HTMLInputElement, Y = any> = InputProps<X> & {
     setter: SetStoreFunction<Y>,
-    name: string & keyof Y
+    name: string & keyof Y,
+    validationErrors?: string[]
 }

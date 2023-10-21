@@ -19,12 +19,18 @@
     flex-direction: column;
     position: relative;
     margin: 0.75rem;
-    
+
+    &.error {
+        textarea, input {
+            border: 2px solid red;
+        }
+    }
 }
 
 .form {
     padding-top: 0.5rem;
-    width: 25vw;
+    width: 90%;
+    max-width: 600px;
     background-color: #00000050;
     border-radius: .5rem;
     box-shadow: 0 0 20px black;
@@ -77,15 +83,19 @@
         height: 3rem;
         width: 90%;
         background: none;
-        border: 5px solid steelblue;
+        border: 1px solid steelblue;
         transition: all 250ms ease;
         display: flex;
         justify-content: center;
         align-items: center;
         &:hover:not(:disabled) {
             background-color: steelblue;
-            box-shadow: 0 0 5px 5px aliceblue;
+            box-shadow: 0 0 1px 1px aliceblue;
             border: none;
+        }
+        &:disabled {
+            border-color: white;
+            cursor: not-allowed;
         }
     }
 

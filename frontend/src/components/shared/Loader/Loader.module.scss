@@ -1,0 +1,27 @@
+.loader {
+    display: flex;
+    div {
+        height: 1rem;
+        width: 1rem;
+        border-radius: 100%;
+        background-color: antiquewhite;
+    }
+    div:first-child {
+        animation: blink 1s ease 0ms infinite;
+    }
+    div:nth-child(2) {
+        animation: blink 1s ease 100ms infinite;
+    }
+    div:last-child {
+        animation: blink 1s ease 200ms infinite;
+    }
+}
+
+@keyframes blink {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
