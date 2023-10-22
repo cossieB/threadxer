@@ -4,5 +4,5 @@ export const [user, setUser] = createStore({
     username: "",
     email: "",
     avatar: "",
-    banner: ""
+    banner: "",
 })

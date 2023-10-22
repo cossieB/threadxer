@@ -6,7 +6,7 @@ import { createUploadthingExpressHandler } from "uploadthing/express";
 import { uploadRouter } from "./uploadthing";
 import AppError from "./utils/AppError";
 import { authRouter } from "./routes";
-import { authenticate } from "./middleware/authenticate";
+import { authenticate, authorize } from "./middleware/authenticate";
 
 dotenv.config()
 const app = express()
@@ -16,7 +16,7 @@ app.use(cors())
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json())
 app.use(express.static(path.resolve(__dirname, '../public')))
-// app.use(authenticate)
+app.use(authenticate)
 
 app.use("/api/uploadthing", createUploadthingExpressHandler({
     router: uploadRouter,

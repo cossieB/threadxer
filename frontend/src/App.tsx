@@ -5,6 +5,7 @@ import Navbar from './components/Navbar';
 import { createEffect } from 'solid-js';
 import { SignUp } from './components/auth/SignUp';
 import { Login } from './components/auth/Login';
+import NotFound from './components/404';
 
 function App() {
     createEffect(() => {
@@ -18,6 +19,7 @@ function App() {
                     <Route path="/auth/signup" element={<SignUp />} />
                     <Route path="/auth/login" element={<Login />} />
                     <Route path="/create" element={<CreatePost />} />
+                    <Route path="*" element={<NotFound />} />
                 </Routes>
         </>
     );

@@ -1,14 +1,15 @@
 import express from "express";
 import AppError from "../utils/AppError";
 import { db } from "../db/drizzle";
-import { Account, User } from "../db/schema";
+import { User } from "../db/schema";
 import { hash, genSalt, compare } from 'bcrypt'
-import { eq } from "drizzle-orm";
+import { DrizzleError, eq } from "drizzle-orm";
 import { validation as validate } from "../utils/validation";
 import cookie from 'cookie';
 import { redis } from "../utils/redis";
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import { generateCookies } from "../utils/generateCookies";
+import { PostgresError } from "postgres";
 
 export const authRouter = express.Router();
 
@@ -22,10 +23,10 @@ authRouter.post('/availability', async (req, res, next) => {
                 throw new AppError("Please don't bypass client validation", 400)
 
             const row = await db.select({
-                username: Account.username
+                username: User.username
             })
-                .from(Account)
-                .where(eq(Account.usernameLower, username.toLowerCase()))
+                .from(User)
+                .where(eq(User.usernameLower, username.toLowerCase()))
                 .limit(1)
 
             return res.json({ available: row.length === 0 })
@@ -35,10 +36,10 @@ authRouter.post('/availability', async (req, res, next) => {
                 throw new AppError("Please don't bypass client validation", 400)
 
             const row = await db.select({
-                email: Account.email
+                email: User.email
             })
-                .from(Account)
-                .where(eq(Account.email, email.toLowerCase()))
+                .from(User)
+                .where(eq(User.email, email.toLowerCase()))
                 .limit(1)
 
             return res.json({ available: row.length === 0 })
@@ -72,7 +73,7 @@ authRouter.post('/signup', async (req, res, next) => {
             throw new AppError("Please don't bypass client validation", 400)
         const salt = await genSalt(10);
         const passwordHash = await hash(password, salt)
-        const row = await db.insert(Account)
+        const row = await db.insert(User)
             .values({
                 email: email.toLowerCase(),
                 username,
@@ -80,11 +81,21 @@ authRouter.post('/signup', async (req, res, next) => {
                 passwordHash
             })
             .returning({
-                userId: Account.userId
+                userId: User.userId,
+                username: User.username,
+                email: User.email,
+                avatar: User.avatar,
+                banner: User.avatar
             })
-        return res.status(201).json({ userId: row[0]?.userId })
+        return res.status(201).json(row[0])
     }
     catch (error) {
+        if (error instanceof PostgresError) {
+            if (error.message.includes('users_username_unique'))
+                return next(new AppError('Username is not available', 400))
+            if (error.message.includes("users_email_unique"))
+                return next(new AppError('Email is not available', 400))
+        }
         next(error)
     }
 })
@@ -98,25 +109,29 @@ authRouter.post('/login', async (req, res, next) => {
             typeof password !== 'string'
         )
             throw new AppError("Please don't bypass client validation", 400)
-        const row = await db.update(Account)
+        const row = await db.update(User)
             .set({ lastLogin: new Date() })
-            .where(eq(Account.email, email))
+            .where(eq(User.email, email))
             .returning({
-                userId: Account.userId,
-                passwordHash: Account.passwordHash
+                userId: User.userId,
+                passwordHash: User.passwordHash,
+                username: User.username,
+                email: User.email,
+                avatar: User.avatar,
+                banner: User.avatar
             })
         if (row.length == 0)
             throw new AppError("Invalid Credentials", 400)
 
-        const user = row[0]
-        const valid = await compare(password, user.passwordHash);
+        const { passwordHash, ...user } = row[0]
+        const valid = await compare(password, passwordHash);
         if (!valid)
             throw new AppError("Invalid Credentials", 400)
 
         const { accessCookie, refreshCookie } = await generateCookies(user.userId);
 
         res.header('Set-Cookie', [accessCookie, refreshCookie])
-        return res.sendStatus(200)
+        return res.json(user)
     }
     catch (error) {
         next(error)
@@ -125,15 +140,11 @@ authRouter.post('/login', async (req, res, next) => {
 authRouter.get('/confirm_email', async (req, res, next) => {
     const { userId } = res.locals as { userId: string }
     try {
-        await db.transaction(async tx => {
-            await tx.update(Account)
-                .set({
-                    emailVerified: new Date()
-                })
-                .where(eq(Account.userId, userId))
-            await tx.insert(User)
-                .values({ userId })
-        })
+        await db.update(User)
+            .set({
+                emailVerified: new Date()
+            })
+            .where(eq(User.userId, userId))
         return res.sendStatus(200)
     } catch (error) {
         next(error)
@@ -141,10 +152,10 @@ authRouter.get('/confirm_email', async (req, res, next) => {
 })
 
 authRouter.get('/refresh', async (req, res, next) => {
-    const refresh = cookie.parse(req.headers.cookie ?? "").rf; 
+    const refresh = cookie.parse(req.headers.cookie ?? "").rf;
     if (!refresh)
         return next(new AppError('No Token', 401))
-    const isValid = await redis.del(`refresh:${refresh}`); 
+    const isValid = await redis.del(`refresh:${refresh}`);
     if (!isValid)
         return next(new AppError('Invalid Token', 403))
     const token = jwt.verify(refresh, process.env.REFRESH_TOKEN_SECRET!) as JwtPayload
@@ -154,9 +165,9 @@ authRouter.get('/refresh', async (req, res, next) => {
 })
 
 authRouter.delete('/logout', async (req, res, next) => {
-    const refresh = cookie.parse(req.headers.cookie ?? "").rf; 
+    const refresh = cookie.parse(req.headers.cookie ?? "").rf;
     if (refresh)
-        await redis.del(`refresh:${refresh}`); 
+        await redis.del(`refresh:${refresh}`);
     res.clearCookie('rf')
     res.clearCookie('at')
     return res.sendStatus(200)

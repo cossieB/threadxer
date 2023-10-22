@@ -4,6 +4,7 @@ import { createStore } from 'solid-js/store';
 import { Popup } from '../shared/Popup';
 import { Validator } from './Validator';
 import SubmitButton from '../shared/SubmitButton';
+import { sendAuthRequest } from '../../utils/sendAuthRequest';
 
 const [userState, setUserState] = createStore({
     email: "",
@@ -23,37 +24,13 @@ export function Login() {
         validator.validateEmail(userState.email)
         return validator.errors.email
     }
-    async function handleLogin(e: SubmitEvent) {
+    async function handleSubmit(e: SubmitEvent) {
         e.preventDefault();
-        try {
-            setState('loading', true);
-            const res = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(userState)
-            })
-            const data = await res.json()
-            if ('rf' in data) {
-                localStorage.setItem('rf', data.rf)
-                setState('success', true)
-            }
-            else if ('error' in data) {
-                setState('error', data.error)
-            }
-
-        }
-        catch (error) {
-            console.log(error);
-        }
-        finally {
-            setState('loading', false)
-        }
+        await sendAuthRequest('/api/auth/login', setState, userState);
     }
     return (
         <>
-            <UserForm onsubmit={handleLogin}>
+            <UserForm onsubmit={handleSubmit}>
                 <FormInput
                     name='email'
                     setter={setUserState}
@@ -80,3 +57,4 @@ export function Login() {
         </>
     );
 }
+

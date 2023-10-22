@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import { pgTable, uuid, varchar, text, timestamp, jsonb, integer, unique, primaryKey, boolean, foreignKey } from "drizzle-orm/pg-core";
 
-export const Account = pgTable('accounts', {
+export const User = pgTable('users', {
     userId: uuid('user_id').primaryKey().defaultRandom(),
     username: varchar('username', { length: 50 }).unique().notNull(),
     usernameLower: varchar('username_lower', { length: 50 }).unique().notNull(),
@@ -9,14 +9,10 @@ export const Account = pgTable('accounts', {
     emailVerified: timestamp('email_verified', { mode: 'date', withTimezone: true }),
     lastLogin: timestamp('last_login', { mode: 'date', withTimezone: true }),
     passwordHash: text('password').notNull(),
-})
-
-export const User = pgTable('users', {
-    userId: uuid('user_id').primaryKey().references(() => Account.userId, { onDelete: 'cascade', onUpdate: 'cascade' }),
     dateJoined: timestamp('date_joined', { mode: 'date', withTimezone: true }).notNull().defaultNow(),
     bio: varchar('bio', { length: 255 }).notNull().default(""),
-    avatar: text('avatar'),
-    banner: text('banner'),
+    avatar: text('avatar').notNull().default("https://upload.wikimedia.org/wikipedia/commons/5/55/Question_Mark.svg"),
+    banner: text('banner').notNull().default("https://upload.wikimedia.org/wikipedia/commons/2/2b/Slavic_pattern.svg"),
     displayName: varchar('display_name', { length: 50 }).notNull().default("")
 })
 
