@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "@solidjs/router"
 import { onMount, type JSXElement, createSignal } from "solid-js"
-import { Popup } from "../Popup"
+import { Popup } from "./Popup"
 
 type Props = {
     title: string

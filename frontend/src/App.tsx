@@ -2,7 +2,7 @@ import { Route, Routes } from '@solidjs/router';
 import Home from './routes/Home';
 import CreatePost from './routes/CreatePost';
 import Navbar from './components/Navbar';
-import { createEffect, createResource } from 'solid-js';
+import { createEffect } from 'solid-js';
 import { SignUp } from './components/auth/SignUp';
 import { Login } from './components/auth/Login';
 
