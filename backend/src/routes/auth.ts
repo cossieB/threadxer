@@ -6,12 +6,11 @@ import { hash, genSalt, compare } from 'bcrypt'
 import { eq } from "drizzle-orm";
 import { validation as validate } from "../utils/validation";
 import { createAccessToken, createRefreshToken } from "../utils/createJWT";
-import { Redis } from "ioredis";
-import cookie from 'cookie'; 
+import cookie from 'cookie';
+import jwt from 'jsonwebtoken'
+import { redis } from "../utils/redis";
 
 export const authRouter = express.Router();
-
-const redis = new Redis()
 
 authRouter.post('/availability', async (req, res, next) => {
     try {
@@ -99,29 +98,35 @@ authRouter.post('/login', async (req, res, next) => {
             typeof password !== 'string'
         )
             throw new AppError("Please don't bypass client validation", 400)
-        const row = await db.select({
-            userId: Account.userId,
-            passwordHash: Account.passwordHash
-        })
-            .from(Account)
-            .where(eq(Account.email, email.toLowerCase()))
+        const row = await db.update(Account)
+            .set({ lastLogin: new Date() })
+            .where(eq(Account.email, email))
+            .returning({
+                userId: Account.userId,
+                passwordHash: Account.passwordHash
+            })
         if (row.length == 0)
             throw new AppError("Invalid Credentials", 400)
+
         const user = row[0]
         const valid = await compare(password, user.passwordHash);
         if (!valid)
             throw new AppError("Invalid Credentials", 400)
+
         const refreshToken = createRefreshToken(user.userId)
         const accessToken = createAccessToken(user.userId)
-        await redis.set(`refresh:${refreshToken}`, user.userId);
-        cookie.serialize('at', accessToken, {
-            domain: '/',
+
+        await redis.set(`refresh:${refreshToken}`, user.userId)
+
+        const ck = cookie.serialize('at', accessToken, {
+            path: '/',
             maxAge: 60 * 15,
             httpOnly: true,
             secure: process.env.NODE_ENV == 'production',
             sameSite: true
-        })
-        return res.json({rf: refreshToken, at: accessToken})
+        });
+        res.setHeader('Set-Cookie', ck )
+        return res.json({ rf: refreshToken, at: accessToken })
     }
     catch (error) {
         next(error)
@@ -146,7 +151,13 @@ authRouter.get('/confirm_email', async (req, res, next) => {
 })
 
 
-authRouter.get('/test', async (req, res) => {
-    const val = await redis.get('name');
-    res.json({ val })
+authRouter.get('/refresh', async (req, res) => {
+    const {rf: refresh} = req.body as {rf?: string}
+    if (!refresh) 
+        return res.sendStatus(401)
+    try {
+        const token = jwt.verify(refresh, process.env.REFRESH_TOKEN_SECRET!)
+    } catch (error) {
+        console.log(error)
+    }
 })
