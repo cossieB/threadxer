@@ -5,6 +5,7 @@ import dotenv from 'dotenv'
 import { createUploadthingExpressHandler } from "uploadthing/express";
 import { uploadRouter } from "./uploadthing";
 import AppError from "./utils/AppError";
+import { authRouter } from "./routes";
 
 dotenv.config()
 const app = express()
@@ -19,12 +20,16 @@ app.use("/api/uploadthing", createUploadthingExpressHandler({
     router: uploadRouter,
 }),
 );
+app.use('/api/auth', authRouter)
+app.use("*", (req, res) => {
+    res.sendStatus(404)
+})
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-    console.error(err.stack);
     if (err instanceof AppError)
-        return res.status(err.status).json({message: err.message})
-    return res.status(500).json({message: "Something went wrong"})
+        return res.status(err.status).send(err.message)
+    console.error(err.stack);
+    return res.status(500).json({ message: "Something went wrong" })
 })
 
 const PORT = process.env.PORT ?? 8080

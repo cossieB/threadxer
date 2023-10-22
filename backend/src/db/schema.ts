@@ -16,7 +16,8 @@ export const User = pgTable('users', {
     dateJoined: timestamp('date_joined', {mode: 'date', withTimezone: true}).notNull().defaultNow(),
     bio: varchar('bio', {length: 255}).notNull().default(""),
     avatar: text('avatar'),
-    banner: text('banner')
+    banner: text('banner'),
+    displayName: varchar('display_name', {length: 50}).notNull().default("")
 })
 
 export const Post = pgTable('posts', {
