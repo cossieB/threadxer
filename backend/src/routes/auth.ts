@@ -5,10 +5,10 @@ import { Account, User } from "../db/schema";
 import { hash, genSalt, compare } from 'bcrypt'
 import { eq } from "drizzle-orm";
 import { validation as validate } from "../utils/validation";
-import { createAccessToken, createRefreshToken } from "../utils/createJWT";
 import cookie from 'cookie';
-import jwt from 'jsonwebtoken'
 import { redis } from "../utils/redis";
+import jwt, { JwtPayload } from 'jsonwebtoken'
+import { generateCookies } from "../utils/generateCookies";
 
 export const authRouter = express.Router();
 
@@ -113,20 +113,10 @@ authRouter.post('/login', async (req, res, next) => {
         if (!valid)
             throw new AppError("Invalid Credentials", 400)
 
-        const refreshToken = createRefreshToken(user.userId)
-        const accessToken = createAccessToken(user.userId)
+        const { accessCookie, refreshCookie } = await generateCookies(user.userId);
 
-        await redis.set(`refresh:${refreshToken}`, user.userId)
-
-        const ck = cookie.serialize('at', accessToken, {
-            path: '/',
-            maxAge: 60 * 15,
-            httpOnly: true,
-            secure: process.env.NODE_ENV == 'production',
-            sameSite: true
-        });
-        res.setHeader('Set-Cookie', ck )
-        return res.json({ rf: refreshToken, at: accessToken })
+        res.header('Set-Cookie', [accessCookie, refreshCookie])
+        return res.sendStatus(200)
     }
     catch (error) {
         next(error)
@@ -150,14 +140,24 @@ authRouter.get('/confirm_email', async (req, res, next) => {
     }
 })
 
+authRouter.get('/refresh', async (req, res, next) => {
+    const refresh = cookie.parse(req.headers.cookie ?? "").rf; 
+    if (!refresh)
+        return next(new AppError('No Token', 401))
+    const isValid = await redis.del(`refresh:${refresh}`); 
+    if (!isValid)
+        return next(new AppError('Invalid Token', 403))
+    const token = jwt.verify(refresh, process.env.REFRESH_TOKEN_SECRET!) as JwtPayload
+    const { accessCookie, refreshCookie } = await generateCookies(token.userId);
+    res.header('Set-Cookie', [accessCookie, refreshCookie])
+    return res.sendStatus(200)
+})
 
-authRouter.get('/refresh', async (req, res) => {
-    const {rf: refresh} = req.body as {rf?: string}
-    if (!refresh) 
-        return res.sendStatus(401)
-    try {
-        const token = jwt.verify(refresh, process.env.REFRESH_TOKEN_SECRET!)
-    } catch (error) {
-        console.log(error)
-    }
+authRouter.delete('/logout', async (req, res, next) => {
+    const refresh = cookie.parse(req.headers.cookie ?? "").rf; 
+    if (refresh)
+        await redis.del(`refresh:${refresh}`); 
+    res.clearCookie('rf')
+    res.clearCookie('at')
+    return res.sendStatus(200)
 })

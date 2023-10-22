@@ -16,7 +16,7 @@ app.use(cors())
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json())
 app.use(express.static(path.resolve(__dirname, '../public')))
-app.use(authenticate)
+// app.use(authenticate)
 
 app.use("/api/uploadthing", createUploadthingExpressHandler({
     router: uploadRouter,
