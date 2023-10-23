@@ -1,10 +1,37 @@
+@use '~/styles/mixins';
+
 .nav {
     display: flex;
-}
 
-@media (max-width: 768px) {
-    .nav {
+    @media (max-width: 768px) {
         position: fixed;
         bottom: 0px;
+    }
+
+    @media (min-width: 768px) {
+        left: 0;
+        flex-direction: column;
+        width: 25rem;
+    }
+    img, svg {
+        height: 2rem;
+        width: 2rem;
+        object-fit: contain;
+    }
+}
+
+.logo {
+    height: 50px;
+    width: 50px;
+}
+
+.a {
+    display: flex;
+    margin-left: 2.5rem;
+    align-items: center;
+    border-radius: 1rem;
+    padding: 0.5rem 2rem;
+    &:hover {
+        background-color: hsl(0, 0%, 47%);
     }
 }

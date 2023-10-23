@@ -2,13 +2,10 @@ import { FormInput } from '../shared/FormInput';
 import UserForm from '../shared/UserForm';
 import { createStore } from 'solid-js/store';
 import { Popup } from '../shared/Popup';
-import { sleep } from '~/lib/sleep';
-import { Show, createMemo } from 'solid-js';
-import Loader from '../shared/Loader/Loader';
+import { createMemo } from 'solid-js';
 import titleCase from '~/lib/titleCase';
 import { Validator } from './Validator';
 import SubmitButton from '../shared/SubmitButton';
-import { setUser } from '~/user';
 import { sendAuthRequest } from '../../utils/sendAuthRequest';
 
 const initialState = {
@@ -44,6 +41,7 @@ export function SignUp() {
             if (!res.ok) {
                 return
             }
+            
             const data = await res.json();
             if ('available' in data && data.available === false)
                 setState('fieldErrors', field, [`${titleCase(field)} not available`])
