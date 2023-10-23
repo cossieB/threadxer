@@ -7,6 +7,7 @@ import { uploadRouter } from "./uploadthing";
 import AppError from "./utils/AppError";
 import { authRouter } from "./routes";
 import { authenticate, authorize } from "./middleware/authenticate";
+import { sendMail } from "./nodemailer";
 
 dotenv.config()
 const app = express()
@@ -23,10 +24,17 @@ app.use("/api/uploadthing", createUploadthingExpressHandler({
 }),
 );
 app.use('/api/auth', authRouter)
+app.get("/test", async (req, res) => {
+    try {
+        await sendMail("Test", "buntucossie@gmail.com", "Testing testing")
+        res.sendStatus(200)
+    } catch (error) {
+        res.sendStatus(500)
+    }
+})
 app.use("*", (req, res) => {
     res.sendStatus(404)
 })
-
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     if (err instanceof AppError)
         return res.status(err.status).json({error: err.message})

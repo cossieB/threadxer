@@ -15,6 +15,13 @@ export const User = pgTable('users', {
     banner: text('banner').notNull().default("https://upload.wikimedia.org/wikipedia/commons/2/2b/Slavic_pattern.svg"),
     displayName: varchar('display_name', { length: 50 }).notNull().default("")
 })
+export const VerificationCodes = pgTable('verification_codes', {
+    codeId: uuid('code_id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').references(() => User.userId, { onDelete: 'cascade', onUpdate: 'cascade' }).notNull().unique(),
+    code: varchar('code', {length: 6}).notNull(),
+    expiry: timestamp('expiry', {withTimezone: true}).default(sql`NOW() + INTERVAL '12 hours'`).notNull(),
+    dateUsed: timestamp('date_used', {withTimezone: true})
+})
 
 export const Post = pgTable('posts', {
     postId: uuid('post_id').primaryKey().defaultRandom(),

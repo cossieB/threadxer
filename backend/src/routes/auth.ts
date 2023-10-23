@@ -1,7 +1,7 @@
 import express from "express";
 import AppError from "../utils/AppError";
 import { db } from "../db/drizzle";
-import { User } from "../db/schema";
+import { User, VerificationCodes } from "../db/schema";
 import { hash, genSalt, compare } from 'bcrypt'
 import { DrizzleError, eq } from "drizzle-orm";
 import { validation as validate } from "../utils/validation";
@@ -10,6 +10,8 @@ import { redis } from "../utils/redis";
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import { generateCookies } from "../utils/generateCookies";
 import { PostgresError } from "postgres";
+import { randomInt } from "crypto";
+import { draftVerificationEmail } from "../utils/draftEmail";
 
 export const authRouter = express.Router();
 
@@ -72,8 +74,10 @@ authRouter.post('/signup', async (req, res, next) => {
         if (Object.values(errors).flat().length > 0)
             throw new AppError("Please don't bypass client validation", 400)
         const salt = await genSalt(10);
-        const passwordHash = await hash(password, salt)
-        const row = await db.insert(User)
+        const passwordHash = await hash(password, salt);
+        const code = randomInt(999999).toString().padStart(6, '0')
+        const user = await db.transaction(async tx => {
+            const row = await tx.insert(User)
             .values({
                 email: email.toLowerCase(),
                 username,
@@ -87,7 +91,15 @@ authRouter.post('/signup', async (req, res, next) => {
                 avatar: User.avatar,
                 banner: User.avatar
             })
-        return res.status(201).json(row[0])
+            await tx.insert(VerificationCodes)
+                .values({
+                    userId: row[0].userId,
+                    code
+                })
+            return row[0]
+        })
+        draftVerificationEmail(username, code, email)
+        return res.status(201).json(user)
     }
     catch (error) {
         if (error instanceof PostgresError) {
