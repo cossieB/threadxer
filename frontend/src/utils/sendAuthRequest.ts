@@ -1,5 +1,6 @@
+import { type JwtPayload, jwtDecode } from 'jwt-decode';
 import { SetStoreFunction } from 'solid-js/store';
-import { setUser } from '~/user';
+import { User, setUser } from '~/user';
 
 export async function sendAuthRequest(
     url: string,
@@ -18,8 +19,9 @@ export async function sendAuthRequest(
         if (res.ok) {
             setState('success', true);
             const data = await res.json();
-            setUser(data);
-            localStorage.setItem('user', JSON.stringify(data));
+            const decoded = jwtDecode< {user: User} & JwtPayload >(data.jwt);
+            setUser(decoded.user);
+            localStorage.setItem('user', JSON.stringify(decoded.user));
         }
         if (res.status === 400) {
             const data = await res.json();

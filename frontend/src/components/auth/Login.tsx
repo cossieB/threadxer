@@ -5,6 +5,7 @@ import { Popup } from '../shared/Popup';
 import { Validator } from './Validator';
 import SubmitButton from '../shared/SubmitButton';
 import { sendAuthRequest } from '../../utils/sendAuthRequest';
+import { useNavigate } from '@solidjs/router';
 
 const [userState, setUserState] = createStore({
     email: "",
@@ -24,9 +25,11 @@ export function Login() {
         validator.validateEmail(userState.email)
         return validator.errors.email
     }
+    const navigate = useNavigate()
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault();
         await sendAuthRequest('/api/auth/login', setState, userState);
+        navigate("/")
     }
     return (
         <>

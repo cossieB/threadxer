@@ -1,11 +1,26 @@
 @import '~/styles/animations';
+@mixin fullScreen {
+    width: 100vw;
+    height: 100vh;
+};
+:root {
+    --nav-width: 20rem;
+    --nav-height: 5rem;
+}
 
 body {
     margin: 0;
     background-color: black;
     height: 100vh;
 }
-
+main {
+    @media (max-width: 768px) {
+        margin-bottom: var(--nav-width);
+    }
+    @media (min-width: 768px) {
+        margin-left: var(--nav-width);
+    }
+}
 code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
         monospace;
@@ -46,4 +61,14 @@ ul {
     padding: 0;
     margin: 0;
     list-style: none;
+}
+#modal > div:first-child {
+    top: 0;
+    left: 0;
+    z-index: 5;
+    @include fullScreen;
+    background-color: rgba(0,0,0, .5);
+    position: fixed;
+    &::after {
+    }
 }

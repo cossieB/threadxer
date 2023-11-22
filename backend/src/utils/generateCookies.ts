@@ -1,12 +1,33 @@
-import { createAccessToken, createRefreshToken } from "./createJWT";
 import cookie from 'cookie';
 import { redis } from "./redis";
+import dotenv from 'dotenv';
+import {sign} from 'jsonwebtoken'
 
-export async function generateCookies(userId: string) {
-    const refreshToken = createRefreshToken(userId);
-    const accessToken = createAccessToken(userId);
+dotenv.config()
 
-    await redis.set(`refresh:${refreshToken}`, userId);
+type TokenUser = {
+    userId: string,
+    username: string,
+    avatar: string,
+    banner: string,
+    email: string
+}
+
+export function createAccessToken(user: TokenUser) {
+    return sign({user}, process.env.ACCESS_TOKEN_SECRET!, {
+        expiresIn: '15m'
+    })
+}
+
+export function createRefreshToken(user: TokenUser) {
+    return sign({user}, process.env.REFRESH_TOKEN_SECRET!)
+}
+
+export async function generateCookies(user: TokenUser) {
+    const refreshToken = createRefreshToken(user);
+    const accessToken = createAccessToken(user);
+
+    await redis.set(`refresh:${refreshToken}`, user.userId);
 
     const accessCookie = cookie.serialize('at', accessToken, {
         path: '/',
@@ -22,5 +43,5 @@ export async function generateCookies(userId: string) {
         sameSite: true,
         maxAge: 60 * 60 * 24 * 30
     });
-    return { accessCookie, refreshCookie };
+    return { accessCookie, refreshCookie, jwt: accessToken };
 }

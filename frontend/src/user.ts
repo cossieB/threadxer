@@ -1,6 +1,6 @@
 import { createStore } from "solid-js/store";
 
-type U = {
+export type User = {
     username: string,
     email: string,
     avatar: string,
@@ -9,7 +9,7 @@ type U = {
 
 const str = localStorage.getItem('user')
 
-const storedUser: U = str ? JSON.parse(str) : {
+const storedUser: User = str ? JSON.parse(str) : {
     username: "",
     email: "",
     avatar: "",

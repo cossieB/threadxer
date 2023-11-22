@@ -11,8 +11,8 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
         res.locals.authError = new AppError('Invalid or no token', 401)
     }
     try {
-        const token = jwt.verify(cookie.at, process.env.ACCESS_TOKEN_SECRET!) as JwtPayload
-        res.locals.userId = token.userId
+        const user = jwt.verify(cookie.at, process.env.ACCESS_TOKEN_SECRET!) as JwtPayload
+        res.locals.user = user
     } 
     catch (error) {
         res.locals.authError = new AppError('Invalid Token', 403)

@@ -2,21 +2,30 @@
 
 .nav {
     display: flex;
+    position: fixed;
 
     @media (max-width: 768px) {
-        position: fixed;
         bottom: 0px;
     }
 
     @media (min-width: 768px) {
         left: 0;
         flex-direction: column;
-        width: 25rem;
+        width: var(--nav-width);
     }
     img, svg {
         height: 2rem;
         width: 2rem;
         object-fit: contain;
+    }
+    a {
+        text-decoration: none;
+        &:visited {
+            color: inherit;
+        }
+    }
+    > :last-child {
+        cursor: pointer;
     }
 }
 

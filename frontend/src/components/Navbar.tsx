@@ -1,8 +1,10 @@
 import { A } from "@solidjs/router"
-import { JSX, Show } from "solid-js"
+import { JSX, Show, createSignal } from "solid-js"
 import styles from "~/styles/components/Nav.module.scss"
 import { setUser, user } from "../user"
-import { HomeSvg, SearchSvg, SettingsSvg } from "../svgs"
+import { HomeSvg, SearchSvg, SettingsSvg, UnlockSvg } from "../svgs"
+import { Portal } from "solid-js/web"
+import { Login } from "./auth/Login"
 
 
 export default function Navbar() {
@@ -11,38 +13,48 @@ export default function Navbar() {
             method: "DELETE"
         })
         if (res.ok)
-            setUser({})
+            setUser({
+                avatar: "",
+                banner: "",
+                email: "",
+                username: ""
+            })
     }
     return (
         <nav class={styles.nav}>
-            <img class={styles.logo} src="/favicon.ico" alt="" />
-            <NavItem
+            <div><img class={styles.logo} src="/favicon.ico" alt="" /></div>
+            <NavLink
                 href="/"
                 text="Home"
                 icon={<HomeSvg />}
             />
-            <NavItem
+            <NavLink
                 href="search"
                 text="Search"
                 icon={<SearchSvg />}
             />
-            <Show when={user.username}>
-                <NavItem
+            <Show
+                when={user.username}
+                fallback={
+                    <NavLink
+                        icon={<UnlockSvg />}
+                        text="Login"
+                        href="/auth/login"
+                    />
+                }
+            >
+                <NavLink
                     href="/profile"
                     text="Profile"
                     icon={<SettingsSvg />}
                 />
                 <NavItem
-                    href="/logout"
-                    text="logout"
+                    onclick={logout}
+                    text={user.username}
                     icon={<img src={user.avatar} />}
+                    
                 />
             </Show>
-            <span onclick={logout}>
-                <Show when={user.username} fallback={"Login"}>
-                    {user.username}
-                </Show>
-            </span>
         </nav>
     )
 }
@@ -53,11 +65,23 @@ type P = {
     text: string
 }
 
-function NavItem(props: P) {
+function NavLink(props: P) {
     return (
         <A class={styles.a} href={props.href}>
             <span> {props.icon} </span>
             <span>{props.text}</span>
         </A>
+    )
+}
+type P2 = {
+    onclick: () => void
+} & Omit<P, 'href'>
+
+function NavItem(props: P2) {
+    return (
+        <div class={styles.a} onclick={props.onclick}>
+            <span> {props.icon} </span>
+            <span>{props.text}</span>
+        </div>
     )
 }

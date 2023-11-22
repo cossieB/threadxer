@@ -9,7 +9,7 @@ type Props = {
 
 export default function Page(props: Props) {
     const location = useLocation();
-    const navigate = useNavigate(); console.log(location)
+    const navigate = useNavigate(); 
     onMount(() => {
         document.title = `${props.title} / Threader`
     })

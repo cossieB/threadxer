@@ -24,14 +24,7 @@ app.use("/api/uploadthing", createUploadthingExpressHandler({
 }),
 );
 app.use('/api/auth', authRouter)
-app.get("/test", async (req, res) => {
-    try {
-        await sendMail("Test", "buntucossie@gmail.com", "Testing testing")
-        res.sendStatus(200)
-    } catch (error) {
-        res.sendStatus(500)
-    }
-})
+
 app.use("*", (req, res) => {
     res.sendStatus(404)
 })

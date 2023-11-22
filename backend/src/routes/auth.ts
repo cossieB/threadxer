@@ -140,17 +140,17 @@ authRouter.post('/login', async (req, res, next) => {
         if (!valid)
             throw new AppError("Invalid Credentials", 400)
 
-        const { accessCookie, refreshCookie } = await generateCookies(user.userId);
+        const { accessCookie, refreshCookie, jwt } = await generateCookies(user);
 
         res.header('Set-Cookie', [accessCookie, refreshCookie])
-        return res.json(user)
+        return res.json({jwt})
     }
     catch (error) {
         next(error)
     }
 })
 authRouter.get('/confirm_email', async (req, res, next) => {
-    const { userId } = res.locals as { userId: string }
+    const { userId } = res.locals.user as { userId: string }
     try {
         await db.update(User)
             .set({
@@ -171,9 +171,10 @@ authRouter.get('/refresh', async (req, res, next) => {
     if (!isValid)
         return next(new AppError('Invalid Token', 403))
     const token = jwt.verify(refresh, process.env.REFRESH_TOKEN_SECRET!) as JwtPayload
-    const { accessCookie, refreshCookie } = await generateCookies(token.userId);
+    console.log(token)
+    const { accessCookie, refreshCookie } = await generateCookies(token.user);
     res.header('Set-Cookie', [accessCookie, refreshCookie])
-    return res.sendStatus(200)
+    return res.json({user: token.user, exp: token.exp})
 })
 
 authRouter.delete('/logout', async (req, res, next) => {
