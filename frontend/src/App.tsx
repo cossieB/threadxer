@@ -7,6 +7,7 @@ import { SignUp } from './components/auth/SignUp';
 import { Login } from './components/auth/Login';
 import NotFound from './components/404';
 import { setUser } from './user';
+import { PostComposer } from './components/PostComposer';
 
 function App() {
     let ref!: HTMLDivElement
@@ -18,12 +19,6 @@ function App() {
                 setUser(data)
             }
             else {
-                const user = {
-                    avatar: "",
-                    banner: "",
-                    email: "",
-                    username: ""
-                }
                 setUser({
                     avatar: "",
                     banner: "",
@@ -37,6 +32,7 @@ function App() {
         <>
             <Navbar />
             <div class='modal' />
+            <PostComposer />
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/auth/signup" element={<SignUp />} />

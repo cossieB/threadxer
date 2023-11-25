@@ -2,7 +2,7 @@ import { A } from "@solidjs/router"
 import { JSX, Show, createSignal } from "solid-js"
 import styles from "~/styles/components/Nav.module.scss"
 import { setUser, user } from "../user"
-import { HomeSvg, SearchSvg, SettingsSvg, UnlockSvg } from "../svgs"
+import { CompostSvg, HomeSvg, SearchSvg, SettingsSvg, UnlockSvg } from "../svgs"
 import { Portal } from "solid-js/web"
 import { Login } from "./auth/Login"
 
@@ -19,6 +19,7 @@ export default function Navbar() {
                 email: "",
                 username: ""
             })
+            localStorage.removeItem('user')
     }
     return (
         <nav class={styles.nav}>
@@ -43,6 +44,11 @@ export default function Navbar() {
                     />
                 }
             >
+                <NavItem
+                    icon={<CompostSvg />}
+                    text="Compose"
+                    onclick={() => {}}
+                />
                 <NavLink
                     href="/profile"
                     text="Profile"
@@ -85,3 +91,4 @@ function NavItem(props: P2) {
         </div>
     )
 }
+

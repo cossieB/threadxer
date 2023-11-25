@@ -24,11 +24,10 @@
             color: inherit;
         }
     }
-    > :last-child {
-        cursor: pointer;
-    }
 }
-
+div:has(> .logo) {
+    @extend %navItemSpace;
+}
 .logo {
     height: 50px;
     width: 50px;
@@ -36,11 +35,16 @@
 
 .a {
     display: flex;
-    margin-left: 2.5rem;
+    @extend %navItemSpace;
     align-items: center;
     border-radius: 1rem;
-    padding: 0.5rem 2rem;
+    cursor: pointer;
     &:hover {
         background-color: hsl(0, 0%, 47%);
     }
+}
+
+%navItemSpace {
+    margin-left: 2.5rem;
+    padding: 0.5rem 2rem;
 }
