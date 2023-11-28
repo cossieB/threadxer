@@ -78,19 +78,19 @@ authRouter.post('/signup', async (req, res, next) => {
         const code = randomInt(999999).toString().padStart(6, '0')
         const user = await db.transaction(async tx => {
             const row = await tx.insert(User)
-            .values({
-                email: email.toLowerCase(),
-                username,
-                usernameLower: username.toLowerCase(),
-                passwordHash
-            })
-            .returning({
-                userId: User.userId,
-                username: User.username,
-                email: User.email,
-                avatar: User.avatar,
-                banner: User.avatar
-            })
+                .values({
+                    email: email.toLowerCase(),
+                    username,
+                    usernameLower: username.toLowerCase(),
+                    passwordHash
+                })
+                .returning({
+                    userId: User.userId,
+                    username: User.username,
+                    email: User.email,
+                    avatar: User.avatar,
+                    banner: User.avatar
+                })
             await tx.insert(VerificationCodes)
                 .values({
                     userId: row[0].userId,
@@ -143,7 +143,7 @@ authRouter.post('/login', async (req, res, next) => {
         const { accessCookie, refreshCookie, jwt } = await generateCookies(user);
 
         res.header('Set-Cookie', [accessCookie, refreshCookie])
-        return res.json({jwt})
+        return res.json({ jwt })
     }
     catch (error) {
         next(error)
@@ -171,10 +171,9 @@ authRouter.get('/refresh', async (req, res, next) => {
     if (!isValid)
         return next(new AppError('Invalid Token', 403))
     const token = jwt.verify(refresh, process.env.REFRESH_TOKEN_SECRET!) as JwtPayload
-    console.log(token)
     const { accessCookie, refreshCookie } = await generateCookies(token.user);
     res.header('Set-Cookie', [accessCookie, refreshCookie])
-    return res.json({user: token.user, exp: token.exp})
+    return res.json({ user: token.user, exp: token.exp })
 })
 
 authRouter.delete('/logout', async (req, res, next) => {

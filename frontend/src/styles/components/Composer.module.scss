@@ -1,9 +1,30 @@
 .composer {
-    background-color: red;
+    background-color: #181818;
     width: min(90%, 50rem);
     height: min(100%, 25rem);
     position: absolute;
     top: 5%;
     left: 50%;
     translate: -50%;
+    border-radius: 0.75rem;
+
+    textarea {
+        width: 100%;
+        height: 100px;
+        background: none;
+        border-radius: 0.5rem;
+    }
+    .preview {
+        width: 100%;
+        min-height: 100px;
+        background-color: white;
+        color: black;
+    }
+    svg {
+        margin: 0 auto;
+    }
+}
+
+.special {
+    color: blue;
 }
