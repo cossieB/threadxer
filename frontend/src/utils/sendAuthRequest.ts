@@ -1,6 +1,7 @@
 import { type JwtPayload, jwtDecode } from 'jwt-decode';
 import { SetStoreFunction } from 'solid-js/store';
-import { User, setUser } from '~/user';
+import { type User, setUser } from '~/globalState/user';
+
 
 export async function sendAuthRequest(
     url: string,

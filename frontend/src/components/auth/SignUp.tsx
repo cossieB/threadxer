@@ -5,7 +5,7 @@ import { Popup } from '../shared/Popup';
 import { createMemo } from 'solid-js';
 import titleCase from '~/lib/titleCase';
 import { Validator } from './Validator';
-import SubmitButton from '../shared/SubmitButton';
+import {SubmitButton} from '../shared/SubmitButton';
 import { sendAuthRequest } from '../../utils/sendAuthRequest';
 
 const initialState = {

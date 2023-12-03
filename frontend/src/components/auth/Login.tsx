@@ -3,7 +3,7 @@ import UserForm from '../shared/UserForm';
 import { createStore } from 'solid-js/store';
 import { Popup } from '../shared/Popup';
 import { Validator } from './Validator';
-import SubmitButton from '../shared/SubmitButton';
+import {SubmitButton} from '../shared/SubmitButton';
 import { sendAuthRequest } from '../../utils/sendAuthRequest';
 import { useNavigate } from '@solidjs/router';
 

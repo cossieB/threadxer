@@ -114,9 +114,16 @@
 }
 .submitBtn {
     background-color: var(--blue1);
-    padding: 0.75rem;
-    border-radius: 1rem;
+    
+    border-radius: 3rem;
+    width: 7.5rem;
     border: none;
+    font-size: large;
+    transition: background-color 250ms ease;
+    &:disabled {
+        background-color: hsl(204, 88%, 63%);
+        background-color: color-mix(in srgb, var(--blue1) 50%, gray);
+    }
 }
 
 @media (max-width: 768px) {

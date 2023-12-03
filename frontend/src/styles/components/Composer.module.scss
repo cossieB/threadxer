@@ -1,15 +1,31 @@
 @use '~/styles/mixins';
 
 .composer {
-    background-color: #181818;
-    width: min(90%, 50rem);
-    height: min(100%, 25rem);
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
     position: absolute;
-    top: 5%;
-    left: 50%;
-    translate: -50%;
-    border-radius: 0.75rem;
-    padding: 0.5rem;
+    backdrop-filter: blur(5px);
+    &::after {
+        position: absolute;
+        content: "";
+        background-color: var(--blue1);
+        inset: 0;
+        z-index: -1;
+        opacity: 0.25;
+    }
+    >div:first-child {
+        position: absolute;
+        background-color: #181818;
+        top: 5%;
+        left: 50%;
+        translate: -50%;
+        border-radius: 0.75rem;
+        padding: 0.5rem;
+        width: min(90%, 50rem);
+        height: min(100%, 25rem);
+    }
     textarea {
         width: 100%;
         height: 100px;
@@ -18,16 +34,18 @@
     .preview {
         width: 100%;
         min-height: 100px;
-        background-color: white;
-        color: black;
         overflow: hidden;
         margin-bottom: 0.5rem;
     }
-    svg {
-        margin: 0 auto;
-    }
-}
 
+}
 .special {
     color: blue;
 }
+
+.bottom {
+    display: flex;
+    margin-bottom: 0.5rem;
+    justify-content: space-around;
+}
+

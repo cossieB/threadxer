@@ -13,6 +13,9 @@ body {
     margin: 0;
     background-color: black;
     height: 100vh;
+    &.modalOpen {
+        overflow: hidden;
+    }
 }
 * {
     box-sizing:border-box

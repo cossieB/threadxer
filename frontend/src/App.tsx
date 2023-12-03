@@ -1,15 +1,17 @@
 import { Route, Routes } from '@solidjs/router';
 import Home from './routes/Home';
 import Navbar from './components/Navbar';
-import { createEffect, onMount } from 'solid-js';
+import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { SignUp } from './components/auth/SignUp';
 import { Login } from './components/auth/Login';
 import NotFound from './components/404';
-import { setUser } from './user';
+import { setUser } from './globalState/user';
 import { PostComposer } from './components/PostComposer';
 
+export const [composerOpen, setComposerOpen] = createSignal(false)
+
 function App() {
-    let ref!: HTMLDivElement
+
     onMount(() => {
         (async function () {
             const res = await fetch('/api/auth/refresh')
@@ -27,10 +29,18 @@ function App() {
             }
         })()
     })
+    createEffect(() => {
+        if (composerOpen())
+            document.body.classList.add("modalOpen")
+        else
+            document.body.classList.remove("modalOpen")
+    })
     return (
         <>
             <Navbar />
-            <div class='modal' />
+            <Show when={composerOpen()}>
+                <PostComposer />
+            </Show>
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/auth/signup" element={<SignUp />} />

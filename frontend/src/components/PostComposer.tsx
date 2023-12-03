@@ -1,8 +1,10 @@
-import { For, Match, Show, Switch, createSignal, onMount } from "solid-js";
+import { Match, Switch, createSignal, onMount } from "solid-js";
 import styles from "~/styles/components/Composer.module.scss"
-import { CloseSvg } from "~/svgs";
 import { CloseBtn } from "./shared/CloseBtn";
-import {SubmitButton} from "./shared/SubmitButton";
+import { SubmitButton } from "./shared/SubmitButton";
+import { setComposerOpen } from "~/App";
+import clickOutside from "~/lib/clickOutside";
+false && clickOutside
 
 export function PostComposer() {
     let textarea!: HTMLTextAreaElement
@@ -16,28 +18,32 @@ export function PostComposer() {
         str = str.replace(rgx, `<span class="${styles.special}">$1</span>`)
         return str
     }
-    const radius = 25
+    const radius = 15
     const circumference = 2 * Math.PI * radius
     return (
-        <div class={styles.composer}>
-            <div class={styles.top}>
-                <CloseBtn onclick={() => {}} />
+        <div class={styles.composer} >
+            <div use:clickOutside={() => setComposerOpen(false)}>
+                <div class={styles.top}>
+                    <CloseBtn onclick={() => {setComposerOpen(false)}} />
+                </div>
+                <textarea
+                    oninput={e => setInput(e.target.value)}
+                    maxLength={255}
+                    ref={textarea}
+                />
+                <div class={styles.bottom}>
+                    <svg height={2 * radius + 10} width={2 * radius + 10}>
+                        <circle cx="50%" cy="50%" r={radius} stroke-dasharray={`${circumference} ${circumference}`} fill="none" stroke="gray" stroke-width={5} />
+                        <circle cx="50%" cy="50%" r={radius} stroke-dasharray={`${input().length / 255 * circumference} ${circumference}`} fill="none" stroke="var(--blue1)" stroke-width={5} />
+                    </svg>
+                    <SubmitButton
+                        disabled={input().length === 0}
+                        finished={false}
+                        loading={false}
+                    />
+                </div>
+                <div class={styles.preview} innerHTML={preview()} />
             </div>
-            <textarea
-                oninput={e => setInput(e.target.value)}
-                maxLength={255}
-                ref={textarea}
-            />
-            <svg height={2 * radius + 10} width={2 * radius + 10}>
-                <circle cx="50%" cy="50%" r={radius} stroke-dasharray={`${circumference} ${circumference}`} fill="none" stroke="gray" stroke-width={5} />
-                <circle cx="50%" cy="50%" r={radius} stroke-dasharray={`${input().length / 255 * circumference} ${circumference}`} fill="none" stroke="var(--blue1)" stroke-width={5} />
-            </svg>
-            <div class={styles.preview} innerHTML={preview()} />
-            <SubmitButton
-                disabled={input().length === 0}
-                finished={false}
-                loading={false}
-            />
         </div>
     );
 }
