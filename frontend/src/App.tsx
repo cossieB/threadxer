@@ -1,6 +1,5 @@
 import { Route, Routes } from '@solidjs/router';
 import Home from './routes/Home';
-import CreatePost from './routes/CreatePost';
 import Navbar from './components/Navbar';
 import { createEffect, onMount } from 'solid-js';
 import { SignUp } from './components/auth/SignUp';
@@ -32,12 +31,11 @@ function App() {
         <>
             <Navbar />
             <div class='modal' />
-            <PostComposer />
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/auth/signup" element={<SignUp />} />
                 <Route path="/auth/login" element={<Login />} />
-                <Route path="/create" element={<CreatePost />} />
+                <Route path="/create" element={<PostComposer />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
         </>

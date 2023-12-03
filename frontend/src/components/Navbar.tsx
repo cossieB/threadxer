@@ -1,10 +1,8 @@
 import { A } from "@solidjs/router"
-import { JSX, Show, createSignal } from "solid-js"
+import { JSX, Show } from "solid-js"
 import styles from "~/styles/components/Nav.module.scss"
 import { setUser, user } from "../user"
 import { CompostSvg, HomeSvg, SearchSvg, SettingsSvg, UnlockSvg } from "../svgs"
-import { Portal } from "solid-js/web"
-import { Login } from "./auth/Login"
 
 
 export default function Navbar() {

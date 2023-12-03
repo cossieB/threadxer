@@ -1,3 +1,5 @@
+@use '~/styles/mixins';
+
 .composer {
     background-color: #181818;
     width: min(90%, 50rem);
@@ -7,18 +9,19 @@
     left: 50%;
     translate: -50%;
     border-radius: 0.75rem;
-
+    padding: 0.5rem;
     textarea {
         width: 100%;
         height: 100px;
         background: none;
-        border-radius: 0.5rem;
     }
     .preview {
         width: 100%;
         min-height: 100px;
         background-color: white;
         color: black;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
     }
     svg {
         margin: 0 auto;

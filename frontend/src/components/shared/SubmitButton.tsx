@@ -9,7 +9,7 @@ type Props = {
     finished: boolean
 } & JSX.ButtonHTMLAttributes<HTMLButtonElement>
 
-export default function SubmitButton(props: Props) {
+export function SubmitButton(props: Props) {
     return (
         <button
             {...props}
@@ -29,4 +29,8 @@ export default function SubmitButton(props: Props) {
             </Switch>
         </button>
     )
+}
+
+export function ActionButton() {
+    
 }

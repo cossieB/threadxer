@@ -1,0 +1,16 @@
+@use '~/styles/mixins';
+
+.btn {
+    @include mixins.flexCenter;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    margin-bottom: 0.5rem;
+    &:hover {
+        background-color: gray;
+        
+    }
+}

@@ -1,9 +1,10 @@
 import { For, Match, Show, Switch, createSignal, onMount } from "solid-js";
 import styles from "~/styles/components/Composer.module.scss"
 import { CloseSvg } from "~/svgs";
+import { CloseBtn } from "./shared/CloseBtn";
+import {SubmitButton} from "./shared/SubmitButton";
 
 export function PostComposer() {
-    let ref!: HTMLDivElement
     let textarea!: HTMLTextAreaElement
     onMount(() => {
         textarea.focus()
@@ -15,27 +16,28 @@ export function PostComposer() {
         str = str.replace(rgx, `<span class="${styles.special}">$1</span>`)
         return str
     }
+    const radius = 25
+    const circumference = 2 * Math.PI * radius
     return (
         <div class={styles.composer}>
-            <div class={styles.top}            >
-                <button>
-                    <CloseSvg />
-                </button>
+            <div class={styles.top}>
+                <CloseBtn onclick={() => {}} />
             </div>
             <textarea
                 oninput={e => setInput(e.target.value)}
                 maxLength={255}
                 ref={textarea}
             />
-            <svg height={20} width="95%">
-                <rect x={0} y={0} height={20} width="100%" fill="none" stroke-width={2} stroke="black" />
-                <rect x={0} y={0} height={20} width={`${input().length / 255 * 100}%`} />
-                <text x={50} y={50} fill="white"> {input().length} </text>
+            <svg height={2 * radius + 10} width={2 * radius + 10}>
+                <circle cx="50%" cy="50%" r={radius} stroke-dasharray={`${circumference} ${circumference}`} fill="none" stroke="gray" stroke-width={5} />
+                <circle cx="50%" cy="50%" r={radius} stroke-dasharray={`${input().length / 255 * circumference} ${circumference}`} fill="none" stroke="var(--blue1)" stroke-width={5} />
             </svg>
             <div class={styles.preview} innerHTML={preview()} />
-            <button onclick={() => console.log(ref.textContent?.length)}>
-                DO TI
-            </button>
+            <SubmitButton
+                disabled={input().length === 0}
+                finished={false}
+                loading={false}
+            />
         </div>
     );
 }
