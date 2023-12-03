@@ -74,3 +74,8 @@ export const FollowerFollowee = pgTable('follower_followee', {
 }, t => ({
     id: primaryKey(t.followeeId, t.followerId)
 }))
+
+export const Hashtags = pgTable('hashtags', {
+    hashtag: varchar('hashtag').primaryKey(),
+    postId: uuid('post_id').references(() => Post.postId, { onDelete: 'set null', onUpdate: 'cascade' }),
+})
