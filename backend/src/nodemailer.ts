@@ -1,6 +1,8 @@
 import { google } from "googleapis";
 import { createTransport } from "nodemailer";
 import { type Options } from "nodemailer/lib/mailer";
+import dotenv from 'dotenv'
+dotenv.config()
 
 const oauth2Client = new google.auth.OAuth2(
     process.env.CLIENT_ID,
@@ -48,30 +50,3 @@ export async function sendMail(subject: string, to: string, message: string) {
         throw error
     }
 }
-
-// export async function sendMail(subject: string, to: string, message: string) {
-//         const transport = createTransport({
-//         service: 'gmail',
-//         host: 'smtp.gmail.com',
-//         port: 587,
-//         secure: process.env.NODE_ENV == 'production',
-//         auth: {
-//             user: process.env.FROM,
-//             pass: process.env.APP_PASSWORD
-//         }
-//     })
-//     const options: Options = {
-//         from: {
-//             name: "Threadxer",
-//             address: process.env.FROM!
-//         },
-//         to,
-//         subject,
-//         html: message
-//     }
-//     try {
-//         await transport.sendMail(options)
-//     } catch (error) {
-//         console.log(error)
-//     }
-// }

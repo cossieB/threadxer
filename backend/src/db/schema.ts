@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, uuid, varchar, text, timestamp, jsonb, integer, unique, primaryKey, boolean, foreignKey } from "drizzle-orm/pg-core";
+import { pgTable, uuid, varchar, text, timestamp, jsonb, integer, unique, primaryKey, boolean, foreignKey, smallint } from "drizzle-orm/pg-core";
 
 export const User = pgTable('users', {
     userId: uuid('user_id').primaryKey().defaultRandom(),
@@ -16,9 +16,8 @@ export const User = pgTable('users', {
     displayName: varchar('display_name', { length: 50 }).notNull().default("")
 })
 export const VerificationCodes = pgTable('verification_codes', {
-    codeId: uuid('code_id').primaryKey().defaultRandom(),
-    userId: uuid('user_id').references(() => User.userId, { onDelete: 'cascade', onUpdate: 'cascade' }).notNull().unique(),
-    code: varchar('code', {length: 6}).notNull(),
+    userId: uuid('user_id').references(() => User.userId, { onDelete: 'cascade', onUpdate: 'cascade' }).primaryKey(),
+    code: varchar('code', {length: 6}),
     expiry: timestamp('expiry', {withTimezone: true}).default(sql`NOW() + INTERVAL '12 hours'`).notNull(),
     dateUsed: timestamp('date_used', {withTimezone: true})
 })

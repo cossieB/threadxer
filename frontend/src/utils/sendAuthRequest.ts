@@ -23,13 +23,21 @@ export async function sendAuthRequest(
             const decoded = jwtDecode< {user: User} & JwtPayload >(data.jwt);
             setUser(decoded.user);
             localStorage.setItem('user', JSON.stringify(decoded.user));
+            return true
         }
         if (res.status === 400) {
             const data = await res.json();
             setState('error', data.error);
+            return false
         }
-    } catch (error) {
+        else {
+            setState('error', "Something Went Wrong. Please try again later");
+            return false
+        }
+    } 
+    catch (error) {
         console.log(error);
+        return false
     }
     finally {
         setState('loading', false);

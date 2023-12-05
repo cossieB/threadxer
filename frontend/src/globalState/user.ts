@@ -4,7 +4,8 @@ export type User = {
     username: string,
     email: string,
     avatar: string,
-    banner: string
+    banner: string,
+    isUnverified: true
 }
 
 const str = localStorage.getItem('user')
@@ -14,5 +15,6 @@ const storedUser: User = str ? JSON.parse(str) : {
     email: "",
     avatar: "",
     banner: "",
+    isUnverified: true
 }
 export const [user, setUser] = createStore(storedUser)

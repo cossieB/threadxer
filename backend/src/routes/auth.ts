@@ -12,6 +12,7 @@ import { generateCookies } from "../utils/generateCookies";
 import { PostgresError } from "postgres";
 import { randomInt } from "crypto";
 import { draftVerificationEmail } from "../utils/draftEmail";
+import { validation } from "../middleware/validation";
 
 export const authRouter = express.Router();
 
@@ -53,29 +54,19 @@ authRouter.post('/availability', async (req, res, next) => {
     }
 })
 
-authRouter.post('/signup', async (req, res, next) => {
+authRouter.post('/signup', validation(['username', 'password', 'confirmPassword', 'email']), async (req, res, next) => {
     try {
-        const { username, password, confirmPassword, email } = req.body;
-        if (
-            !username ||
-            typeof username !== 'string' ||
-            !password ||
-            typeof password !== 'string' ||
-            !confirmPassword ||
-            typeof confirmPassword !== 'string' ||
-            !email ||
-            typeof email !== 'string'
-        )
-            throw new AppError("Please don't bypass client validation", 400)
+        const { username, password, confirmPassword, email } = req.body as Record<string, string>;
         if (password != confirmPassword)
             throw new AppError("Please don't bypass client validation", 400)
 
         const errors = validate(username, password, confirmPassword, email);
         if (Object.values(errors).flat().length > 0)
             throw new AppError("Please don't bypass client validation", 400)
+
+        const code = randomInt(999999).toString().padStart(6, '0')
         const salt = await genSalt(10);
         const passwordHash = await hash(password, salt);
-        const code = randomInt(999999).toString().padStart(6, '0')
         const user = await db.transaction(async tx => {
             const row = await tx.insert(User)
                 .values({
@@ -90,16 +81,18 @@ authRouter.post('/signup', async (req, res, next) => {
                     email: User.email,
                     avatar: User.avatar,
                     banner: User.avatar
-                })
+                });
             await tx.insert(VerificationCodes)
                 .values({
                     userId: row[0].userId,
-                    code
+                    code,
                 })
             return row[0]
         })
-        draftVerificationEmail(username, code, email)
-        return res.status(201).json(user)
+        const { accessCookie, refreshCookie, jwt } = await generateCookies({ ...user, isUnverified: true });
+        res.header('Set-Cookie', [accessCookie, refreshCookie])
+        // draftVerificationEmail(username, code, email)
+        return res.status(201).json(jwt)
     }
     catch (error) {
         if (error instanceof PostgresError) {
@@ -111,36 +104,29 @@ authRouter.post('/signup', async (req, res, next) => {
         next(error)
     }
 })
-authRouter.post('/login', async (req, res, next) => {
+authRouter.post('/login', validation(['email', 'password']), async (req, res, next) => {
     try {
-        const { email, password } = req.body;
-        if (
-            !email ||
-            typeof email !== 'string' ||
-            !password ||
-            typeof password !== 'string'
-        )
-            throw new AppError("Please don't bypass client validation", 400)
-        const row = await db.update(User)
-            .set({ lastLogin: new Date() })
-            .where(eq(User.email, email))
-            .returning({
-                userId: User.userId,
-                passwordHash: User.passwordHash,
-                username: User.username,
-                email: User.email,
-                avatar: User.avatar,
-                banner: User.avatar
-            })
+        const { email, password } = req.body as Record<string, string>;
+        const row = await db.select({
+            userId: User.userId,
+            passwordHash: User.passwordHash,
+            username: User.username,
+            email: User.email,
+            avatar: User.avatar,
+            banner: User.avatar,
+            dateVerified: User.emailVerified
+        })
+            .from(User)
+            .where(eq(User.email, email.toLowerCase()))
         if (row.length == 0)
             throw new AppError("Invalid Credentials", 400)
 
-        const { passwordHash, ...user } = row[0]
+        const { passwordHash, dateVerified, ...user } = row[0]
         const valid = await compare(password, passwordHash);
         if (!valid)
             throw new AppError("Invalid Credentials", 400)
 
-        const { accessCookie, refreshCookie, jwt } = await generateCookies(user);
+        const { accessCookie, refreshCookie, jwt } = await generateCookies({ ...user, isUnverified: !dateVerified });
 
         res.header('Set-Cookie', [accessCookie, refreshCookie])
         return res.json({ jwt })

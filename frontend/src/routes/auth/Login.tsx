@@ -1,11 +1,11 @@
-import { FormInput } from '../shared/FormInput';
-import UserForm from '../shared/UserForm';
+import { FormInput } from '../../components/shared/FormInput';
+import UserForm from '../../components/shared/UserForm';
 import { createStore } from 'solid-js/store';
-import { Popup } from '../shared/Popup';
-import { Validator } from './Validator';
-import {SubmitButton} from '../shared/SubmitButton';
-import { sendAuthRequest } from '../../utils/sendAuthRequest';
+import { Popup } from '../../components/shared/Popup';
+import { Validator } from '../../utils/Validator';
+import { SubmitButton } from '../../components/shared/SubmitButton';
 import { useNavigate } from '@solidjs/router';
+import { sendAuthRequest } from '~/utils/sendAuthRequest';
 
 const [userState, setUserState] = createStore({
     email: "",
@@ -26,10 +26,11 @@ export function Login() {
         return validator.errors.email
     }
     const navigate = useNavigate()
+
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault();
-        await sendAuthRequest('/api/auth/login', setState, userState);
-        navigate("/")
+        const isSuccess = await sendAuthRequest('/api/auth/login', setState, userState)
+        if (isSuccess) navigate('/')
     }
     return (
         <>

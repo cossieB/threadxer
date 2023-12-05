@@ -2,7 +2,7 @@ import { A } from "@solidjs/router"
 import { JSX, Show } from "solid-js"
 import styles from "~/styles/components/Nav.module.scss"
 import { setUser, user } from "../globalState/user"
-import { CompostSvg, HomeSvg, SearchSvg, SettingsSvg, UnlockSvg } from "../svgs"
+import { CompostSvg, HomeSvg, RegisterSvg, SearchSvg, SettingsSvg, UnlockSvg } from "../svgs"
 import { setComposerOpen } from "~/App"
 
 
@@ -18,7 +18,7 @@ export default function Navbar() {
                 email: "",
                 username: ""
             })
-            localStorage.removeItem('user')
+        localStorage.removeItem('user')
     }
     return (
         <nav class={styles.nav}>
@@ -36,17 +36,24 @@ export default function Navbar() {
             <Show
                 when={user.username}
                 fallback={
-                    <NavLink
-                        icon={<UnlockSvg />}
-                        text="Login"
-                        href="/auth/login"
-                    />
+                    <>
+                        <NavLink
+                            icon={<UnlockSvg />}
+                            text="Login"
+                            href="/auth/login"
+                        />
+                        <NavLink
+                            icon={<RegisterSvg />}
+                            text="Signup"
+                            href="/auth/signup"
+                        />
+                    </>
                 }
             >
                 <NavItem
                     icon={<CompostSvg />}
                     text="Compose"
-                    onclick={() => {setComposerOpen(prev => !prev)}}
+                    onclick={() => { setComposerOpen(prev => !prev) }}
                 />
                 <NavLink
                     href="/profile"
@@ -57,7 +64,7 @@ export default function Navbar() {
                     onclick={logout}
                     text={user.username}
                     icon={<img src={user.avatar} />}
-                    
+
                 />
             </Show>
         </nav>

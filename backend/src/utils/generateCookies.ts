@@ -1,7 +1,7 @@
 import cookie from 'cookie';
 import { redis } from "./redis";
 import dotenv from 'dotenv';
-import {sign} from 'jsonwebtoken'
+import jwt from 'jsonwebtoken'
 
 dotenv.config()
 
@@ -10,19 +10,18 @@ type TokenUser = {
     username: string,
     avatar: string,
     banner: string,
-    email: string
+    email: string,
+    isUnverified: boolean
 }
 
 export function createAccessToken(user: TokenUser) {
-    return sign({user}, process.env.ACCESS_TOKEN_SECRET!, {
+    return jwt.sign({user}, process.env.ACCESS_TOKEN_SECRET!, {
         expiresIn: '15m'
     })
 }
-
 export function createRefreshToken(user: TokenUser) {
-    return sign({user}, process.env.REFRESH_TOKEN_SECRET!)
+    return jwt.sign({user}, process.env.REFRESH_TOKEN_SECRET!)
 }
-
 export async function generateCookies(user: TokenUser) {
     const refreshToken = createRefreshToken(user);
     const accessToken = createAccessToken(user);
