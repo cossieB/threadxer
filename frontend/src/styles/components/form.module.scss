@@ -121,8 +121,8 @@
     font-size: large;
     transition: background-color 250ms ease;
     &:disabled {
-        background-color: hsl(204, 88%, 63%);
-        background-color: color-mix(in srgb, var(--blue1) 50%, gray);
+        background-color: white;
+        color: var(--blue1);
     }
 }
 

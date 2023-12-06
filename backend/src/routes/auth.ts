@@ -92,7 +92,7 @@ authRouter.post('/signup', validation(['username', 'password', 'confirmPassword'
         const { accessCookie, refreshCookie, jwt } = await generateCookies({ ...user, isUnverified: true });
         res.header('Set-Cookie', [accessCookie, refreshCookie])
         // draftVerificationEmail(username, code, email)
-        return res.status(201).json(jwt)
+        return res.status(201).json({jwt})
     }
     catch (error) {
         if (error instanceof PostgresError) {

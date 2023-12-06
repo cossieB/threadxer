@@ -4,7 +4,7 @@ import { createStore } from 'solid-js/store';
 import { Popup } from '../../components/shared/Popup';
 import { Validator } from '../../utils/Validator';
 import { SubmitButton } from '../../components/shared/SubmitButton';
-import { useNavigate } from '@solidjs/router';
+import { useLocation, useNavigate } from '@solidjs/router';
 import { sendAuthRequest } from '~/utils/sendAuthRequest';
 
 const [userState, setUserState] = createStore({
@@ -26,11 +26,12 @@ export function Login() {
         return validator.errors.email
     }
     const navigate = useNavigate()
+    const location = useLocation()
 
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault();
         const isSuccess = await sendAuthRequest('/api/auth/login', setState, userState)
-        if (isSuccess) navigate('/')
+        if (isSuccess) navigate(location.query.redirect ?? '/')
     }
     return (
         <>

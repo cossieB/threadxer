@@ -1,5 +1,6 @@
 import { Show, createSignal, onCleanup } from "solid-js";
 import { Transition } from "solid-transition-group";
+import styles from "~/styles/components/Popup.module.scss"
 
 type Props = {
     text: string,
@@ -33,7 +34,7 @@ function Alert(props: Props) {
     })
     return (
         <div
-            class="popup"
+            class={styles.popup}
             style={{ '--time': time() }}
             onMouseOver={() => clearInterval(t)}
             onMouseLeave={() => {

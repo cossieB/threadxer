@@ -5,7 +5,7 @@ export type User = {
     email: string,
     avatar: string,
     banner: string,
-    isUnverified: true
+    isUnverified: boolean
 }
 
 const str = localStorage.getItem('user')
