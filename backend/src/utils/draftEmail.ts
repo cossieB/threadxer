@@ -20,6 +20,7 @@ export async function draftVerificationEmail(name: string, code: string, to: str
                     </strong>
                 </code>
             </center>
+            <aside>Be advised this code will expire in 72 hours.</aside>
         </body>
     </html>
     `

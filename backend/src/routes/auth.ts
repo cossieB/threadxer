@@ -3,12 +3,12 @@ import AppError from "../utils/AppError";
 import { db } from "../db/drizzle";
 import { User, VerificationCodes } from "../db/schema";
 import { hash, genSalt, compare } from 'bcrypt'
-import { DrizzleError, eq } from "drizzle-orm";
+import { DrizzleError, eq, sql } from "drizzle-orm";
 import { validation as validate } from "../utils/validation";
 import cookie from 'cookie';
 import { redis } from "../utils/redis";
-import jwt, { JwtPayload } from 'jsonwebtoken'
-import { generateCookies } from "../utils/generateCookies";
+import jwt, { type JwtPayload } from 'jsonwebtoken'
+import { createAccessToken, generateCookie } from "../utils/generateCookies";
 import { PostgresError } from "postgres";
 import { randomInt } from "crypto";
 import { draftVerificationEmail } from "../utils/draftEmail";
@@ -26,27 +26,29 @@ authRouter.post('/availability', async (req, res, next) => {
             if (typeof username != 'string')
                 throw new AppError("Please don't bypass client validation", 400)
 
-            const row = await db.select({
-                username: User.username
+            const user = await db.query.User.findFirst({
+                columns: {
+                    username: true
+                },
+                where({ usernameLower }, { eq }) {
+                    return eq(usernameLower, username.toLowerCase())
+                },
             })
-                .from(User)
-                .where(eq(User.usernameLower, username.toLowerCase()))
-                .limit(1)
-
-            return res.json({ available: row.length === 0 })
+            return res.json({ available: !user })
         }
         if (email) {
             if (typeof email != 'string')
                 throw new AppError("Please don't bypass client validation", 400)
 
-            const row = await db.select({
-                email: User.email
+            const user = await db.query.User.findFirst({
+                columns: {
+                    username: true
+                },
+                where(fields, { eq }) {
+                    return eq(fields.email, email.toLowerCase())
+                },
             })
-                .from(User)
-                .where(eq(User.email, email.toLowerCase()))
-                .limit(1)
-
-            return res.json({ available: row.length === 0 })
+            return res.json({ available: !user })
         }
     }
     catch (error) {
@@ -90,10 +92,12 @@ authRouter.post('/signup', validation(['username', 'password', 'confirmPassword'
                 })
             return row[0]
         })
-        const { accessCookie, refreshCookie, jwt } = await generateCookies({ ...user, isUnverified: true });
-        res.header('Set-Cookie', [accessCookie, refreshCookie])
+        const u = { ...user, isUnverified: true }
+        const accessToken = createAccessToken(u)
+        const refreshCookie = await generateCookie(u);
+        res.header('Set-Cookie', refreshCookie)
         // draftVerificationEmail(username, code, email)
-        return res.status(201).json({jwt})
+        return res.status(201).json({ jwt: accessToken })
     }
     catch (error) {
         if (error instanceof PostgresError) {
@@ -113,64 +117,96 @@ authRouter.post('/login', validation(['email', 'password']), async (req, res, ne
             const url = new URL(req.get('Referrer') ?? "")
             if (url.searchParams.get('redirect'))
                 redirect = url.searchParams.get('redirect')!
-        } catch (_) {}
-        const row = await db.select({
-            userId: User.userId,
-            passwordHash: User.passwordHash,
-            username: User.username,
-            email: User.email,
-            avatar: User.avatar,
-            banner: User.avatar,
-            dateVerified: User.emailVerified
+        } catch (_) { }
+        const row = await db.query.User.findFirst({
+            where(fields, operators) {
+                return operators.eq(fields.email, email.toLowerCase())
+            },
         })
-            .from(User)
-            .where(eq(User.email, email.toLowerCase()))
-        if (row.length == 0)
+        if (!row)
             throw new AppError("Invalid Credentials", 400)
 
-        const { passwordHash, dateVerified, ...user } = row[0]
+        const { passwordHash, emailVerified, ...user } = row
         const valid = await compare(password, passwordHash);
         if (!valid)
             throw new AppError("Invalid Credentials", 400)
 
-        const { accessCookie, refreshCookie, jwt } = await generateCookies({ ...user, isUnverified: !dateVerified });
+        const u = { ...user, isUnverified: !emailVerified };
+        const accessToken = createAccessToken(u)
+        const [refreshCookie] = await Promise.all([
+            generateCookie(u), 
+            db.update(User).set({lastLogin: new Date})
+        ]);
 
-        res.header('Set-Cookie', [accessCookie, refreshCookie])
-        return res.json({ jwt, redirect })
+        res.header('Set-Cookie', refreshCookie)
+        return res.json({ jwt: accessToken, redirect })
     }
     catch (error) {
         next(error)
     }
 })
 authRouter.post('/verify', authorize, validation(['code']), async (req, res, next) => {
-    const { user } = res.locals 
+    const token = res.locals.token!;
     const rows = await db.select()
         .from(VerificationCodes)
-        .where(eq(VerificationCodes.userId, user.userId))
+        .where(eq(VerificationCodes.userId, token.user.userId))
     if (rows.length == 0)
-        return next(new AppError('Not Found', 400))
+        return next(new AppError('Error. Please click "resend".', 400))
     const obj = rows[0]
     if (obj.expiry < new Date) {
         const code = randomInt(999999).toString().padStart(6, '0')
-        // draftVerificationEmail(user.username, code, user.email)
+        // draftVerificationEmail(token.user.username, code, token.user.email)
         return next(new AppError("Code expired. Check your email for a new code.", 400))
     }
-
-        
     try {
         if (obj.code !== req.body.code)
             return next(new AppError('Invalid Code', 400))
-        await db.update(User)
-            .set({
-                emailVerified: new Date()
-            })
-            .where(eq(User.userId, user.userId))
+        
+        await db.transaction(async tx => {
+            await tx.update(User)
+                .set({
+                    emailVerified: new Date()
+                })
+                .where(eq(User.userId, token.user.userId))
+            await tx.update(VerificationCodes)
+                .set({
+                    dateUsed: new Date
+                })
+        })
         return res.sendStatus(200)
     } catch (error) {
         next(error)
     }
 })
-
+authRouter.get('/resend', authorize, async (req, res, next) => {
+    const code = randomInt(999999).toString().padStart(6, '0');
+    const token = res.locals.token!;
+    if (!token.user.isUnverified)
+        return next(new AppError('Already Verified', 400))
+    try {
+        await db.insert(VerificationCodes)
+            .values({
+                userId: token.user.userId,
+                code,
+            })
+            .onConflictDoUpdate({
+                target: VerificationCodes.userId,
+                set: {
+                    code,
+                    expiry: sql`NOW() + INTERVAL '72 hours'`
+                }
+            })
+        // draftVerificationEmail(token.user.username, code, token.user.email)
+        res.sendStatus(200)
+    }
+    catch (error) {
+        if (error instanceof PostgresError) {
+            if (error.message.includes("violates foreign key constraint"))
+                return next(new AppError("User Not Found", 400))
+        }
+        next(error)
+    }
+})
 authRouter.get('/refresh', async (req, res, next) => {
     const refresh = cookie.parse(req.headers?.cookie ?? "").rf;
     if (!refresh)
@@ -179,8 +215,8 @@ authRouter.get('/refresh', async (req, res, next) => {
     if (!isValid)
         return next(new AppError('Invalid Token', 403))
     const token = jwt.verify(refresh, process.env.REFRESH_TOKEN_SECRET!) as JwtPayload
-    const { accessCookie, refreshCookie } = await generateCookies(token.user);
-    res.header('Set-Cookie', [accessCookie, refreshCookie])
+    const refreshCookie = await generateCookie(token.user);
+    res.header('Set-Cookie', refreshCookie)
     return res.json({ user: token.user, exp: token.exp })
 })
 
@@ -189,6 +225,5 @@ authRouter.delete('/logout', async (req, res, next) => {
     if (refresh)
         await redis.del(`refresh:${refresh}`);
     res.clearCookie('rf')
-    res.clearCookie('at')
     return res.sendStatus(200)
 })

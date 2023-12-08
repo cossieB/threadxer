@@ -1,13 +1,13 @@
 import 'express';
+import { TokenUser } from './types';
 
-interface Locals {
-    user?: {
-        userId: string
-    }
-}
-
-declare module 'express' {
-    export interface Response {
-        locals: Locals
+declare global {
+    namespace Express {
+        interface Locals {
+            token?: {
+                user: TokenUser
+                iat: number
+            }
+        }
     }
 }

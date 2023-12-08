@@ -17,8 +17,8 @@ export const User = pgTable('users', {
 })
 export const VerificationCodes = pgTable('verification_codes', {
     userId: uuid('user_id').references(() => User.userId, { onDelete: 'cascade', onUpdate: 'cascade' }).primaryKey(),
-    code: varchar('code', {length: 6}),
-    expiry: timestamp('expiry', {withTimezone: true}).default(sql`NOW() + INTERVAL '12 hours'`).notNull(),
+    code: varchar('code', {length: 6}).notNull(),
+    expiry: timestamp('expiry', {withTimezone: true}).default(sql`NOW() + INTERVAL '72 hours'`).notNull(),
     dateUsed: timestamp('date_used', {withTimezone: true})
 })
 
