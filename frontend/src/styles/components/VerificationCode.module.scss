@@ -1,0 +1,31 @@
+@use '~/styles/mixins';
+
+.main {
+    @include mixins.fullScreen;
+    margin: 0;
+    @include mixins.flexCenter(column);
+}
+.code {
+    height: 2rem;
+    width: 2rem;
+    background: white;
+    border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: black;
+    &:focus {
+        background-color: var(--blue1);
+    }
+}
+.row {
+    display: flex;
+}
+.form {
+    display: flex;
+    flex-direction: column;
+    button {
+        width: unset;
+        margin: .5rem 0
+    }
+}

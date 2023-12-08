@@ -107,6 +107,12 @@ authRouter.post('/signup', validation(['username', 'password', 'confirmPassword'
 authRouter.post('/login', validation(['email', 'password']), async (req, res, next) => {
     try {
         const { email, password } = req.body as Record<string, string>;
+        let redirect = "/"
+        try {
+            const url = new URL(req.get('Referrer') ?? "")
+            if (url.searchParams.get('redirect'))
+                redirect = url.searchParams.get('redirect')!
+        } catch (_) {}
         const row = await db.select({
             userId: User.userId,
             passwordHash: User.passwordHash,
@@ -129,7 +135,7 @@ authRouter.post('/login', validation(['email', 'password']), async (req, res, ne
         const { accessCookie, refreshCookie, jwt } = await generateCookies({ ...user, isUnverified: !dateVerified });
 
         res.header('Set-Cookie', [accessCookie, refreshCookie])
-        return res.json({ jwt })
+        return res.json({ jwt, redirect })
     }
     catch (error) {
         next(error)
@@ -150,7 +156,7 @@ authRouter.get('/confirm_email', async (req, res, next) => {
 })
 
 authRouter.get('/refresh', async (req, res, next) => {
-    const refresh = cookie.parse(req.headers.cookie ?? "").rf;
+    const refresh = cookie.parse(req.headers?.cookie ?? "").rf;
     if (!refresh)
         return next(new AppError('No Token', 401))
     const isValid = await redis.del(`refresh:${refresh}`);

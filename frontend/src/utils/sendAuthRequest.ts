@@ -7,7 +7,7 @@ export async function sendAuthRequest(
     url: string,
     setState: SetStoreFunction<{ loading: boolean; success: boolean; error: string | null; }>,
     userState: {}
-) {
+): Promise<false | [true, string]> {
     try {
         setState('loading', true);
         const res = await fetch(url, {
@@ -23,7 +23,7 @@ export async function sendAuthRequest(
             const decoded = jwtDecode< {user: User} & JwtPayload >(data.jwt);
             setUser(decoded.user);
             localStorage.setItem('user', JSON.stringify(decoded.user));
-            return true
+            return [true, data.redirect]
         }
         if (res.status === 400) {
             const data = await res.json();

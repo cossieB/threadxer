@@ -40,15 +40,6 @@
     position: relative;
     left: 50%;
     translate: -50%;
-    textarea,
-    input,
-    button {
-        position: relative;
-        border-radius: .5rem;
-        color: white;
-        border: none;
-        background: #424242;
-    }
 
     textarea,
     input {
@@ -76,27 +67,8 @@
         height: 12rem;
     }
     button {
-        margin-bottom: 1rem;
-        font-size: large;
-        width: inherit;
-        color: aliceblue;
-        height: 3rem;
         width: 90%;
-        background: none;
-        border: 1px solid steelblue;
-        transition: all 250ms ease;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        &:hover:not(:disabled) {
-            background-color: steelblue;
-            box-shadow: 0 0 1px 1px aliceblue;
-            border: none;
-        }
-        &:disabled {
-            border-color: white;
-            cursor: not-allowed;
-        }
+        margin-bottom: .5rem;
     }
 
     label {
@@ -114,7 +86,6 @@
 }
 .submitBtn {
     background-color: var(--blue1);
-    
     border-radius: 3rem;
     width: 7.5rem;
     border: none;

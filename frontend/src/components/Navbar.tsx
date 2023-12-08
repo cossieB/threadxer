@@ -50,11 +50,13 @@ export default function Navbar() {
                     </>
                 }
             >
-                <NavItem
-                    icon={<CompostSvg />}
-                    text="Compose"
-                    onclick={() => { setComposerOpen(prev => !prev) }}
-                />
+                <Show when={!user.isUnverified}>
+                    <NavItem
+                        icon={<CompostSvg />}
+                        text="Compose"
+                        onclick={() => { setComposerOpen(prev => !prev) }}
+                    />
+                </Show>
                 <NavLink
                     href="/profile"
                     text="Profile"

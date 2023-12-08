@@ -42,11 +42,15 @@ ul {
     margin: 0;
     list-style: none;
 }
-#modal > div:first-child {
-    top: 0;
-    left: 0;
-    z-index: 5;
-    @include fullScreen;
-    background-color: rgba(0,0,0, .5);
-    position: fixed;
+
+button {
+    border-radius: 3rem;
+    width: 7.5rem;
+    border: none;
+    font-size: large;
+    transition: background-color 250ms ease;
+    &:disabled {
+        background-color: white;
+        color: black;
+    }
 }

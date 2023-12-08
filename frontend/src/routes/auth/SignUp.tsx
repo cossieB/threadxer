@@ -2,12 +2,13 @@ import { FormInput } from '../../components/shared/FormInput';
 import UserForm from '../../components/shared/UserForm';
 import { createStore } from 'solid-js/store';
 import { Popup } from '../../components/shared/Popup';
-import { createMemo } from 'solid-js';
+import { Show, createMemo } from 'solid-js';
 import titleCase from '~/lib/titleCase';
 import { Validator } from '../../utils/Validator';
 import { SubmitButton } from '../../components/shared/SubmitButton';
 import { sendAuthRequest } from '~/utils/sendAuthRequest';
-import { useNavigate } from '@solidjs/router';
+import { Navigate, useNavigate } from '@solidjs/router';
+import { user } from '~/globalState/user';
 
 const initialState = {
     email: "",
@@ -69,7 +70,7 @@ export function SignUp() {
 
     }
     return (
-        <>
+        <Show when={!user.username} fallback={<Navigate href="/" />}>
             <UserForm onsubmit={handleSubmit}>
                 <FormInput
                     name='email'
@@ -148,6 +149,6 @@ export function SignUp() {
                 when={!!state.error || state.success}
                 colorDeg='270'
             />
-        </>
+        </Show>
     );
 }

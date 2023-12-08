@@ -8,13 +8,14 @@ export type User = {
     isUnverified: boolean
 }
 
-const str = localStorage.getItem('user')
+const str = localStorage.getItem('user');
 
 const storedUser: User = str ? JSON.parse(str) : {
     username: "",
     email: "",
     avatar: "",
     banner: "",
-    isUnverified: true
+    isUnverified: false,
+    userId: ""
 }
 export const [user, setUser] = createStore(storedUser)

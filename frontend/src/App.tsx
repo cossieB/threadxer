@@ -9,13 +9,14 @@ import { setUser, user } from './globalState/user';
 import { PostComposer } from './components/PostComposer';
 import VerifyEmail from './routes/auth/Verify';
 import { Popup } from './components/shared/Popup';
+import { createQuery } from '@tanstack/solid-query';
+import { unwrap } from 'solid-js/store';
 
 export const [composerOpen, setComposerOpen] = createSignal(false)
 
 function App() {
-    const location = useLocation()
-    const navigate = useNavigate();
-    if (user.username && user.isUnverified) navigate("/auth/verify")
+
+
     onMount(() => {
         (async function () {
             const res = await fetch('/api/auth/refresh')
@@ -28,7 +29,8 @@ function App() {
                     avatar: "",
                     banner: "",
                     email: "",
-                    username: ""
+                    username: "",
+                    userId: ""
                 })
             }
         })()
@@ -41,12 +43,14 @@ function App() {
     })
     return (
         <>
-            <Navbar />
+            <Show when={!user.isUnverified}>
+                <Navbar />
+            </Show>
             <Show when={composerOpen()}>
                 <PostComposer />
             </Show>
             <Popup
-                close={() => history.replaceState(undefined,"")}
+                close={() => history.replaceState(undefined, "")}
                 text={location.state!.message}
                 when={location.state?.message}
             />

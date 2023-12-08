@@ -4,8 +4,10 @@ import { createStore } from 'solid-js/store';
 import { Popup } from '../../components/shared/Popup';
 import { Validator } from '../../utils/Validator';
 import { SubmitButton } from '../../components/shared/SubmitButton';
-import { useLocation, useNavigate } from '@solidjs/router';
+import { Navigate, useLocation, useNavigate } from '@solidjs/router';
 import { sendAuthRequest } from '~/utils/sendAuthRequest';
+import { Show, createEffect } from 'solid-js';
+import { user } from '~/globalState/user';
 
 const [userState, setUserState] = createStore({
     email: "",
@@ -28,13 +30,20 @@ export function Login() {
     const navigate = useNavigate()
     const location = useLocation()
 
+    createEffect(() => {
+        if (user.username)
+            navigate('/')
+    })
+
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault();
+        console.log(location.query.redirect)
+        console.log(new Date)
         const isSuccess = await sendAuthRequest('/api/auth/login', setState, userState)
-        if (isSuccess) navigate(location.query.redirect ?? '/')
+        if (isSuccess) navigate(isSuccess[1])
     }
     return (
-        <>
+        <Show when={!user.username} fallback={<Navigate href="/" />}>
             <UserForm onsubmit={handleSubmit}>
                 <FormInput
                     name='email'
@@ -59,7 +68,7 @@ export function Login() {
                 when={!!state.error}
                 colorDeg='270'
             />
-        </>
+        </Show>
     );
 }
 
