@@ -7,11 +7,11 @@ dotenv.config()
 
 export function authenticate(req: Request, res: Response, next: NextFunction) {
     const cookie = parse(req.headers.cookie ?? "")
-    if (!cookie.at) {
+    if (!cookie.rf) {
         res.locals.authError = new AppError('Invalid or no token', 401)
     }
     try {
-        const user = jwt.verify(cookie.at, process.env.ACCESS_TOKEN_SECRET!) as JwtPayload
+        const user = jwt.verify(cookie.rf, process.env.REFRESH_TOKEN_SECRET!) as JwtPayload
         res.locals.user = user
     } 
     catch (error) {

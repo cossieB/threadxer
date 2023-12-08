@@ -13,6 +13,7 @@ import { PostgresError } from "postgres";
 import { randomInt } from "crypto";
 import { draftVerificationEmail } from "../utils/draftEmail";
 import { validation } from "../middleware/validation";
+import { authorize } from "../middleware/authenticate";
 
 export const authRouter = express.Router();
 
@@ -141,14 +142,29 @@ authRouter.post('/login', validation(['email', 'password']), async (req, res, ne
         next(error)
     }
 })
-authRouter.get('/confirm_email', async (req, res, next) => {
-    const { userId } = res.locals.user as { userId: string }
+authRouter.post('/verify', authorize, validation(['code']), async (req, res, next) => {
+    const { user } = res.locals 
+    const rows = await db.select()
+        .from(VerificationCodes)
+        .where(eq(VerificationCodes.userId, user.userId))
+    if (rows.length == 0)
+        return next(new AppError('Not Found', 400))
+    const obj = rows[0]
+    if (obj.expiry < new Date) {
+        const code = randomInt(999999).toString().padStart(6, '0')
+        // draftVerificationEmail(user.username, code, user.email)
+        return next(new AppError("Code expired. Check your email for a new code.", 400))
+    }
+
+        
     try {
+        if (obj.code !== req.body.code)
+            return next(new AppError('Invalid Code', 400))
         await db.update(User)
             .set({
                 emailVerified: new Date()
             })
-            .where(eq(User.userId, userId))
+            .where(eq(User.userId, user.userId))
         return res.sendStatus(200)
     } catch (error) {
         next(error)
