@@ -5,19 +5,45 @@ import { FormInput } from "~/components/shared/FormInput";
 import { SubmitButton } from "~/components/shared/SubmitButton";
 import UserForm from "~/components/shared/UserForm";
 import { user } from "~/globalState/user";
+import { sleep } from "~/lib/sleep";
 import styles from '~/styles/components/VerificationCode.module.scss'
+import { customFetch } from "~/utils/customFetcher";
 
 export default function VerifyEmail() {
     const navigate = useNavigate();
-    const [isLoading, setIsLoading] = createSignal(false)
-    const [finished, setFinished] = createSignal(false)
-    const [state, setState] = createStore({ verificationCode: "" })
+    const [state, setState] = createStore({
+        submitting: false,
+        finished: false,
+        isResending: false,
+        resendSuccessful: false
+    })
     const [code, setCode] = createStore(["", "", "", "", "", ""])
     const isDisabled = () => code.some(letter => !letter)
-    function handleSubmit(e: SubmitEvent) {
+
+    async function handleSubmit(e: SubmitEvent) {
         e.preventDefault()
     }
-
+    async function handleResend() {
+        setState('isResending', true);
+        
+        try {
+            const response = await customFetch('/api/auth/resend', undefined, true)
+            if (!response.ok) {
+                // TODO handle error
+                return
+            }
+            setState('resendSuccessful', true)
+        } 
+        catch (error) {
+            
+        }
+        finally {
+            setState('isResending', false)
+        }
+    }
+    onMount(() => {
+        document.querySelector<HTMLDivElement>(`.${styles.code}`)?.focus()
+    })
     createEffect(() => {
         const encoded = encodeURIComponent("/auth/verify")
         if (!user.username) navigate(`/auth/login?redirect=${encoded}`, { state: { message: "Please login to verify your account" } })
@@ -41,11 +67,18 @@ export default function VerifyEmail() {
                     </Index>
                 </div>
                 <SubmitButton
-                    loading={isLoading()}
-                    finished={finished()}
+                    loading={state.submitting}
+                    finished={state.finished}
                     disabled={isDisabled()}
                 />
-                <button>Send Me Another</button>
+                <SubmitButton
+                    loading={state.isResending}
+                    finished={state.resendSuccessful}
+                    text="Send Me Another"
+                    type="button"
+                    style={{background: 'white', color: 'var(--blue1)'}}
+                    onclick={handleResend}
+                />
             </div>
         </main>
     )
@@ -77,7 +110,7 @@ function Block(props: P) {
         if (next)
             next.focus()
         else
-            ref.blur()
+            document.querySelector('button')?.focus()
 
     }
     onMount(() => {

@@ -65,9 +65,7 @@ export function SignUp() {
         const errorCount = Object.values(errors).flat().length;
         if (errorCount > 0)
             return setState('fieldErrors', errors)
-        const isSuccess = await sendAuthRequest('/api/auth/signup', setState, userState);
-        if (isSuccess) navigate('/auth/verify')
-
+        await sendAuthRequest('/api/auth/signup', setState, userState, navigate);
     }
     return (
         <Show when={!user.username} fallback={<Navigate href="/" />}>

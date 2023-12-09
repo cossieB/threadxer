@@ -5,7 +5,7 @@ import styles from "~/styles/components/form.module.scss"
 type Props = {
     text?: string
     loading: boolean
-    disabled: boolean
+    disabled?: boolean
     finished: boolean
 } & JSX.ButtonHTMLAttributes<HTMLButtonElement>
 

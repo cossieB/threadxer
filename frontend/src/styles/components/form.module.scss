@@ -1,4 +1,4 @@
-@import "~/styles/mixins";
+@use "~/styles/mixins";
 
 #container {
     color: white;
@@ -10,7 +10,7 @@
 }
 
 #formDiv {
-    @include flexCenter(column);
+    @include mixins.flexCenter(column);
     height: 100%;
 }
 
@@ -91,9 +91,11 @@
     border: none;
     font-size: large;
     transition: background-color 250ms ease;
+    min-height: 2.5rem;
+    @include mixins.flexCenter;
     &:disabled {
-        background-color: white;
-        color: var(--blue1);
+        background-color: var(--gray1);
+        color: white;
     }
 }
 

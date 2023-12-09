@@ -28,7 +28,6 @@ export function Login() {
         return validator.errors.email
     }
     const navigate = useNavigate()
-    const location = useLocation()
 
     createEffect(() => {
         if (user.username)
@@ -37,10 +36,7 @@ export function Login() {
 
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault();
-        console.log(location.query.redirect)
-        console.log(new Date)
-        const isSuccess = await sendAuthRequest('/api/auth/login', setState, userState)
-        if (isSuccess) navigate(isSuccess[1])
+        await sendAuthRequest('/api/auth/login', setState, userState, navigate)
     }
     return (
         <Show when={!user.username} fallback={<Navigate href="/" />}>

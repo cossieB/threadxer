@@ -1,39 +1,24 @@
-import { Route, Routes, useLocation, useNavigate } from '@solidjs/router';
+import { Route, Routes, useLocation } from '@solidjs/router';
 import Home from './routes/Home';
 import Navbar from './components/Navbar';
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { SignUp } from './routes/auth/SignUp';
 import { Login } from './routes/auth/Login';
 import NotFound from './components/404';
-import { setUser, user } from './globalState/user';
+import { user } from './globalState/user';
 import { PostComposer } from './components/PostComposer';
 import VerifyEmail from './routes/auth/Verify';
 import { Popup } from './components/shared/Popup';
-import { createQuery } from '@tanstack/solid-query';
-import { unwrap } from 'solid-js/store';
+import { refresh } from './utils/customFetcher';
 
 export const [composerOpen, setComposerOpen] = createSignal(false)
 
 function App() {
 
+    const location = useLocation();
 
     onMount(() => {
-        (async function () {
-            const res = await fetch('/api/auth/refresh')
-            if (res.ok) {
-                const data = await res.json();
-                setUser(data)
-            }
-            else {
-                setUser({
-                    avatar: "",
-                    banner: "",
-                    email: "",
-                    username: "",
-                    userId: ""
-                })
-            }
-        })()
+        refresh()
     })
     createEffect(() => {
         if (composerOpen())

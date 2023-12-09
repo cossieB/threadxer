@@ -4,7 +4,7 @@
         height: 1rem;
         width: 1rem;
         border-radius: 100%;
-        background-color: antiquewhite;
+        background-color: var(--blue1);
     }
     div:first-child {
         animation: blink 1s ease 0ms infinite;

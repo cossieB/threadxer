@@ -1,12 +1,13 @@
+import { type Navigator } from '@solidjs/router';
 import { type JwtPayload, jwtDecode } from 'jwt-decode';
 import { SetStoreFunction } from 'solid-js/store';
 import { type User, setUser } from '~/globalState/user';
 
-
 export async function sendAuthRequest(
     url: string,
     setState: SetStoreFunction<{ loading: boolean; success: boolean; error: string | null; }>,
-    userState: {}
+    userState: {},
+    navigate: Navigator
 ): Promise<false | [true, string]> {
     try {
         setState('loading', true);
@@ -23,7 +24,7 @@ export async function sendAuthRequest(
             const decoded = jwtDecode< {user: User} & JwtPayload >(data.jwt);
             setUser(decoded.user);
             localStorage.setItem('user', JSON.stringify(decoded.user));
-            return [true, data.redirect]
+            navigate(data.redirect)
         }
         if (res.status === 400) {
             const data = await res.json();

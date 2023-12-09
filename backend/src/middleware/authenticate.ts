@@ -7,12 +7,14 @@ import { TokenUser } from "../types";
 dotenv.config()
 
 export function authenticate(req: Request, res: Response, next: NextFunction) {
-    const cookie = parse(req.headers.cookie ?? "")
-    if (!cookie.rf) {
+    const authHeader = req.headers.authorization
+    if (!authHeader || authHeader.split(" ").length < 2){
         res.locals.authError = new AppError('Invalid or no token', 401)
+        return next()
     }
+    const at = authHeader.split(" ")[1]; 
     try {
-        const token = jwt.verify(cookie.rf, process.env.REFRESH_TOKEN_SECRET!) as {user: TokenUser, iat: number}; 
+        const token = jwt.verify(at, process.env.ACCESS_TOKEN_SECRET!) as {user: TokenUser, iat: number};
         res.locals.token = token
     } 
     catch (error) {
