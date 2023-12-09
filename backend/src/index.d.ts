@@ -7,7 +7,8 @@ declare global {
             token?: {
                 user: TokenUser
                 iat: number
-            }
+            },
+            refresh?: string
         }
     }
 }

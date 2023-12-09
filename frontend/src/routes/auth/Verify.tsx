@@ -1,10 +1,12 @@
 import { useNavigate } from "@solidjs/router";
+import { JwtPayload, jwtDecode } from "jwt-decode";
 import { Accessor, For, Index, Setter, createEffect, createSignal, onCleanup, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
 import { FormInput } from "~/components/shared/FormInput";
+import { Popup } from "~/components/shared/Popup";
 import { SubmitButton } from "~/components/shared/SubmitButton";
 import UserForm from "~/components/shared/UserForm";
-import { user } from "~/globalState/user";
+import { User, setToken, setUser, user } from "~/globalState/user";
 import { sleep } from "~/lib/sleep";
 import styles from '~/styles/components/VerificationCode.module.scss'
 import { customFetch } from "~/utils/customFetcher";
@@ -15,17 +17,33 @@ export default function VerifyEmail() {
         submitting: false,
         finished: false,
         isResending: false,
-        resendSuccessful: false
+        resendSuccessful: false,
+        error: ""
     })
     const [code, setCode] = createStore(["", "", "", "", "", ""])
     const isDisabled = () => code.some(letter => !letter)
 
-    async function handleSubmit(e: SubmitEvent) {
-        e.preventDefault()
+    async function handleSubmit() {
+        const res = await customFetch('/api/auth/verify', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ code: code.join('') })
+        }, true);
+        if (!res.ok) {
+            const data = await res.json()
+            return setState('error', data?.error ?? "")
+        }
+        const data = await res.json();
+        setToken(data.jwt)
+        const decoded = jwtDecode< {user: User} & JwtPayload >(data.jwt);
+        setUser(decoded.user)
+        navigate("/")
     }
     async function handleResend() {
         setState('isResending', true);
-        
+
         try {
             const response = await customFetch('/api/auth/resend', undefined, true)
             if (!response.ok) {
@@ -33,9 +51,9 @@ export default function VerifyEmail() {
                 return
             }
             setState('resendSuccessful', true)
-        } 
+        }
         catch (error) {
-            
+
         }
         finally {
             setState('isResending', false)
@@ -70,16 +88,22 @@ export default function VerifyEmail() {
                     loading={state.submitting}
                     finished={state.finished}
                     disabled={isDisabled()}
+                    onclick={handleSubmit}
                 />
                 <SubmitButton
                     loading={state.isResending}
                     finished={state.resendSuccessful}
                     text="Send Me Another"
                     type="button"
-                    style={{background: 'white', color: 'var(--blue1)'}}
+                    style={{ background: 'white', color: 'var(--blue1)' }}
                     onclick={handleResend}
                 />
             </div>
+            <Popup
+                when={!!state.error}
+                close={() => setState('error', "")}
+                text={state.error}
+            />
         </main>
     )
 }
@@ -99,7 +123,7 @@ function Block(props: P) {
         }
         const next = ref.nextSibling as HTMLDivElement | null;
         const prev = ref.previousSibling as HTMLDivElement | null;
-        if (e.key == "ArrowLeft") 
+        if (e.key == "ArrowLeft")
             return prev?.focus()
         if (e.key == "ArrowRight")
             return next?.focus()

@@ -23,6 +23,7 @@ oauth2Client.generateAuthUrl({
 export async function sendMail(subject: string, to: string, message: string) {
     const accessToken = await oauth2Client.getAccessToken()
     const transport = createTransport({
+        // @ts-expect-error
         service: 'gmail',
         auth: {
             type: "OAUTH2",

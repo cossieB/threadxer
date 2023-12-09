@@ -157,6 +157,8 @@ authRouter.post('/login', validation(['email', 'password']), async (req, res, ne
 })
 authRouter.post('/verify', authorize, validation(['code']), async (req, res, next) => {
     const token = res.locals.token!;
+    if (!token.user.isUnverified)
+        return next(new AppError("Already verified", 400))
     const row = await db.query.VerificationCodes.findFirst({
         where(fields, operators) {
             return operators.eq(fields.userId, token.user.userId)
@@ -164,14 +166,13 @@ authRouter.post('/verify', authorize, validation(['code']), async (req, res, nex
     })
     if (!row)
         return next(new AppError('Error. Please click "resend".', 400))
-    const obj = row
-    if (obj.expiry < new Date) {
+    if (row.expiry < new Date) {
         const code = randomInt(999999).toString().padStart(6, '0')
         // draftVerificationEmail(token.user.username, code, token.user.email)
         return next(new AppError("Code expired. Check your email for a new code.", 400))
     }
     try {
-        if (obj.code !== req.body.code)
+        if (row.code !== req.body.code)
             return next(new AppError('Invalid Code', 400))
         
         await db.transaction(async tx => {
@@ -185,7 +186,11 @@ authRouter.post('/verify', authorize, validation(['code']), async (req, res, nex
                     dateUsed: new Date
                 })
         })
-        return res.sendStatus(200)
+        const accessToken = createAccessToken({...token.user, isUnverified: false})
+        const cookie = await generateCookie({...token.user, isUnverified: false})
+        redis.del(`refresh:${res.locals.refresh}`)
+        res.setHeader('Set-Cookie', cookie)
+        return res.json({jwt: accessToken})
     } catch (error) {
         next(error)
     }

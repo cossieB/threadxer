@@ -11,14 +11,17 @@ export default function Navbar() {
         const res = await fetch('/api/auth/logout', {
             method: "DELETE"
         })
-        if (res.ok)
+        if (res.ok) {
             setUser({
                 avatar: "",
                 banner: "",
                 email: "",
-                username: ""
+                username: "",
+                isUnverified: false,
+                userId: ""
             })
-        localStorage.removeItem('user')
+            localStorage.removeItem('user')
+        }
     }
     return (
         <nav class={styles.nav}>

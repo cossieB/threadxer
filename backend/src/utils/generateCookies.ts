@@ -17,7 +17,7 @@ export function createRefreshToken(user: TokenUser) {
 export async function generateCookie(user: TokenUser) {
     const refreshToken = createRefreshToken(user);
 
-    await redis.set(`refresh:${refreshToken}`, user.userId);
+    await redis.setex(`refresh:${refreshToken}`, 60 * 60 * 24 * 30, user.userId);
 
     const refreshCookie = cookie.serialize('rf', refreshToken, {
         path: '/',

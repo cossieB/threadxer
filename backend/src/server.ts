@@ -25,6 +25,14 @@ app.use("/api/uploadthing", createUploadthingExpressHandler({
 );
 app.use('/api/auth', authRouter)
 
+app.all('/api/*', (req, res) => {
+    res.sendStatus(404)
+})
+
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, '..', '/public', 'index.html'))
+})
+
 app.use("*", (req, res) => {
     res.sendStatus(404)
 })

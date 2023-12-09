@@ -20,8 +20,19 @@ export async function customFetch(url: U, reqOpts: V, refreshRequired: boolean =
 
 export async function refresh() {
     const result = await fetch('/api/auth/refresh')
-    if (!result.ok)
+    if (result.status == 401 || result.status == 403) {
+        setUser({
+            username: "",
+            email: "",
+            avatar: "",
+            banner: "",
+            isUnverified: false,
+            userId: ""
+        })
+        setToken('jwt', "")
         return false
+    }
+        
     const data = await result.json()
     if (typeof data.jwt == 'string') {
         setToken('jwt', data.jwt)
