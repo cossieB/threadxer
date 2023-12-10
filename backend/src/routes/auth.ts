@@ -188,7 +188,7 @@ authRouter.post('/verify', authorize, validation(['code']), async (req, res, nex
         })
         const accessToken = createAccessToken({...token.user, isUnverified: false})
         const cookie = await generateCookie({...token.user, isUnverified: false})
-        redis.del(`refresh:${res.locals.refresh}`)
+        redis.del(`refresh:${req.cookies.rf}`)
         res.setHeader('Set-Cookie', cookie)
         return res.json({jwt: accessToken})
     } catch (error) {
@@ -225,7 +225,7 @@ authRouter.get('/resend', authorize, async (req, res, next) => {
     }
 })
 authRouter.get('/refresh', async (req, res, next) => {
-    const refresh = cookie.parse(req.headers?.cookie ?? "").rf;
+    const refresh = req.cookies.rf;
     if (!refresh)
         return next(new AppError('No Token', 401))
     const token = jwt.verify(refresh, process.env.REFRESH_TOKEN_SECRET!) as JwtPayload
@@ -237,7 +237,7 @@ authRouter.get('/refresh', async (req, res, next) => {
 })
 
 authRouter.delete('/logout', async (req, res, next) => {
-    const refresh = cookie.parse(req.headers.cookie ?? "").rf;
+    const refresh = req.cookies.rf;
     if (refresh)
         await redis.del(`refresh:${refresh}`);
     res.clearCookie('rf')

@@ -8,6 +8,7 @@ import AppError from "./utils/AppError";
 import { authRouter } from "./routes";
 import { authenticate, authorize } from "./middleware/authenticate";
 import { sendMail } from "./nodemailer";
+import { cookieParser } from "./middleware/cookieParser";
 
 dotenv.config()
 const app = express()
@@ -16,6 +17,7 @@ const app = express()
 app.use(cors())
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json())
+app.use(cookieParser)
 app.use(express.static(path.resolve(__dirname, '../public')))
 app.use(authenticate)
 
