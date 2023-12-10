@@ -1,15 +1,12 @@
 import { useNavigate } from "@solidjs/router";
-import { JwtPayload, jwtDecode } from "jwt-decode";
-import { Accessor, For, Index, Setter, createEffect, createSignal, onCleanup, onMount } from "solid-js";
+import { Accessor, Index, Setter, createEffect, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
-import { FormInput } from "~/components/shared/FormInput";
 import { Popup } from "~/components/shared/Popup";
 import { SubmitButton } from "~/components/shared/SubmitButton";
-import UserForm from "~/components/shared/UserForm";
-import { User, setToken, setUser, user } from "~/globalState/user";
-import { sleep } from "~/lib/sleep";
+import { createUser, user } from "~/globalState/user";
 import styles from '~/styles/components/VerificationCode.module.scss'
 import { customFetch } from "~/utils/customFetcher";
+import { CodeBlock } from "./CodeBlock";
 
 export default function VerifyEmail() {
     const navigate = useNavigate();
@@ -36,9 +33,7 @@ export default function VerifyEmail() {
             return setState('error', data?.error ?? "")
         }
         const data = await res.json();
-        setToken(data.jwt)
-        const decoded = jwtDecode< {user: User} & JwtPayload >(data.jwt);
-        setUser(decoded.user)
+        createUser(data.jwt)
         navigate("/")
     }
     async function handleResend() {
@@ -75,7 +70,7 @@ export default function VerifyEmail() {
                 <div class={styles.row}>
                     <Index each={code}>
                         {(letter, i) =>
-                            <Block
+                            <CodeBlock
                                 i={i}
                                 letter={letter}
                                 code={code}
@@ -105,49 +100,5 @@ export default function VerifyEmail() {
                 text={state.error}
             />
         </main>
-    )
-}
-type P = {
-    letter: Accessor<string>
-    i: number
-    code: string[]
-    setCode: Setter<string[]>
-}
-function Block(props: P) {
-    let ref!: HTMLDivElement
-    function handleInput(e: KeyboardEvent) {
-        if (e.key == "Backspace" || e.key == "Delete") {
-            //@ts-expect-error
-            props.setCode(props.i, "")
-            return
-        }
-        const next = ref.nextSibling as HTMLDivElement | null;
-        const prev = ref.previousSibling as HTMLDivElement | null;
-        if (e.key == "ArrowLeft")
-            return prev?.focus()
-        if (e.key == "ArrowRight")
-            return next?.focus()
-
-        else if (/\D/.test(e.key)) return
-        //@ts-expect-error
-        props.setCode(props.i, e.key)
-        if (next)
-            next.focus()
-        else
-            document.querySelector('button')?.focus()
-
-    }
-    onMount(() => {
-        ref.addEventListener('keyup', handleInput)
-        onCleanup(() => ref.removeEventListener('keyup', handleInput))
-    })
-    return (
-        <div
-            ref={ref}
-            tabIndex={0}
-            onclick={() => ref.focus()}
-            class={styles.code}
-            innerText={props.code[props.i]}
-        />
     )
 }

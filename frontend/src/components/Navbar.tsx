@@ -1,7 +1,7 @@
 import { A } from "@solidjs/router"
 import { JSX, Show } from "solid-js"
 import styles from "~/styles/components/Nav.module.scss"
-import { setUser, user } from "../globalState/user"
+import { deleteUser, setToken, setUser, user } from "../globalState/user"
 import { CompostSvg, HomeSvg, RegisterSvg, SearchSvg, SettingsSvg, UnlockSvg } from "../svgs"
 import { setComposerOpen } from "~/App"
 
@@ -12,15 +12,7 @@ export default function Navbar() {
             method: "DELETE"
         })
         if (res.ok) {
-            setUser({
-                avatar: "",
-                banner: "",
-                email: "",
-                username: "",
-                isUnverified: false,
-                userId: ""
-            })
-            localStorage.removeItem('user')
+            deleteUser()
         }
     }
     return (

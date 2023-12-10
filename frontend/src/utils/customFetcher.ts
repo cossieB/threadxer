@@ -1,5 +1,4 @@
-import { JwtPayload, jwtDecode } from "jwt-decode"
-import { User, setToken, setUser, token } from "~/globalState/user";
+import { createUser, deleteUser, token } from "~/globalState/user";
 
 type U = Parameters<typeof fetch>[0]
 type V = Parameters<typeof fetch>[1]
@@ -21,24 +20,13 @@ export async function customFetch(url: U, reqOpts: V, refreshRequired: boolean =
 export async function refresh() {
     const result = await fetch('/api/auth/refresh')
     if (result.status == 401 || result.status == 403) {
-        setUser({
-            username: "",
-            email: "",
-            avatar: "",
-            banner: "",
-            isUnverified: false,
-            userId: ""
-        })
-        setToken('jwt', "")
+        deleteUser()
         return false
     }
         
     const data = await result.json()
     if (typeof data.jwt == 'string') {
-        setToken('jwt', data.jwt)
-        const decoded = jwtDecode(data.jwt) as JwtPayload & {user: User}
-        setUser(decoded.user)
-        localStorage.setItem('user', JSON.stringify(decoded.user))
+        createUser(data.jwt)
     }
     return true
 }

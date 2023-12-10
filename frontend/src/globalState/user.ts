@@ -1,4 +1,4 @@
-import { jwtDecode } from "jwt-decode";
+import { JwtPayload, jwtDecode } from "jwt-decode";
 import { createStore } from "solid-js/store";
 
 export type User = {
@@ -32,3 +32,22 @@ export const [token, setToken] = createStore({
         }
     }
 })
+
+export function deleteUser() {
+    setUser({
+        avatar: "",
+        banner: "",
+        email: "",
+        username: "",
+        isUnverified: false,
+        userId: ""
+    })
+    localStorage.removeItem('user')
+    setToken("jwt", "")
+}
+export function createUser(jwt: string) {
+    const decoded = jwtDecode<{ user: User } & JwtPayload>(jwt);
+    setUser(decoded.user);
+    localStorage.setItem('user', JSON.stringify(decoded.user));
+    setToken({ jwt })
+}

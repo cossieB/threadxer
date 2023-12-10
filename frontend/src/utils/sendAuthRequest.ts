@@ -1,7 +1,6 @@
 import { type Navigator } from '@solidjs/router';
-import { type JwtPayload, jwtDecode } from 'jwt-decode';
 import { SetStoreFunction } from 'solid-js/store';
-import { type User, setUser } from '~/globalState/user';
+import { createUser } from '~/globalState/user';
 
 export async function sendAuthRequest(
     url: string,
@@ -21,9 +20,7 @@ export async function sendAuthRequest(
         if (res.ok) {
             setState('success', true);
             const data = await res.json();
-            const decoded = jwtDecode< {user: User} & JwtPayload >(data.jwt);
-            setUser(decoded.user);
-            localStorage.setItem('user', JSON.stringify(decoded.user));
+            createUser(data.jwt)
             navigate(data.redirect)
         }
         if (res.status === 400) {

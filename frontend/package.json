@@ -10,16 +10,16 @@
   },
   "dependencies": {
     "@solidjs/router": "^0.9.1",
-    "@tanstack/solid-query": "^5.12.1",
+    "@tanstack/solid-query": "^5.13.4",
     "jwt-decode": "^4.0.0",
     "solid-js": "^1.7.8",
     "solid-transition-group": "^0.2.3"
   },
   "devDependencies": {
-    "@types/node": "^20.8.6",
+    "@types/node": "^20.10.4",
     "sass": "^1.69.3",
-    "typescript": "^5.0.2",
-    "vite": "^5.0.4",
-    "vite-plugin-solid": "2.7.2"
+    "typescript": "^5.3.3",
+    "vite": "^5.0.7",
+    "vite-plugin-solid": "^2.8.0"
   }
 }
