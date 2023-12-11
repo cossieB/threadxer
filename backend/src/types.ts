@@ -3,6 +3,5 @@ export type TokenUser = {
     username: string,
     avatar: string,
     banner: string,
-    email: string,
     isUnverified: boolean
 }

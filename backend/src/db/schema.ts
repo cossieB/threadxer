@@ -71,10 +71,15 @@ export const FollowerFollowee = pgTable('follower_followee', {
     followeeId: uuid('followee_id').references(() => User.userId, { onDelete: 'cascade', onUpdate: 'cascade' }).notNull(),
     dateFollowed: timestamp('date_followed', { withTimezone: true }).defaultNow().notNull()
 }, t => ({
-    id: primaryKey(t.followeeId, t.followerId)
+    id: primaryKey({columns: [t.followeeId, t.followerId]})
 }))
 
 export const Hashtags = pgTable('hashtags', {
     hashtag: varchar('hashtag').primaryKey(),
     postId: uuid('post_id').references(() => Post.postId, { onDelete: 'set null', onUpdate: 'cascade' }),
+})
+
+export const RefreshTokens = pgTable('refresh_tokens', {
+    token: text('token').primaryKey(),
+    userId: uuid('user_id').references(() => User.userId, { onDelete: 'cascade', onUpdate: 'cascade' }).notNull(),
 })

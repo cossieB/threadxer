@@ -1,19 +1,20 @@
 import express from "express";
 import AppError from "../utils/AppError";
 import { db } from "../db/drizzle";
-import { User, VerificationCodes } from "../db/schema";
+import { RefreshTokens, User, VerificationCodes } from "../db/schema";
 import { hash, genSalt, compare } from 'bcrypt'
 import { DrizzleError, eq, sql } from "drizzle-orm";
 import { validation as validate } from "../utils/validation";
 import cookie from 'cookie';
 import { redis } from "../utils/redis";
 import jwt, { type JwtPayload } from 'jsonwebtoken'
-import { createAccessToken, generateCookie } from "../utils/generateCookies";
 import { PostgresError } from "postgres";
 import { randomInt } from "crypto";
 import { draftVerificationEmail } from "../utils/draftEmail";
 import { validation } from "../middleware/validation";
 import { authorize } from "../middleware/authenticate";
+import { rateLimiter } from "../middleware/rateLimiter";
+import { handleTokens } from "../utils/generateCookies";
 
 export const authRouter = express.Router();
 
@@ -81,7 +82,6 @@ authRouter.post('/signup', validation(['username', 'password', 'confirmPassword'
                 .returning({
                     userId: User.userId,
                     username: User.username,
-                    email: User.email,
                     avatar: User.avatar,
                     banner: User.avatar
                 });
@@ -92,10 +92,8 @@ authRouter.post('/signup', validation(['username', 'password', 'confirmPassword'
                 })
             return row[0]
         })
-        const u = { ...user, isUnverified: true }
-        const accessToken = createAccessToken(u)
-        const refreshCookie = await generateCookie(u);
-        res.header('Set-Cookie', refreshCookie)
+        const { accessToken, cookie } = await handleTokens({ ...user, isUnverified: true })
+        res.header('Set-Cookie', cookie)
         // draftVerificationEmail(username, code, email)
         return res.status(201).json({ jwt: accessToken, redirect: '/auth/verify' })
     }
@@ -109,7 +107,7 @@ authRouter.post('/signup', validation(['username', 'password', 'confirmPassword'
         next(error)
     }
 })
-authRouter.post('/login', validation(['email', 'password']), async (req, res, next) => {
+authRouter.post('/login', rateLimiter('login', 5, 300), validation(['email', 'password']), async (req, res, next) => {
     try {
         const { email, password } = req.body as Record<string, string>;
         let redirect = "/"
@@ -123,7 +121,6 @@ authRouter.post('/login', validation(['email', 'password']), async (req, res, ne
                 avatar: true,
                 banner: true,
                 passwordHash: true,
-                email: true,
                 emailVerified: true,
                 userId: true,
                 username: true
@@ -140,15 +137,10 @@ authRouter.post('/login', validation(['email', 'password']), async (req, res, ne
         if (!valid)
             throw new AppError("Invalid Credentials", 400)
 
-        const u = { ...user, isUnverified: !emailVerified };
-        const accessToken = createAccessToken(u)
-        const [refreshCookie] = await Promise.all([
-            generateCookie(u), 
-            db.update(User).set({lastLogin: new Date})
-        ]);
-        if (u.isUnverified)
+        const {accessToken, cookie} = await handleTokens({ ...user, isUnverified: true })
+        if (!row.emailVerified)
             redirect = '/auth/verify'
-        res.header('Set-Cookie', refreshCookie)
+        res.header('Set-Cookie', cookie)
         return res.json({ jwt: accessToken, redirect })
     }
     catch (error) {
@@ -156,12 +148,12 @@ authRouter.post('/login', validation(['email', 'password']), async (req, res, ne
     }
 })
 authRouter.post('/verify', authorize, validation(['code']), async (req, res, next) => {
-    const token = res.locals.token!;
-    if (!token.user.isUnverified)
+    const oldAccessToken = res.locals.token!;
+    if (!oldAccessToken.user.isUnverified)
         return next(new AppError("Already verified", 400))
     const row = await db.query.VerificationCodes.findFirst({
         where(fields, operators) {
-            return operators.eq(fields.userId, token.user.userId)
+            return operators.eq(fields.userId, oldAccessToken.user.userId)
         }
     })
     if (!row)
@@ -174,36 +166,43 @@ authRouter.post('/verify', authorize, validation(['code']), async (req, res, nex
     try {
         if (row.code !== req.body.code)
             return next(new AppError('Invalid Code', 400))
-        
+        const now = new Date;
         await db.transaction(async tx => {
             await tx.update(User)
                 .set({
-                    emailVerified: new Date()
+                    emailVerified: now
                 })
-                .where(eq(User.userId, token.user.userId))
+                .where(eq(User.userId, oldAccessToken.user.userId))
             await tx.update(VerificationCodes)
                 .set({
-                    dateUsed: new Date
+                    dateUsed: now
                 })
+            await tx.delete(RefreshTokens).where(eq(RefreshTokens.token, req.cookies.rf))
         })
-        const accessToken = createAccessToken({...token.user, isUnverified: false})
-        const cookie = await generateCookie({...token.user, isUnverified: false})
-        redis.del(`refresh:${req.cookies.rf}`)
+        const {accessToken: newAccessToken, cookie} = await handleTokens({...oldAccessToken.user, isUnverified: false}, async refreshToken => {
+            await db.transaction(async tx => {
+                await tx.delete(RefreshTokens).where(eq(RefreshTokens.token, req.cookies.rf))
+                await tx.insert(RefreshTokens).values({
+                    token: refreshToken,
+                    userId: oldAccessToken.user.userId
+                })
+            })
+        })
         res.setHeader('Set-Cookie', cookie)
-        return res.json({jwt: accessToken})
+        return res.json({ jwt: newAccessToken })
     } catch (error) {
         next(error)
     }
 })
 authRouter.get('/resend', authorize, async (req, res, next) => {
     const code = randomInt(999999).toString().padStart(6, '0');
-    const token = res.locals.token!;
-    if (!token.user.isUnverified)
+    const accessToken = res.locals.token!;
+    if (!accessToken.user.isUnverified)
         return next(new AppError('Already Verified', 400))
     try {
         await db.insert(VerificationCodes)
             .values({
-                userId: token.user.userId,
+                userId: accessToken.user.userId,
                 code,
             })
             .onConflictDoUpdate({
@@ -228,18 +227,41 @@ authRouter.get('/refresh', async (req, res, next) => {
     const refresh = req.cookies.rf;
     if (!refresh)
         return next(new AppError('No Token', 401))
-    const token = jwt.verify(refresh, process.env.REFRESH_TOKEN_SECRET!) as JwtPayload
-    const isValid = await redis.get(`refresh:${refresh}`);
-    if (!isValid)
-        return next(new AppError('Invalid Token', 403))
-    const accessToken = createAccessToken(token.user)
-    return res.json({ jwt: accessToken })
+    try {
+        const token = jwt.verify(refresh, process.env.REFRESH_TOKEN_SECRET!) as JwtPayload;
+        const found = await db.query.RefreshTokens.findFirst({
+            where(fields, operators) {
+                return operators.eq(fields.token, refresh)
+            },
+        })
+        // Handling refresh token reuse
+        if (!found) {
+            await db.delete(RefreshTokens).where(eq(RefreshTokens.userId, token.user.userId));
+            res.clearCookie('rf')
+            return next(new AppError('Invalid Token', 403))
+        }
+        const {accessToken, cookie} = await handleTokens(token.user, async refreshToken => {
+            await db.transaction(async tx => {
+                await tx.delete(RefreshTokens).where(eq(RefreshTokens.token, refresh))
+                await tx.insert(RefreshTokens).values({
+                    token: refreshToken,
+                    userId: token.user.userId
+                })
+            })
+        })
+        res.setHeader('Set-Cookie', cookie)
+        return res.json({ jwt: accessToken })
+    }
+    catch (error: any) {
+        console.log(error)
+        next(error)
+    }
 })
 
 authRouter.delete('/logout', async (req, res, next) => {
     const refresh = req.cookies.rf;
     if (refresh)
-        await redis.del(`refresh:${refresh}`);
+        await db.delete(RefreshTokens).where(eq(RefreshTokens.token, refresh))
     res.clearCookie('rf')
     return res.sendStatus(200)
 })

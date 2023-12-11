@@ -1,24 +1,21 @@
 import cookie from 'cookie';
-import { redis } from "./redis";
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken'
 import { type TokenUser } from '../types';
+import { db } from '../db/drizzle';
+import { RefreshTokens } from '../db/schema';
 
 dotenv.config()
 
 export function createAccessToken(user: TokenUser) {
-    return jwt.sign({user}, process.env.ACCESS_TOKEN_SECRET!, {
+    return jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET!, {
         expiresIn: '15m'
     })
 }
 export function createRefreshToken(user: TokenUser) {
-    return jwt.sign({user}, process.env.REFRESH_TOKEN_SECRET!)
+    return jwt.sign({ user }, process.env.REFRESH_TOKEN_SECRET!)
 }
-export async function generateCookie(user: TokenUser) {
-    const refreshToken = createRefreshToken(user);
-
-    await redis.setex(`refresh:${refreshToken}`, 60 * 60 * 24 * 30, user.userId);
-
+export function generateCookie(refreshToken: string) {
     const refreshCookie = cookie.serialize('rf', refreshToken, {
         path: '/',
         httpOnly: true,
@@ -27,4 +24,28 @@ export async function generateCookie(user: TokenUser) {
         maxAge: 60 * 60 * 24 * 30
     });
     return refreshCookie;
+}
+
+/**
+ * This function creates access token, refresh token and a cookie of the refresh token and saves the token to the database.
+ * @param user 
+ * @param saveToDb Optional function to save the refresh token to the database in case you want to use a SQL transaction
+ * @returns 
+ */
+export async function handleTokens(user: TokenUser, saveToDb?: (refreshToken: string) => Promise<void>) {
+    const accessToken = createAccessToken(user);
+    const refreshToken = createRefreshToken(user)
+    const cookie = generateCookie(refreshToken);
+
+    if (!saveToDb)
+        await db
+            .insert(RefreshTokens)
+            .values({
+                token: refreshToken,
+                userId: user.userId
+            })
+    else
+        await saveToDb(refreshToken)
+
+    return { accessToken, cookie }
 }
