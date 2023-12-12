@@ -22,7 +22,9 @@ export default function Navbar() {
     const [alertLogout, setAlertLogout] = createSignal(false)
     return (
         <nav class={styles.nav}>
-            <div><img class={styles.logo} src="/favicon.ico" alt="" /></div>
+            <div class={styles.logoContainer}>
+                <img class={styles.logo} src="/favicon.ico" alt="" />
+            </div>
             <NavLink
                 href="/"
                 text="Home"
@@ -58,15 +60,14 @@ export default function Navbar() {
                     />
                 </Show>
                 <NavLink
-                    href="/profile"
-                    text="Profile"
-                    icon={<SettingsSvg />}
-                />
-                <NavLink
                     href={`/users/${user.username}`}
                     text={user.username}
                     icon={<img src={user.avatar} />}
-
+                />
+                <NavLink
+                    href="/profile"
+                    text="Profile"
+                    icon={<SettingsSvg />}
                 />
                 <NavItem
                     onclick={() => setAlertLogout(true)}
@@ -95,7 +96,7 @@ function NavLink(props: P) {
     return (
         <A class={styles.a} href={props.href}>
             <span> {props.icon} </span>
-            <span>{props.text}</span>
+            <span class={styles.text}>{props.text}</span>
         </A>
     )
 }
@@ -107,7 +108,7 @@ function NavItem(props: P2) {
     return (
         <div class={styles.a} onclick={props.onclick}>
             <span> {props.icon} </span>
-            <span>{props.text}</span>
+            <span class={styles.text}>{props.text}</span>
         </div>
     )
 }
