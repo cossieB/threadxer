@@ -5,9 +5,8 @@ import dotenv from 'dotenv'
 import { createUploadthingExpressHandler } from "uploadthing/express";
 import { uploadRouter } from "./uploadthing";
 import AppError from "./utils/AppError";
-import { authRouter } from "./routes";
-import { authenticate, authorize } from "./middleware/authenticate";
-import { sendMail } from "./nodemailer";
+import * as Routes from "./routes";
+import { authenticate } from "./middleware/authenticate";
 import { cookieParser } from "./middleware/cookieParser";
 
 dotenv.config()
@@ -23,9 +22,10 @@ app.use(authenticate)
 
 app.use("/api/uploadthing", createUploadthingExpressHandler({
     router: uploadRouter,
-}),
-);
-app.use('/api/auth', authRouter)
+}));
+app.use('/api/auth', Routes.authRouter)
+app.use('/api/auth/verify', Routes.verificationRouter)
+app.use('/api/auth/refresh', Routes.refreshRoutes)
 
 app.all('/api/*', (req, res) => {
     res.sendStatus(404)
@@ -40,7 +40,7 @@ app.use("*", (req, res) => {
 })
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     if (err instanceof AppError)
-        return res.status(err.status).json({error: err.message})
+        return res.status(err.status).json({ error: err.message })
     console.error(err.stack);
     return res.status(500).json({ message: "Something went wrong" })
 })

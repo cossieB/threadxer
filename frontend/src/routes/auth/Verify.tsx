@@ -40,7 +40,7 @@ export default function VerifyEmail() {
         setState('isResending', true);
 
         try {
-            const response = await customFetch('/api/auth/resend', undefined, true)
+            const response = await customFetch('/api/auth/verify', undefined, true)
             if (!response.ok) {
                 // TODO handle error
                 return
