@@ -1,5 +1,5 @@
 import { useNavigate } from "@solidjs/router";
-import { Accessor, Index, Setter, createEffect, onMount } from "solid-js";
+import { Index, Setter, createEffect, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
 import { Popup } from "~/components/shared/Popup";
 import { SubmitButton } from "~/components/shared/SubmitButton";
@@ -27,7 +27,7 @@ export default function VerifyEmail() {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ code: code.join('') })
-        }, true);
+        });
         if (!res.ok) {
             const data = await res.json()
             return setState('error', data?.error ?? "")
@@ -40,7 +40,7 @@ export default function VerifyEmail() {
         setState('isResending', true);
 
         try {
-            const response = await customFetch('/api/auth/verify', undefined, true)
+            const response = await customFetch('/api/auth/verify')
             if (!response.ok) {
                 // TODO handle error
                 return

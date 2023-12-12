@@ -5,7 +5,7 @@ import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { SignUp } from './routes/auth/SignUp';
 import { Login } from './routes/auth/Login';
 import NotFound from './components/404';
-import { token, user } from './globalState/user';
+import { user } from './globalState/user';
 import { PostComposer } from './components/PostComposer';
 import VerifyEmail from './routes/auth/Verify';
 import { Popup } from './components/shared/Popup';

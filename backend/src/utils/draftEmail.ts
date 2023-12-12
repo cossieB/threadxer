@@ -6,7 +6,7 @@ export async function draftVerificationEmail(name: string, code: string, to: str
     <html>
         <body style="background:black; color: white; max-width: 600px; margin-left: auto; margin-right: auto; padding: 5rem 2rem">
             <center>
-                <img style="height: 150px" src="/favicon.ico">
+                <img style="height: 150px" src="${process.env.DOMAIN}/favicon.ico">
             </center>
             <center><h1>Verify your account</h1></center>
             <strong>Hi ${name}, 👋🏾</strong><br />
@@ -20,7 +20,7 @@ export async function draftVerificationEmail(name: string, code: string, to: str
                     </strong>
                 </code>
             </center>
-            <aside>Be advised this code will expire in 72 hours.</aside>
+            <aside style="margin-top: 50px">Be advised this code will expire in 72 hours.</aside>
         </body>
     </html>
     `

@@ -34,20 +34,23 @@ export const [token, setToken] = createStore({
 })
 
 export function deleteUser() {
-    setUser({
+    const blankUser = {
         avatar: "",
         banner: "",
         email: "",
         username: "",
         isUnverified: false,
         userId: ""
-    })
+    };
+    setUser(blankUser)
     localStorage.removeItem('user')
     setToken("jwt", "")
+    return blankUser
 }
 export function createUser(jwt: string) {
     const decoded = jwtDecode<{ user: User } & JwtPayload>(jwt);
     setUser(decoded.user);
     localStorage.setItem('user', JSON.stringify(decoded.user));
     setToken({ jwt })
+    return decoded.user
 }

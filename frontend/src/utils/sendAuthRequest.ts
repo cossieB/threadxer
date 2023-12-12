@@ -19,7 +19,7 @@ export async function sendAuthRequest(
         });
         if (res.ok) {
             setState('success', true);
-            const data = await res.json(); console.log(data)
+            const data = await res.json(); 
             createUser(data.jwt)
             navigate(data.redirect)
         }

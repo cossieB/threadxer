@@ -1,0 +1,23 @@
+@use '~/styles/mixins';
+
+.modal {
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    @include mixins.flexCenter;
+    position: absolute;
+    backdrop-filter: blur(5px);
+    &::after {
+        position: absolute;
+        content: "";
+        background-color: var(--blue1);
+        inset: 0;
+        z-index: -1;
+        opacity: 0.25;
+    }
+    > div {
+        background-color: var(--gray1);
+        padding: 2rem;
+    }
+}

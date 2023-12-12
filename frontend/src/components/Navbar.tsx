@@ -1,20 +1,25 @@
 import { A } from "@solidjs/router"
-import { JSX, Show } from "solid-js"
+import { JSX, Show, createSignal } from "solid-js"
 import styles from "~/styles/components/Nav.module.scss"
-import { deleteUser, setToken, setUser, user } from "../globalState/user"
-import { CompostSvg, HomeSvg, RegisterSvg, SearchSvg, SettingsSvg, UnlockSvg } from "../svgs"
+import { deleteUser, user } from "../globalState/user"
+import { CompostSvg, HomeSvg, LogoutSvg, RegisterSvg, SearchSvg, SettingsSvg, UnlockSvg } from "../svgs"
 import { setComposerOpen } from "~/App"
+import { customFetch } from "~/utils/customFetcher"
+import Modal from "./Modal";
+import clickOutside from "~/lib/clickOutside"
+false && clickOutside
 
-
-export default function Navbar() {
-    async function logout() {
-        const res = await fetch('/api/auth/logout', {
-            method: "DELETE"
-        })
-        if (res.ok) {
-            deleteUser()
-        }
+async function logout() {
+    const res = await customFetch('/api/auth/logout', {
+        method: "DELETE"
+    })
+    if (res.ok) {
+        deleteUser();
+        location.reload()
     }
+}
+export default function Navbar() {
+    const [alertLogout, setAlertLogout] = createSignal(false)
     return (
         <nav class={styles.nav}>
             <div><img class={styles.logo} src="/favicon.ico" alt="" /></div>
@@ -57,13 +62,25 @@ export default function Navbar() {
                     text="Profile"
                     icon={<SettingsSvg />}
                 />
-                <NavItem
-                    onclick={logout}
+                <NavLink
+                    href={`/users/${user.username}`}
                     text={user.username}
                     icon={<img src={user.avatar} />}
 
                 />
+                <NavItem
+                    onclick={() => setAlertLogout(true)}
+                    text="Logout"
+                    icon={<LogoutSvg />}
+
+                />
             </Show>
+            <Modal when={alertLogout()} >
+                <div use:clickOutside={() => setAlertLogout(false)}>
+                    <strong>Confirm logout? </strong>{""}
+                    <button class="danger" onclick={() => {logout()}}>Logout</button>
+                </div>
+            </Modal>
         </nav>
     )
 }
@@ -94,4 +111,3 @@ function NavItem(props: P2) {
         </div>
     )
 }
-
