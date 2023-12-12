@@ -26,6 +26,7 @@ app.use("/api/uploadthing", createUploadthingExpressHandler({
 app.use('/api/auth', Routes.authRouter)
 app.use('/api/auth/verify', Routes.verificationRouter)
 app.use('/api/auth/refresh', Routes.refreshRoutes)
+app.use('/api/users', Routes.userRouter)
 
 app.all('/api/*', (req, res) => {
     res.sendStatus(404)

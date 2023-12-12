@@ -74,7 +74,7 @@ export async function resendVerificationToken (req: Request, res: Response, next
                     expiry: sql`NOW() + INTERVAL '72 hours'`
                 }
             })
-        draftVerificationEmail(accessToken.user.username, code, accessToken.user.email)
+        // draftVerificationEmail(accessToken.user.username, code, accessToken.user.email)
         res.sendStatus(200)
     }
     catch (error) {

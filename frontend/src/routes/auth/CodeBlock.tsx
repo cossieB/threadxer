@@ -1,6 +1,6 @@
 import { Accessor, Setter, onCleanup, onMount } from "solid-js";
 import styles from '~/styles/components/VerificationCode.module.scss';
- 
+
 export type P = {
     letter: Accessor<string>
     i: number
@@ -43,6 +43,23 @@ export function CodeBlock(props: P) {
             tabIndex={0}
             onclick={() => ref.focus()}
             class={styles.code}
-            innerText={props.code[props.i]} />
+            innerText={props.code[props.i]}
+            onpaste={(e) => {
+                const newArr: string[] = []
+                const clipboardData = e.clipboardData?.getData('text')
+                if (!clipboardData)
+                    return
+                for (let i = 0; i < clipboardData.length && i < 6; i++) {
+                    const char = clipboardData[i]
+                    if (parseInt(char))
+                        newArr.push(char)
+                }
+                if (newArr.length == 6)
+                    props.setCode(newArr)
+            }}
+            onauxclick={e => {
+                console.log("HERE")
+            }}
+        />
     );
 }
