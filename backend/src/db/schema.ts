@@ -12,7 +12,7 @@ export const User = pgTable('users', {
     dateJoined: timestamp('date_joined', { mode: 'date', withTimezone: true }).notNull().defaultNow(),
     bio: varchar('bio', { length: 255 }).notNull().default(""),
     avatar: text('avatar').notNull().default("https://upload.wikimedia.org/wikipedia/commons/5/55/Question_Mark.svg"),
-    banner: text('banner').notNull().default("https://upload.wikimedia.org/wikipedia/commons/2/2b/Slavic_pattern.svg"),
+    banner: text('banner').notNull().default("/default_banner.png"),
     displayName: varchar('display_name', { length: 50 }).notNull().default("")
 })
 export const VerificationCodes = pgTable('verification_codes', {

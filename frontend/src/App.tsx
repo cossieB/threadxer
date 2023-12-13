@@ -10,6 +10,7 @@ import { PostComposer } from './components/PostComposer';
 import VerifyEmail from './routes/auth/Verify';
 import { Popup } from './components/shared/Popup';
 import { refresh } from './utils/customFetcher';
+import PreferencesPage from './routes/Preferences';
 
 export const [composerOpen, setComposerOpen] = createSignal(false)
 
@@ -46,6 +47,7 @@ function App() {
                 <Route path="/auth/verify" component={VerifyEmail} />
                 <Route path="/create" component={PostComposer} />
                 <Route path="*" component={NotFound} />
+                <Route path="/profile" component={PreferencesPage} />
             </Routes>
         </>
     );
