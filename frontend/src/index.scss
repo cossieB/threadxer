@@ -1,12 +1,14 @@
-@import '~/styles/animations', '~/styles/modal';
+@use '~/styles/mixins';
+@import '~/styles/animations', '~/styles/modal', '~/styles/layout';
 
 @mixin fullScreen {
     width: 100vw;
     height: 100vh;
 };
+@include mixins.hideScrollbar('main');
 :root {
-    --nav-width: 12.5rem;
-    --nav-height: 5rem;
+    --sidepanelWidth: 25%;
+    --nav-height: 3rem;
     --blue1: rgb(29, 155, 240);
     --gray1: #181818;
 }
@@ -26,11 +28,12 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0;
 }
 main {
+    flex-grow: 0;
     @media (max-width: 768px) {
-        margin-bottom: var(--nav-width);
+        height: calc(100vh - var(--nav-height));
     }
     @media (min-width: 768px) {
-        margin-left: var(--nav-width);
+        width: calc(100% - 2 * var(--sidepanelWidth));
     }
 }
 code {

@@ -29,17 +29,10 @@ function App() {
     })
     return (
         <>
+            <div class="layout">
             <Show when={!user.isUnverified}>
                 <Navbar />
             </Show>
-            <Show when={composerOpen()}>
-                <PostComposer />
-            </Show>
-            <Popup
-                close={() => history.replaceState(undefined, "")}
-                text={location.state!.message}
-                when={location.state?.message}
-            />
             <Routes>
                 <Route path="/" component={Home} />
                 <Route path="/auth/signup" component={SignUp} />
@@ -49,6 +42,16 @@ function App() {
                 <Route path="*" component={NotFound} />
                 <Route path="/profile" component={PreferencesPage} />
             </Routes>
+            <div class="sidepanel"></div>
+            </div>
+            <Show when={composerOpen()}>
+                <PostComposer />
+            </Show>
+            <Popup
+                close={() => history.replaceState(undefined, "")}
+                text={location.state!.message}
+                when={location.state?.message}
+            />
         </>
     );
 };

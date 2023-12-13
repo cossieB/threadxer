@@ -5,6 +5,15 @@ import Loader from "~/components/shared/Loader/Loader";
 import Page from "~/components/shared/Page";
 import { user } from "~/globalState/user";
 
+type ApiUserResponse = {
+    username: string;
+    dateJoined: Date;
+    bio: string;
+    avatar: string;
+    banner: string;
+    displayName: string;
+};
+
 async function fetchUser(username: string) {
     const res = await fetch(`api/users/${username.toLowerCase()}`);
     if (!res.ok) {
@@ -17,7 +26,8 @@ async function fetchUser(username: string) {
         }
     }
     if (res.ok) {
-        return await res.json();
+
+        return await res.json() as ApiUserResponse;
     }
 }
 

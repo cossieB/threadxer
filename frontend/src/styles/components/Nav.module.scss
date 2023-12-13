@@ -2,25 +2,24 @@
 
 @mixin navItemSpace {
     @media (min-width: 768px) {
-        margin-left: 2.5rem;
-        padding: 0.5rem 2rem;
+        width: 80%;
+        padding: 0.5rem 0;
+        @include mixins.flexCenter
     }
 }
 
 .nav {
     display: flex;
-    position: fixed;
-
     align-items: center;
-    justify-content: space-around;
+    flex-shrink: 0;
     @media (max-width: 768px) {
+        justify-content: space-around;
         width: 100vw;
-        bottom: 0px;
+        height: var(--nav-height);
     }
     @media (min-width: 768px) {
-        left: 0;
         flex-direction: column;
-        width: var(--nav-width);
+        width: var(--sidepanelWidth);
     }
 
     img,
