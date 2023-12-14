@@ -24,8 +24,8 @@ export async function checkAvailability(req: Request, res: Response, next: NextF
                 columns: {
                     username: true
                 },
-                where({ usernameLower }, { eq }) {
-                    return eq(usernameLower, username.toLowerCase());
+                where(fields, operators) {
+                    return operators.eq(fields.usernameLower, username.toLowerCase());
                 },
             });
             return res.json({ available: !user });

@@ -8,6 +8,7 @@ import { Navigate, useLocation, useNavigate } from '@solidjs/router';
 import { sendAuthRequest } from '~/utils/sendAuthRequest';
 import { Show, createEffect } from 'solid-js';
 import { user } from '~/globalState/user';
+import Page from '~/components/shared/Page';
 
 const [userState, setUserState] = createStore({
     email: "",
@@ -40,30 +41,32 @@ export function Login() {
     }
     return (
         <Show when={!user.username} fallback={<Navigate href="/" />}>
-            <UserForm onsubmit={handleSubmit}>
-                <FormInput
-                    name='email'
-                    setter={setUserState}
-                    type='email'
-                    validationErrors={error()}
+            <Page title='Log In'>
+                <UserForm onsubmit={handleSubmit}>
+                    <FormInput
+                        name='email'
+                        setter={setUserState}
+                        type='email'
+                        validationErrors={error()}
+                    />
+                    <FormInput
+                        name='password'
+                        setter={setUserState}
+                        type='password'
+                    />
+                    <SubmitButton
+                        loading={state.loading}
+                        finished={state.success}
+                        disabled={error().length > 0}
+                    />
+                </UserForm>
+                <Popup
+                    close={() => setState('error', null)}
+                    text={state.error!}
+                    when={!!state.error}
+                    colorDeg='270'
                 />
-                <FormInput
-                    name='password'
-                    setter={setUserState}
-                    type='password'
-                />
-                <SubmitButton
-                    loading={state.loading}
-                    finished={state.success}
-                    disabled={error().length > 0}
-                />
-            </UserForm>
-            <Popup
-                close={() => setState('error', null)}
-                text={state.error!}
-                when={!!state.error}
-                colorDeg='270'
-            />
+            </Page>
         </Show>
     );
 }

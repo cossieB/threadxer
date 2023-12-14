@@ -3,6 +3,7 @@ import { db } from "../db/drizzle";
 import type { Request, Response, NextFunction } from "express";
 import { User } from "../db/schema";
 import { eq } from "drizzle-orm";
+import { sleep } from "../lib/sleep";
 
 export async function getUser(req: Request, res: Response, next: NextFunction) {
     const username = req.params.username.toLowerCase();

@@ -13,7 +13,10 @@ export const User = pgTable('users', {
     bio: varchar('bio', { length: 255 }).notNull().default(""),
     avatar: text('avatar').notNull().default("https://upload.wikimedia.org/wikipedia/commons/5/55/Question_Mark.svg"),
     banner: text('banner').notNull().default("/default_banner.png"),
-    displayName: varchar('display_name', { length: 50 }).notNull().default("")
+    displayName: varchar('display_name', { length: 50 }).notNull().default(""),
+    location: varchar('location', {length: 100}).notNull().default(""),
+    website: varchar('website'),
+    dateOfBirth: timestamp('dob')
 })
 export const VerificationCodes = pgTable('verification_codes', {
     userId: uuid('user_id').references(() => User.userId, { onDelete: 'cascade', onUpdate: 'cascade' }).primaryKey(),
