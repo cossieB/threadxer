@@ -29,7 +29,7 @@ export function generateCookie(refreshToken: string) {
 /**
  * This function creates access token, refresh token and a cookie of the refresh token and saves the token to the database.
  * @param user 
- * @param saveToDb Optional function to save the refresh token to the database in case you want to use a SQL transaction
+ * @param saveToDb Optional function to save the refresh token to the database in case you want to use a SQL transaction.
  * @returns 
  */
 export async function handleTokens(user: TokenUser, saveToDb?: (refreshToken: string) => Promise<void>) {
@@ -37,15 +37,15 @@ export async function handleTokens(user: TokenUser, saveToDb?: (refreshToken: st
     const refreshToken = createRefreshToken(user)
     const cookie = generateCookie(refreshToken);
 
-    if (!saveToDb)
+    if (saveToDb)
+        await saveToDb(refreshToken)
+    else
         await db
             .insert(RefreshTokens)
             .values({
                 token: refreshToken,
                 userId: user.userId
             })
-    else
-        await saveToDb(refreshToken)
 
     return { accessToken, cookie }
 }

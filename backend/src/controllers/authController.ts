@@ -9,6 +9,7 @@ import { handleTokens } from "../utils/generateCookies";
 import { validation as validate } from "../utils/validation";
 import { eq } from "drizzle-orm";
 import { draftVerificationEmail } from "../utils/draftEmail";
+import { redis } from "../utils/redis";
 
 export async function checkAvailability(req: Request, res: Response, next: NextFunction) {
     try {
@@ -85,6 +86,8 @@ export async function signupUser(req: Request, res: Response, next: NextFunction
                 })
             return row[0]
         })
+        redis.setex(`verification:${user.userId}`, code, 259200)
+            .catch(e => console.log(e))
         const { accessToken, cookie } = await handleTokens({ ...user, isUnverified: true })
         res.header('Set-Cookie', cookie)
         draftVerificationEmail(username, code, email)

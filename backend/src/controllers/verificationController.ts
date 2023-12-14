@@ -7,25 +7,44 @@ import { RefreshTokens, User, VerificationCodes } from "../db/schema";
 import { handleTokens } from "../utils/generateCookies";
 import { eq, sql } from "drizzle-orm";
 import { draftVerificationEmail } from "../utils/draftEmail";
+import { redis } from "../utils/redis";
 
-export async function verifyUser (req: Request, res: Response, next: NextFunction) {
+export async function verifyUser(req: Request, res: Response, next: NextFunction) {
     const oldAccessToken = res.locals.token!;
     if (!oldAccessToken.user.isUnverified)
         return next(new AppError("Already verified", 400))
-    const row = await db.query.VerificationCodes.findFirst({
-        where(fields, operators) {
-            return operators.eq(fields.userId, oldAccessToken.user.userId)
+    let storedCode: string;
+    const cachedCode = await redis.get(`verification:${oldAccessToken.user.userId}`)
+    if (cachedCode)
+        storedCode = cachedCode
+    else {
+        const row = await db.query.VerificationCodes.findFirst({
+            where(fields, operators) {
+                return operators.eq(fields.userId, oldAccessToken.user.userId)
+            }
+        })
+        if (!row)
+            return next(new AppError('Error. Please click "resend".', 400))
+        if (row.expiry < new Date) {
+            const code = randomInt(999999).toString().padStart(6, '0');
+            await Promise.all([
+                db
+                    .update(VerificationCodes)
+                    .set({
+                        code,
+                        expiry: sql`NOW() + INTERVAL '72 hours'`
+                    })
+                    .where(eq(VerificationCodes.userId, oldAccessToken.user.userId)),
+                redis.setex(`verification:${oldAccessToken.user.userId}`, code, 259200)
+            ])
+            draftVerificationEmail(oldAccessToken.user.username, code, oldAccessToken.user.email)
+            return next(new AppError("Code expired. Check your email for a new code.", 400))
         }
-    })
-    if (!row)
-        return next(new AppError('Error. Please click "resend".', 400))
-    if (row.expiry < new Date) {
-        const code = randomInt(999999).toString().padStart(6, '0')
-        draftVerificationEmail(oldAccessToken.user.username, code, oldAccessToken.user.email)
-        return next(new AppError("Code expired. Check your email for a new code.", 400))
+        await redis.setex(`verification:${oldAccessToken.user.userId}`, row.code, 259200)
+        storedCode = row.code
     }
     try {
-        if (row.code !== req.body.code)
+        if (storedCode !== req.body.code)
             return next(new AppError('Invalid Code', 400))
         const now = new Date;
         await db.transaction(async tx => {
@@ -56,7 +75,7 @@ export async function verifyUser (req: Request, res: Response, next: NextFunctio
     }
 }
 
-export async function resendVerificationToken (req: Request, res: Response, next: NextFunction) {
+export async function resendVerificationToken(req: Request, res: Response, next: NextFunction) {
     const code = randomInt(999999).toString().padStart(6, '0');
     const accessToken = res.locals.token!;
     if (!accessToken.user.isUnverified)
@@ -74,7 +93,7 @@ export async function resendVerificationToken (req: Request, res: Response, next
                     expiry: sql`NOW() + INTERVAL '72 hours'`
                 }
             })
-        // draftVerificationEmail(accessToken.user.username, code, accessToken.user.email)
+        draftVerificationEmail(accessToken.user.username, code, accessToken.user.email)
         res.sendStatus(200)
     }
     catch (error) {
