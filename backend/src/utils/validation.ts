@@ -13,7 +13,7 @@ export function validation(username: string, password: string, confirmPassword: 
         errors.password.push("Password must have at least 6 characters")
     if (password != confirmPassword)
         errors.confirmPassword.push("Passwords do not match")
-    if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email))
+    if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,}$/.test(email))
         errors.email.push("Invalid email")
     return errors
 }

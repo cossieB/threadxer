@@ -7,7 +7,7 @@ export async function sendAuthRequest(
     setState: SetStoreFunction<{ loading: boolean; success: boolean; error: string | null; }>,
     userState: {},
     navigate: Navigator
-): Promise<false | [true, string]> {
+) {
     try {
         setState('loading', true);
         const res = await fetch(url, {
@@ -23,19 +23,16 @@ export async function sendAuthRequest(
             createUser(data.jwt)
             navigate(data.redirect)
         }
-        if (res.status === 400) {
+        else if (res.headers.get('Content-Type')?.includes('application/json')) {
             const data = await res.json();
             setState('error', data.error);
-            return false
         }
         else {
             setState('error', "Something Went Wrong. Please try again later");
-            return false
         }
     } 
     catch (error) {
-        console.log(error);
-        return false
+        console.log(error)
     }
     finally {
         setState('loading', false);

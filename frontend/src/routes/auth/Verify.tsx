@@ -34,7 +34,7 @@ export default function VerifyEmail() {
         }
         const data = await res.json();
         createUser(data.jwt)
-        navigate("/")
+        navigate("/profile")
     }
     async function handleResend() {
         setState('isResending', true);

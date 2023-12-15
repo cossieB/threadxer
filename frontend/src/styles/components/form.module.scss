@@ -55,6 +55,9 @@
                 color: hsl(180, 25%, 75%);
             }
         }
+        &.error {
+            border: 2px solid red;
+        }
     }
 
     >div {

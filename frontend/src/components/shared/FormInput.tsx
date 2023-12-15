@@ -19,13 +19,11 @@ export function FormInput<T>(props: Props<HTMLInputElement, T>) {
     const errored = () => merged.validationErrors.length > 0
     return (
         <>
-            <div class={styles.formControl} classList={{[styles.error]: errored()}}>
+            <div class={styles.formControl} classList={{ [styles.error]: errored() }}>
                 <input {...props} onchange={getOnChange(props)} type={props.type ?? 'text'} autocomplete="off" name={merged.name} id={merged.name} required={merged.required} placeholder=" " value={merged.value} />
                 <label for={merged.name}>
                     {titleCase(merged.label)}
-                    <Show when={merged.required}>
-                        *
-                    </Show>
+                    <Show when={merged.required}>*</Show>
                 </label>
             </div>
             <Show when={merged.validationErrors.length > 0}>

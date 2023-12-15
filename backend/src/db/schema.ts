@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, uuid, varchar, text, timestamp, jsonb, integer, unique, primaryKey, boolean, foreignKey, smallint } from "drizzle-orm/pg-core";
+import { pgTable, uuid, varchar, text, timestamp, jsonb, integer, unique, primaryKey, boolean, foreignKey, smallint, date } from "drizzle-orm/pg-core";
 
 export const User = pgTable('users', {
     userId: uuid('user_id').primaryKey().defaultRandom(),
@@ -16,7 +16,7 @@ export const User = pgTable('users', {
     displayName: varchar('display_name', { length: 50 }).notNull().default(""),
     location: varchar('location', {length: 100}).notNull().default(""),
     website: varchar('website'),
-    dateOfBirth: timestamp('dob')
+    dateOfBirth: date('dob')
 })
 export const VerificationCodes = pgTable('verification_codes', {
     userId: uuid('user_id').references(() => User.userId, { onDelete: 'cascade', onUpdate: 'cascade' }).primaryKey(),
@@ -59,6 +59,17 @@ export const Media = pgTable('media', {
     url: text('url').notNull(),
     uploadThingResponse: jsonb('uploadthing_response').notNull().default(sql`'{}'::jsonb`)
 })
+
+// export const Avatar = pgTable('avatars', {
+//     userId: uuid('user_id').references(() => User.userId, { onDelete: 'cascade', onUpdate: 'cascade' }).primaryKey(),
+//     url: text('url').notNull(),
+//     uploadThingResponse: jsonb('uploadthing_response').notNull().default(sql`'{}'::jsonb`)
+// })
+// export const Banner = pgTable('banners', {
+//     userId: uuid('user_id').references(() => User.userId, { onDelete: 'cascade', onUpdate: 'cascade' }).primaryKey(),
+//     url: text('url').notNull(),
+//     uploadThingResponse: jsonb('uploadthing_response').notNull().default(sql`'{}'::jsonb`)
+// })
 
 export const Likes = pgTable('likes', {
     likeId: uuid('like_id').primaryKey().defaultRandom(),

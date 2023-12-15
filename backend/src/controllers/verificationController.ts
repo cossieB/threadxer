@@ -35,12 +35,12 @@ export async function verifyUser(req: Request, res: Response, next: NextFunction
                         expiry: sql`NOW() + INTERVAL '72 hours'`
                     })
                     .where(eq(VerificationCodes.userId, oldAccessToken.user.userId)),
-                redis.setex(`verification:${oldAccessToken.user.userId}`, code, 259200)
+                redis.setex(`verification:${oldAccessToken.user.userId}`, 259200, code)
             ])
             draftVerificationEmail(oldAccessToken.user.username, code, oldAccessToken.user.email)
             return next(new AppError("Code expired. Check your email for a new code.", 400))
         }
-        await redis.setex(`verification:${oldAccessToken.user.userId}`, row.code, 259200)
+        await redis.setex(`verification:${oldAccessToken.user.userId}`, 259200, row.code)
         storedCode = row.code
     }
     try {

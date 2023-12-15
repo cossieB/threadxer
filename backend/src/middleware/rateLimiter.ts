@@ -11,12 +11,12 @@ import { redis } from "../utils/redis"
  */
 export  function rateLimiter(name: string, limit: number, window: number) {
     return async function (req: Request, res: Response, next: NextFunction) {
-        const key = `${name}:${res.locals.token?.user ?? req.ip}`;
-        const count = await redis.incr(key );
+        const key = `${name}:${res.locals.token?.user.userId ?? req.ip}`;
+        const count = await redis.incr(key);
         if (count == 1)
             redis.expire(key, window)
         if (count > limit)
-            return next(new AppError('Too many requests', 429))
+            return next(new AppError("You're doing that too much", 429))
 
         next()
     }

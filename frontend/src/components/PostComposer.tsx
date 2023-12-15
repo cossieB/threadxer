@@ -4,6 +4,7 @@ import { CloseBtn } from "./shared/CloseBtn";
 import { SubmitButton } from "./shared/SubmitButton";
 import { setComposerOpen } from "~/App";
 import clickOutside from "~/lib/clickOutside";
+import { CharacterCounter } from "./CharacterCounter";
 false && clickOutside
 
 export function PostComposer() {
@@ -18,13 +19,11 @@ export function PostComposer() {
         str = str.replace(rgx, `<span class="${styles.special}">$1</span>`)
         return str
     }
-    const radius = 15
-    const circumference = 2 * Math.PI * radius
     return (
         <div class={styles.composer} >
             <div use:clickOutside={() => setComposerOpen(false)}>
                 <div class={styles.top}>
-                    <CloseBtn onclick={() => {setComposerOpen(false)}} />
+                    <CloseBtn onclick={() => { setComposerOpen(false) }} />
                 </div>
                 <textarea
                     oninput={e => setInput(e.target.value)}
@@ -32,10 +31,10 @@ export function PostComposer() {
                     ref={textarea}
                 />
                 <div class={styles.bottom}>
-                    <svg height={2 * radius + 10} width={2 * radius + 10}>
-                        <circle cx="50%" cy="50%" r={radius} stroke-dasharray={`${circumference} ${circumference}`} fill="none" stroke="gray" stroke-width={5} />
-                        <circle cx="50%" cy="50%" r={radius} stroke-dasharray={`${input().length / 255 * circumference} ${circumference}`} fill="none" stroke="var(--blue1)" stroke-width={5} />
-                    </svg>
+                    <CharacterCounter
+                        inputLength={input().length}
+                        max={255}
+                    />
                     <SubmitButton
                         disabled={input().length === 0}
                         finished={false}
@@ -60,3 +59,4 @@ function FormatText(props: { str: string }) {
         </Switch>
     )
 }
+

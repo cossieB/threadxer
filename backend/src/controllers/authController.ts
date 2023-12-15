@@ -10,6 +10,7 @@ import { validation as validate } from "../utils/validation";
 import { eq } from "drizzle-orm";
 import { draftVerificationEmail } from "../utils/draftEmail";
 import { redis } from "../utils/redis";
+import titleCase from "../lib/titleCase";
 
 export async function checkAvailability(req: Request, res: Response, next: NextFunction) {
     try {
@@ -61,6 +62,7 @@ export async function signupUser(req: Request, res: Response, next: NextFunction
         if (Object.values(errors).flat().length > 0)
             throw new AppError("Please don't bypass client validation", 400)
 
+        const displayName = titleCase(username.replaceAll('_', ' '))
         const code = randomInt(999999).toString().padStart(6, '0')
         const salt = await genSalt(10);
         const passwordHash = await hash(password, salt);
@@ -70,7 +72,8 @@ export async function signupUser(req: Request, res: Response, next: NextFunction
                     email: email.toLowerCase(),
                     username,
                     usernameLower: username.toLowerCase(),
-                    passwordHash
+                    passwordHash, 
+                    displayName
                 })
                 .returning({
                     userId: User.userId,
@@ -86,11 +89,11 @@ export async function signupUser(req: Request, res: Response, next: NextFunction
                 })
             return row[0]
         })
-        redis.setex(`verification:${user.userId}`, code, 259200)
+        redis.setex(`verification:${user.userId}`, 259200, code)
             .catch(e => console.log(e))
         const { accessToken, cookie } = await handleTokens({ ...user, isUnverified: true })
         res.header('Set-Cookie', cookie)
-        draftVerificationEmail(username, code, email)
+        // draftVerificationEmail(username, code, email)
         return res.status(201).json({ jwt: accessToken, redirect: '/auth/verify' })
     }
     catch (error) {

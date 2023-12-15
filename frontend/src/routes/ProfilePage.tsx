@@ -2,13 +2,14 @@ import { Navigate } from "@solidjs/router";
 import { createMutation, createQuery } from "@tanstack/solid-query";
 import { Switch, Match } from "solid-js";
 import { createStore } from "solid-js/store";
-import { CustomInput, CustomTextarea } from "~/components/CustomInput";
-import { FormInput, FormTextarea } from "~/components/shared/FormInput";
+import { CustomInput } from "~/components/CustomInput";
+import { TextareaWithCounter } from "~/components/CustomTextarea";
 import Loader from "~/components/shared/Loader/Loader";
 import Page from "~/components/shared/Page";
 import { SubmitButton } from "~/components/shared/SubmitButton";
 import UserForm from "~/components/shared/UserForm";
 import { user } from "~/globalState/user";
+import { validateUrl } from "~/lib/validateUrl";
 import styles from "~/styles/routes/ProfilePage.module.scss"
 import { CloseSvg, UploadSvg } from "~/svgs";
 
@@ -38,9 +39,13 @@ async function fetchUser(username: string) {
     }
 }
 
+const [fieldErrors, setFieldErrors] = createStore({
+    username: [] as string[],
+    website: [] as string[],
+})
+
 export default function PreferencesPage() {
-    let avatarSelector!: HTMLInputElement
-    let bannerSelector!: HTMLInputElement;
+    const errored = () => Object.values(fieldErrors).flat().length > 0
 
     const data = createQuery(() => ({
         get enabled() {
@@ -54,6 +59,8 @@ export default function PreferencesPage() {
     }))
     async function submitForm(e: SubmitEvent) {
         e.preventDefault()
+        const fd = new FormData(e.target as HTMLFormElement);
+        console.log(Object.fromEntries(fd))
     }
     const mutation = createMutation(() => ({
         mutationFn: submitForm
@@ -74,43 +81,70 @@ export default function PreferencesPage() {
                 <Match when={data.isSuccess}>
                     <div class={styles.profile}>
                         <div class={styles.userImages} style={{ 'background-image': `url(${data.data?.banner})` }}>
-                            <button type="button" onclick={() => bannerSelector.click()}>
-                                <UploadSvg />
-                            </button>
+                            <UploadBtn />
                             <button type="button">
                                 <CloseSvg />
                             </button>
                             <div class={styles.avatar} style={{ 'background-image': `url(${data.data?.avatar})` }}>
-                                <button type="button" onclick={() => avatarSelector.click()}>
-                                    <UploadSvg />
-                                </button>
+                                <UploadBtn />
                             </div>
-                            <input type="file" hidden ref={avatarSelector} accept="image/*" />
-                            <input type="file" hidden ref={bannerSelector} accept="image/*" />
                         </div>
                         <UserForm onsubmit={mutation.mutate}>
                             <CustomInput
                                 name="username"
+                                disabled
                                 minlength={3}
+                                value={data.data?.username}
                                 maxlength={15}
                                 onchange={e => {
                                     e.target.value = e.target.value.trim().replace(/\s/g, '_').replace(/\W/g, "")
                                 }}
                             />
-                            <CustomInput name="displayName" />
-                            <CustomTextarea
+                            <CustomInput
+                                name="displayName"
+                                value={data.data?.displayName}
+                            />
+                            <CustomInput name="location" required={false} />
+                            <TextareaWithCounter
                                 name="bio"
                                 required={false}
+                                value={data.data?.bio}
+                                maxLength={180}
                             />
-                            <CustomInput name="location" />
+                            <CustomInput
+                                name="website"
+                                type="url"
+                                required={false}
+                                oninput={() => setFieldErrors('website', [])}
+                                validatorFn={value => {
+                                    if (!value)
+                                        return setFieldErrors('website', [])
+                                    const url = validateUrl(value)
+                                    if (!url)
+                                        setFieldErrors('website', ["Enter valid URL with starting with https"])
+
+                                }}
+                                validationErrors={fieldErrors.website}
+                            />
                             <SubmitButton
                                 finished={mutation.isSuccess}
                                 loading={mutation.isPending}
+                                disabled={errored()}
                             />
                         </UserForm>
                     </div>
                 </Match>
             </Switch>
         </Page>
+    )
+}
+
+function UploadBtn() {
+    let ref!: HTMLInputElement
+    return (
+        <button type="button" onclick={() => ref.click()}>
+            <UploadSvg />
+            <input type="file" hidden ref={ref} accept="image/*" />
+        </button>
     )
 }
