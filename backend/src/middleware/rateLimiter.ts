@@ -9,12 +9,11 @@ import { redis } from "../utils/redis"
  * @param window time in seconds
  * @returns 
  */
-export  function rateLimiter(name: string, limit: number, window: number) {
+export function rateLimiter(name: string, limit: number, window: number) {
     return async function (req: Request, res: Response, next: NextFunction) {
         const key = `${name}:${res.locals.token?.user.userId ?? req.ip}`;
         const count = await redis.incr(key);
-        if (count == 1)
-            redis.expire(key, window)
+        redis.expire(key, window, 'NX')
         if (count > limit)
             return next(new AppError("You're doing that too much", 429))
 

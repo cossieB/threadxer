@@ -29,8 +29,7 @@ export function FormInput<T>(props: Props<HTMLInputElement, T>) {
             <Show when={merged.validationErrors.length > 0}>
                 <ul>
                     <For each={merged.validationErrors}>
-                        {error => <li> {error} </li>
-                        }
+                        {error => <li> {error} </li>}
                     </For>
                 </ul>
             </Show>
@@ -45,9 +44,7 @@ export function FormTextarea<T>(props: Props<HTMLTextAreaElement, T>) {
             <textarea {...props} name={merged.name} onchange={getOnChange(props)} id={merged.name} required={merged.required} placeholder=" " />
             <label for={merged.name}>
                 {titleCase(merged.label)}
-                <Show when={merged.required}>
-                    *
-                </Show>
+                <Show when={merged.required}>*</Show>
             </label>
         </div>
     )

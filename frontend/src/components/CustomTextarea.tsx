@@ -22,7 +22,7 @@ export function CustomTextarea(props: Props) {
 }
 
 export function TextareaWithCounter(props: Require<Props, 'maxLength'>) {
-    const [input, setInput] = createSignal("")
+    const [input, setInput] = createSignal(typeof props.value == 'string' ? props.value : "")
     const merged = mergeProps({ label: props.name, required: true }, props)
     return (
         <>

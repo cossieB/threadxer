@@ -3,7 +3,7 @@ import { db } from "../db/drizzle";
 import type { Request, Response, NextFunction } from "express";
 import { User } from "../db/schema";
 import { eq } from "drizzle-orm";
-import { sleep } from "../lib/sleep";
+import { validateUrl } from "../lib/validateUrl";
 
 export async function getUser(req: Request, res: Response, next: NextFunction) {
     const username = req.params.username.toLowerCase();
@@ -19,15 +19,20 @@ export async function getUser(req: Request, res: Response, next: NextFunction) {
 }
 
 export async function updateUser(req: Request, res: Response, next: NextFunction) {
-    const user = res.locals.token!.user;
-    const result = await db
-        .update(User)
-        .set({
-            username: req.body.username,
-            usernameLower: req.body.username.toLowerCase()
-        })
-        .where(eq(User.email, user.email))
-    if (result.length == 0)
-        return next(new AppError("Please logout and login again", 403))
-    return res.sendStatus(200)
+    try {
+        const user = res.locals.token!.user;
+        if (req.body.website && !validateUrl(req.body.website))
+            throw new AppError("Please don't bypass client validation", 400)
+        const { displayName, bio, website, location } = req.body;
+        
+        await db
+            .update(User)
+            .set({ displayName, bio, website, location })
+            .where(eq(User.email, user.email))
+ 
+        return res.sendStatus(200)
+    } 
+    catch (error) {
+        next(error)
+    }
 }

@@ -1,5 +1,5 @@
 import { Navigate } from "@solidjs/router";
-import { createMutation, createQuery } from "@tanstack/solid-query";
+import { createMutation, createQuery, useQueryClient } from "@tanstack/solid-query";
 import { Switch, Match } from "solid-js";
 import { createStore } from "solid-js/store";
 import { CustomInput } from "~/components/CustomInput";
@@ -11,7 +11,9 @@ import UserForm from "~/components/shared/UserForm";
 import { user } from "~/globalState/user";
 import { validateUrl } from "~/lib/validateUrl";
 import styles from "~/styles/routes/ProfilePage.module.scss"
-import { CloseSvg, UploadSvg } from "~/svgs";
+import { CloseSvg } from "~/svgs";
+import { customFetch } from "~/utils/customFetcher";
+import { UploadBtn } from "./UploadBtn";
 
 type ApiUserResponse = {
     username: string;
@@ -20,7 +22,8 @@ type ApiUserResponse = {
     avatar: string;
     banner: string;
     displayName: string;
-    dob?: Date
+    dob?: Date,
+    location: string
 };
 
 async function fetchUser(username: string) {
@@ -38,6 +41,25 @@ async function fetchUser(username: string) {
         return await res.json() as ApiUserResponse;
     }
 }
+async function mutateUser(e: SubmitEvent) {
+    e.preventDefault()
+
+    const fd = new FormData(e.target as HTMLFormElement);
+    const res = await customFetch('/api/users', {
+        method: "POST",
+        headers: {
+            'Content-Type': "application/json"
+        },
+        body: JSON.stringify(Object.fromEntries(fd))
+    });
+    if (!res.ok) {
+        if (res.headers.get('Content-Type')?.includes("application/json"))
+            throw new Error((await res.json()).error)
+        else 
+            throw new Error("Something went wrong. Please try again later")
+    }
+    
+}
 
 const [fieldErrors, setFieldErrors] = createStore({
     username: [] as string[],
@@ -45,7 +67,8 @@ const [fieldErrors, setFieldErrors] = createStore({
 })
 
 export default function PreferencesPage() {
-    const errored = () => Object.values(fieldErrors).flat().length > 0
+    const errored = () => Object.values(fieldErrors).flat().length > 0;
+    const queryClient = useQueryClient()
 
     const data = createQuery(() => ({
         get enabled() {
@@ -57,13 +80,18 @@ export default function PreferencesPage() {
         refetchOnReconnect: false,
         refetchOnWindowFocus: false,
     }))
-    async function submitForm(e: SubmitEvent) {
-        e.preventDefault()
-        const fd = new FormData(e.target as HTMLFormElement);
-        console.log(Object.fromEntries(fd))
-    }
+
+
     const mutation = createMutation(() => ({
-        mutationFn: submitForm
+        mutationFn: mutateUser,
+        onSuccess(data, variables, context) {
+            queryClient.invalidateQueries({
+                queryKey: ['users', user.username.toLowerCase()]
+            })
+        },
+        onError(error, variables, context) {
+            console.log(error)
+        },
     }))
 
     return (
@@ -104,11 +132,16 @@ export default function PreferencesPage() {
                                 name="displayName"
                                 value={data.data?.displayName}
                             />
-                            <CustomInput name="location" required={false} />
+                            <CustomInput
+                                name="location"
+                                required={false}
+                                value={data.data?.location}
+                            />
                             <TextareaWithCounter
                                 name="bio"
                                 required={false}
                                 value={data.data?.bio}
+
                                 maxLength={180}
                             />
                             <CustomInput
@@ -125,6 +158,7 @@ export default function PreferencesPage() {
 
                                 }}
                                 validationErrors={fieldErrors.website}
+
                             />
                             <SubmitButton
                                 finished={mutation.isSuccess}
@@ -136,15 +170,5 @@ export default function PreferencesPage() {
                 </Match>
             </Switch>
         </Page>
-    )
-}
-
-function UploadBtn() {
-    let ref!: HTMLInputElement
-    return (
-        <button type="button" onclick={() => ref.click()}>
-            <UploadSvg />
-            <input type="file" hidden ref={ref} accept="image/*" />
-        </button>
     )
 }
