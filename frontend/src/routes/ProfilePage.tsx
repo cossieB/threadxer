@@ -11,7 +11,7 @@ import UserForm from "~/components/shared/UserForm";
 import { user } from "~/globalState/user";
 import { validateUrl } from "~/lib/validateUrl";
 import styles from "~/styles/routes/ProfilePage.module.scss"
-import { CloseSvg } from "~/svgs";
+import { CloseSvg, DeleteSvg } from "~/svgs";
 import { customFetch } from "~/utils/customFetcher";
 import { UploadBtn } from "./UploadBtn";
 import { Popup } from "~/components/shared/Popup";
@@ -112,7 +112,7 @@ export default function PreferencesPage() {
                         <div class={styles.userImages} style={{ 'background-image': `url(${data.data?.banner})` }}>
                             <UploadBtn />
                             <button type="button">
-                                <CloseSvg />
+                                <DeleteSvg />
                             </button>
                             <div class={styles.avatar} style={{ 'background-image': `url(${data.data?.avatar})` }}>
                                 <UploadBtn />

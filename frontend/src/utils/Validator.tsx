@@ -21,7 +21,7 @@ export class Validator {
             this._errors.confirmPassword.push("Passwords do not match");
     };
     validateEmail = (email: string) => {
-        if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,}$/.test(email))
+        if (!/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(email))
             this.errors.email.push("Invalid email");
     };
     validate = (username: string, password: string, confirmPassword: string, email: string) => {
