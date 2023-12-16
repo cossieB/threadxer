@@ -21,7 +21,8 @@ export function CustomInput(props: Props) {
     const merged = mergeProps({
         label: props.name,
         required: true,
-        validationErrors: [] as string[]
+        validationErrors: [] as string[],
+        autocomplete: "off"
     }, props)
     const errored = () => merged.validationErrors.length > 0
     return (

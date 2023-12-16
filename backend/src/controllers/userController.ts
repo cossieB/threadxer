@@ -19,7 +19,7 @@ export async function getUser(req: Request, res: Response, next: NextFunction) {
 }
 
 export async function updateUser(req: Request, res: Response, next: NextFunction) {
-    try {throw new Error("SHIT")
+    try {
         const user = res.locals.token!.user;
         if (req.body.website && !validateUrl(req.body.website))
             throw new AppError("Please don't bypass client validation", 400)

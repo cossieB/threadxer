@@ -6,7 +6,6 @@ import { randomInt } from "crypto";
 import { PostgresError } from "postgres";
 import { RefreshTokens, User, VerificationCodes } from "../db/schema";
 import { handleTokens } from "../utils/generateCookies";
-import { validation as validate } from "../utils/validation";
 import { eq } from "drizzle-orm";
 import { draftVerificationEmail } from "../utils/draftEmail";
 import { redis } from "../utils/redis";
@@ -56,10 +55,6 @@ export async function signupUser(req: Request, res: Response, next: NextFunction
     try {
         const { username, password, confirmPassword, email } = req.body as Record<string, string>;
         if (password != confirmPassword)
-            throw new AppError("Please don't bypass client validation", 400)
-
-        const errors = validate(username, password, confirmPassword, email);
-        if (Object.values(errors).flat().length > 0)
             throw new AppError("Please don't bypass client validation", 400)
 
         const displayName = titleCase(username.replaceAll('_', ' '))

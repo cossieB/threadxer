@@ -3,21 +3,44 @@ import AppError from "../utils/AppError"
 
 type O = {
     property: string,
-    type: string | boolean | number | null
+    type?: 'string' | 'boolean' | 'number' | 'null',
+    min?: number,
+    max?: number,
+    regex?: RegExp,
+    required?: boolean
 }
 /**
  * 
  * @param arr An array of required properties in request body.
  * @returns 
  */
+
+const defaults: Omit<Required<O>, 'property' | 'regex'> = {
+    type: 'string',
+    min: Number.NEGATIVE_INFINITY,
+    max: Number.POSITIVE_INFINITY,
+    required: true
+}
+
 export function validation(arr: (string | O)[]) {
     return function (req: Request, res: Response, next: NextFunction) {
         for (const element of arr) {
-            const [property, type] = typeof element === 'string' ? [element, 'string'] : [element.property, element.type]
-            const key = req.body[property]
-            if (!key || typeof key != type)
+
+            const options = typeof element === 'object' ? { ...defaults, ...element } : { ...defaults, property: element }
+            const { property } = options
+            const bodyValue = req.body[property]; 
+
+            if (options.required && !bodyValue) {
+                return next(new AppError("Please don't bypass client validation", 400))
+            }
+            if (typeof bodyValue != options.type)
                 return next(new AppError("Please don't bypass client validation", 400))
 
+            if ((bodyValue.length) && (bodyValue.length > options.max || bodyValue.length < options.min))
+                return next(new AppError("Please don't bypass client validation", 400))
+
+            if (options.regex && !options.regex.test(bodyValue))
+                return next(new AppError("Please don't bypass client validation", 400))
         }
         next()
     }

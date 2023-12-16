@@ -43,7 +43,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     if (err instanceof AppError)
         return res.status(err.status).json({ error: err.message })
     console.error(err.stack);
-    return res.status(500).json({ message: "Something went wrong" })
+    return res.status(500).json({ error: "Something went wrong. Please try again later." })
 })
 
 const PORT = process.env.PORT ?? 8080
