@@ -9,11 +9,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@solidjs/router": "^0.9.1",
+    "@solidjs/router": "^0.10.3",
     "@tanstack/solid-query": "^5.13.4",
     "jwt-decode": "^4.0.0",
     "solid-js": "^1.7.8",
-    "solid-transition-group": "^0.2.3"
+    "solid-transition-group": "^0.2.3",
+    "uploadthing": "^6.1.0"
   },
   "devDependencies": {
     "@types/node": "^20.10.4",

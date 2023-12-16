@@ -14,6 +14,7 @@ import styles from "~/styles/routes/ProfilePage.module.scss"
 import { CloseSvg } from "~/svgs";
 import { customFetch } from "~/utils/customFetcher";
 import { UploadBtn } from "./UploadBtn";
+import { Popup } from "~/components/shared/Popup";
 
 type ApiUserResponse = {
     username: string;
@@ -58,7 +59,7 @@ async function mutateUser(e: SubmitEvent) {
         else 
             throw new Error("Something went wrong. Please try again later")
     }
-    
+
 }
 
 const [fieldErrors, setFieldErrors] = createStore({
@@ -169,6 +170,11 @@ export default function PreferencesPage() {
                     </div>
                 </Match>
             </Switch>
+            <Popup
+                close={mutation.reset}
+                text={mutation.error?.message ?? ""}
+                when={mutation.isError}
+            />
         </Page>
     )
 }

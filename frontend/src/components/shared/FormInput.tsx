@@ -55,7 +55,7 @@ export function SelectInput(props: P) {
     return (
         <div class={styles.formControl}>
             <select name={merged.name} id={merged.name} onchange={getOnChange(props)}>
-                <option value="" disabled selected={!!!props.default}>{titleCase(props.label)}</option>
+                <option value="" disabled selected={!props.default}>{titleCase(props.label)}</option>
                 <For each={merged.arr}>
                     {item =>
                         <SelectOption

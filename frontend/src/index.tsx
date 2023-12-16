@@ -3,16 +3,29 @@ import { render } from 'solid-js/web'
 
 import './index.scss'
 import App from './App'
-import { Router } from '@solidjs/router'
+import { Route, Router } from '@solidjs/router'
 import { QueryClient, QueryClientProvider } from '@tanstack/solid-query';
+import NotFound from './components/404';
+import { PostComposer } from './components/PostComposer';
+import Home from './routes/Home';
+import ProfilePage from './routes/ProfilePage';
+import { Login } from './routes/auth/Login';
+import { SignUp } from './routes/auth/SignUp';
+import VerifyEmail from './routes/auth/Verify';
 
 const root = document.getElementById('root');
 const queryClient = new QueryClient
 
 render(() =>
     <QueryClientProvider client={queryClient}>
-        <Router>
-            <App />
+        <Router root={App}>
+            <Route path="/" component={Home} />
+            <Route path="/auth/signup" component={SignUp} />
+            <Route path="/auth/login" component={Login} />
+            <Route path="/auth/verify" component={VerifyEmail} />
+            <Route path="/create" component={PostComposer} />
+            <Route path="*" component={NotFound} />
+            <Route path="/profile" component={ProfilePage} />
         </Router>
     </QueryClientProvider>
     , root!)

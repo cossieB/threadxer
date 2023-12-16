@@ -14,6 +14,18 @@ export const uploadRouter = {
     }).onUploadComplete((data) => {
         console.log("upload completed", data);
     }),
+    avatar: f({
+        image: {
+            maxFileSize: "1024B"
+        }
+    })
+    .middleware(async ({req, res}) => {
+        console.log(res.locals.token?.user)
+        return {userId: res.locals.token?.user.userId}
+    })
+    .onUploadComplete(data => {
+        console.log(data)
+    })
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof uploadRouter;
