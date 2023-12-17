@@ -59,7 +59,7 @@ export async function verifyUser(req: Request, res: Response, next: NextFunction
                 })
             await tx.delete(RefreshTokens).where(eq(RefreshTokens.token, req.cookies.rf))
         })
-        const { accessToken: newAccessToken, cookie } = await handleTokens({ ...oldAccessToken.user, isUnverified: false }, async refreshToken => {
+        const { accessToken: newAccessToken, cookie, fb } = await handleTokens({ ...oldAccessToken.user, isUnverified: false }, async refreshToken => {
             await db.transaction(async tx => {
                 await tx.delete(RefreshTokens).where(eq(RefreshTokens.token, req.cookies.rf))
                 await tx.insert(RefreshTokens).values({
@@ -69,7 +69,7 @@ export async function verifyUser(req: Request, res: Response, next: NextFunction
             })
         })
         res.setHeader('Set-Cookie', cookie)
-        return res.json({ jwt: newAccessToken })
+        return res.json({ jwt: newAccessToken, fb })
     } catch (error) {
         next(error)
     }

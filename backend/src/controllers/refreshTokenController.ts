@@ -24,7 +24,7 @@ export async function getAccessToken(req: Request, res: Response, next: NextFunc
             res.clearCookie('rf')
             return next(new AppError('Invalid Token', 403))
         }
-        const { accessToken, cookie } = await handleTokens(token.user, async refreshToken => {
+        const { accessToken, cookie, fb } = await handleTokens(token.user, async refreshToken => {
             await db.transaction(async tx => {
                 await tx.delete(RefreshTokens).where(eq(RefreshTokens.token, refresh))
                 await tx.insert(RefreshTokens).values({
@@ -33,7 +33,6 @@ export async function getAccessToken(req: Request, res: Response, next: NextFunc
                 })
             })
         })
-        const fb = await getAuth().createCustomToken(token.user.userId)
         res.setHeader('Set-Cookie', cookie)
         return res.json({ jwt: accessToken, fb })
     }

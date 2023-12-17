@@ -2,13 +2,10 @@ import cors from "cors";
 import express, { type NextFunction, type Request, type Response } from "express";
 import path from "path";
 import dotenv from 'dotenv'
-import { createUploadthingExpressHandler } from "uploadthing/express";
-import { uploadRouter } from "./uploadthing";
 import AppError from "./utils/AppError";
 import * as Routes from "./routes";
 import { authenticate } from "./middleware/authenticate";
 import { cookieParser } from "./middleware/cookieParser";
-import { getAuth } from "firebase-admin/auth";
 import { startFire } from "./config/firebase";
 
 dotenv.config()
@@ -22,28 +19,11 @@ app.use(cookieParser)
 app.use(express.static(path.resolve(__dirname, '../public')))
 app.use(authenticate)
 
-app.use("/api/uploadthing", createUploadthingExpressHandler({
-    router: uploadRouter,
-}));
 app.use('/api/auth', Routes.authRouter)
 app.use('/api/auth/verify', Routes.verificationRouter)
 app.use('/api/auth/refresh', Routes.refreshRoutes)
 app.use('/api/users', Routes.userRouter)
-app.get('/test', (req, res) => {
 
-    getAuth()
-        .createCustomToken("skdfjsfsdjfkasdfj")
-        .then((customToken) => {
-            console.log(customToken)
-            // Send token back to client
-            res.json({jwt: customToken})
-        })
-        .catch((error) => {
-            console.error(error);
-            res.sendStatus(500)
-        });
-    
-})
 app.all('/api/*', (req, res) => {
     res.sendStatus(404)
 })

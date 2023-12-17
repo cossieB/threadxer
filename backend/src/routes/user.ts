@@ -6,4 +6,4 @@ import { validation } from "../middleware/validation";
 export const userRouter = Router()
 
 userRouter.get('/:username', userController.getUser)
-userRouter.post('/', authorize, validation(['displayName']), userController.updateUser)
+userRouter.post('/', authorize, userController.updateUser)

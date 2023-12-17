@@ -133,7 +133,7 @@ export async function loginUser(req: Request, res: Response, next: NextFunction)
         if (!valid)
             throw new AppError("Invalid Credentials", 400)
 
-        const { accessToken, cookie } = await handleTokens({ ...user, isUnverified: !emailVerified }, async refreshToken => {
+        const { accessToken, cookie, fb } = await handleTokens({ ...user, isUnverified: !emailVerified }, async refreshToken => {
             db.transaction(async tx => {
                 await tx.insert(RefreshTokens).values({
                     token: refreshToken,
@@ -147,7 +147,7 @@ export async function loginUser(req: Request, res: Response, next: NextFunction)
         if (!row.emailVerified)
             redirect = '/auth/verify'
         res.header('Set-Cookie', cookie)
-        return res.json({ jwt: accessToken, redirect })
+        return res.json({ jwt: accessToken, redirect, fb })
     }
     catch (error) {
         next(error)

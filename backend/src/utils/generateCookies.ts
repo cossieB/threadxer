@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken'
 import { type TokenUser } from '../types';
 import { db } from '../db/drizzle';
 import { RefreshTokens } from '../db/schema';
+import { getAuth } from 'firebase-admin/auth';
 
 dotenv.config()
 
@@ -36,6 +37,7 @@ export async function handleTokens(user: TokenUser, saveToDb?: (refreshToken: st
     const accessToken = createAccessToken(user);
     const refreshToken = createRefreshToken(user)
     const cookie = generateCookie(refreshToken);
+    const fb = await getAuth().createCustomToken(user.userId)
 
     if (saveToDb)
         await saveToDb(refreshToken)
@@ -47,5 +49,5 @@ export async function handleTokens(user: TokenUser, saveToDb?: (refreshToken: st
                 userId: user.userId
             })
 
-    return { accessToken, cookie }
+    return { accessToken, cookie, fb }
 }

@@ -11,56 +11,12 @@ import UserForm from "~/components/shared/UserForm";
 import { user } from "~/globalState/user";
 import { validateUrl } from "~/lib/validateUrl";
 import styles from "~/styles/routes/ProfilePage.module.scss"
-import { CloseSvg, DeleteSvg } from "~/svgs";
-import { customFetch } from "~/utils/customFetcher";
-import { UploadBtn } from "./UploadBtn";
+import { DeleteSvg } from "~/svgs";
+import { UploadBtn } from "../components/ImageUploader/UploadBtn";
 import { Popup } from "~/components/shared/Popup";
-
-type ApiUserResponse = {
-    username: string;
-    dateJoined: Date;
-    bio: string;
-    avatar: string;
-    banner: string;
-    displayName: string;
-    dob?: Date,
-    location: string
-};
-
-async function fetchUser(username: string) {
-    const res = await fetch(`api/users/${username.toLowerCase()}`);
-    if (!res.ok) {
-        if (res.headers.get('Content-Type')?.includes('application/json')) {
-            const data = await res.json();
-            throw new Error(data.error);
-        }
-        else {
-            throw new Error("Something went wrong. Please try again later.")
-        }
-    }
-    if (res.ok) {
-        return await res.json() as ApiUserResponse;
-    }
-}
-async function mutateUser(e: SubmitEvent) {
-    e.preventDefault()
-
-    const fd = new FormData(e.target as HTMLFormElement);
-    const res = await customFetch('/api/users', {
-        method: "POST",
-        headers: {
-            'Content-Type': "application/json"
-        },
-        body: JSON.stringify(Object.fromEntries(fd))
-    });
-    if (!res.ok) {
-        if (res.headers.get('Content-Type')?.includes("application/json"))
-            throw new Error((await res.json()).error)
-        else 
-            throw new Error("Something went wrong. Please try again later")
-    }
-
-}
+import { useUser } from "~/models/user";
+import { customFetch } from "~/utils/customFetcher";
+import { handleApiError } from "~/models/handleApiError";
 
 const [fieldErrors, setFieldErrors] = createStore({
     username: [] as string[],
@@ -71,29 +27,7 @@ export default function PreferencesPage() {
     const errored = () => Object.values(fieldErrors).flat().length > 0;
     const queryClient = useQueryClient()
 
-    const data = createQuery(() => ({
-        get enabled() {
-            return !!user.username
-        },
-        queryKey: ['users', user.username.toLowerCase()],
-        queryFn: (key) => fetchUser(key.queryKey[1]),
-        refetchOnMount: false,
-        refetchOnReconnect: false,
-        refetchOnWindowFocus: false,
-    }))
-
-
-    const mutation = createMutation(() => ({
-        mutationFn: mutateUser,
-        onSuccess(data, variables, context) {
-            queryClient.invalidateQueries({
-                queryKey: ['users', user.username.toLowerCase()]
-            })
-        },
-        onError(error, variables, context) {
-            console.log(error)
-        },
-    }))
+    const {query, mutation, imageMutation} = useUser(queryClient)
 
     return (
         <Page title="Preferences">
@@ -101,21 +35,21 @@ export default function PreferencesPage() {
                 <Match when={!user.username}>
                     <Navigate href="/auth/login?redirect=%2Fprofile" />
                 </Match>
-                <Match when={data.isLoading}>
+                <Match when={query.isLoading}>
                     <Loader />
                 </Match>
-                <Match when={data.isError}>
-                    {data.error?.message}
+                <Match when={query.isError}>
+                    {query.error?.message}
                 </Match>
-                <Match when={data.isSuccess}>
+                <Match when={query.isSuccess}>
                     <div class={styles.profile}>
-                        <div class={styles.userImages} style={{ 'background-image': `url(${data.data?.banner})` }}>
-                            <UploadBtn />
+                        <div class={styles.userImages} style={{ 'background-image': `url(${query.data?.banner})` }}>
+                            <UploadBtn path="banner" mutation={imageMutation} />
                             <button type="button">
                                 <DeleteSvg />
                             </button>
-                            <div class={styles.avatar} style={{ 'background-image': `url(${data.data?.avatar})` }}>
-                                <UploadBtn />
+                            <div class={styles.avatar} style={{ 'background-image': `url(${query.data?.avatar})` }}>
+                                <UploadBtn path="avatar" mutation={imageMutation} />
                             </div>
                         </div>
                         <UserForm onsubmit={mutation.mutate}>
@@ -123,7 +57,7 @@ export default function PreferencesPage() {
                                 name="username"
                                 disabled
                                 minlength={3}
-                                value={data.data?.username}
+                                value={query.data?.username}
                                 maxlength={15}
                                 onchange={e => {
                                     e.target.value = e.target.value.trim().replace(/\s/g, '_').replace(/\W/g, "")
@@ -131,17 +65,17 @@ export default function PreferencesPage() {
                             />
                             <CustomInput
                                 name="displayName"
-                                value={data.data?.displayName}
+                                value={query.data?.displayName}
                             />
                             <CustomInput
                                 name="location"
                                 required={false}
-                                value={data.data?.location}
+                                value={query.data?.location}
                             />
                             <TextareaWithCounter
                                 name="bio"
                                 required={false}
-                                value={data.data?.bio}
+                                value={query.data?.bio}
 
                                 maxLength={180}
                             />
@@ -174,6 +108,11 @@ export default function PreferencesPage() {
                 close={mutation.reset}
                 text={mutation.error?.message ?? ""}
                 when={mutation.isError}
+            />
+            <Popup
+                close={imageMutation.reset}
+                text={imageMutation.error?.message ?? ""}
+                when={imageMutation.isError}
             />
         </Page>
     )

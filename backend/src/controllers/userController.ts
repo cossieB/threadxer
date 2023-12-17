@@ -23,11 +23,11 @@ export async function updateUser(req: Request, res: Response, next: NextFunction
         const user = res.locals.token!.user;
         if (req.body.website && !validateUrl(req.body.website))
             throw new AppError("Please don't bypass client validation", 400)
-        const { displayName, bio, website, location } = req.body;
+        const { displayName, bio, website, location, avatar, banner } = req.body;
         
         await db
             .update(User)
-            .set({ displayName, bio, website, location })
+            .set({ displayName, bio, website, location, avatar, banner })
             .where(eq(User.email, user.email))
  
         return res.sendStatus(200)

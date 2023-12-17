@@ -1,29 +1,30 @@
-import { StorageReference, getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { createSignal, mergeProps } from "solid-js";
 import { ChangeEvent } from "~/lib/solidTypes";
 import { UploadSvg } from "~/svgs";
-import { storage } from "../../firebase";
+import { storage } from "../../../firebase";
 import { user } from "~/globalState/user";
+import type { CreateMutationResult, QueryKey } from "@tanstack/solid-query";
 
 
 type Props = {
-    limit?: number
-    path: string
+    path: "avatar" | "banner",
+    invalidate?: QueryKey
+    mutation: CreateMutationResult<void, Error, {
+        field: "avatar" | "banner";
+        url: string;
+    }, unknown>
+    
 }
-
-// const {isUploading, startUpload} = useUploadThing('videoAndImage', {})
-
 export function UploadBtn(props: Props) {
     const merged = mergeProps({ limit: 1 }, props)
     let inputElement!: HTMLInputElement;
-    const [files, setFiles] = createSignal<File[]>([])
 
     async function selectFiles(e: ChangeEvent<HTMLInputElement>) {
         if (!user.userId) return
         const files = Array.from(e.target.files ?? []).slice(0, merged.limit)
-        setFiles(files)
-        const urls = await Promise.all(validateAndUpload(files, 'avatars'))
-        console.log(urls)
+        const urls = await Promise.all(validateAndUpload(files, `${merged.path}s`))
+        urls.length && props.mutation.mutate({field: props.path, url: urls[0]},)
     }
 
     return (
