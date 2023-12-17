@@ -5,6 +5,7 @@ import { RefreshTokens } from "../db/schema";
 import { handleTokens } from "../utils/generateCookies";
 import { eq } from "drizzle-orm";
 import jwt, { type JwtPayload } from "jsonwebtoken";
+import { getAuth } from "firebase-admin/auth";
 
 export async function getAccessToken(req: Request, res: Response, next: NextFunction) {
     const refresh = req.cookies.rf;
@@ -32,8 +33,9 @@ export async function getAccessToken(req: Request, res: Response, next: NextFunc
                 })
             })
         })
+        const fb = await getAuth().createCustomToken(token.user.userId)
         res.setHeader('Set-Cookie', cookie)
-        return res.json({ jwt: accessToken })
+        return res.json({ jwt: accessToken, fb })
     }
     catch (error: any) {
         console.log(error)

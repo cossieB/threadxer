@@ -8,6 +8,8 @@ import AppError from "./utils/AppError";
 import * as Routes from "./routes";
 import { authenticate } from "./middleware/authenticate";
 import { cookieParser } from "./middleware/cookieParser";
+import { getAuth } from "firebase-admin/auth";
+import { startFire } from "./config/firebase";
 
 dotenv.config()
 const app = express()
@@ -27,7 +29,21 @@ app.use('/api/auth', Routes.authRouter)
 app.use('/api/auth/verify', Routes.verificationRouter)
 app.use('/api/auth/refresh', Routes.refreshRoutes)
 app.use('/api/users', Routes.userRouter)
+app.get('/test', (req, res) => {
 
+    getAuth()
+        .createCustomToken("skdfjsfsdjfkasdfj")
+        .then((customToken) => {
+            console.log(customToken)
+            // Send token back to client
+            res.json({jwt: customToken})
+        })
+        .catch((error) => {
+            console.error(error);
+            res.sendStatus(500)
+        });
+    
+})
 app.all('/api/*', (req, res) => {
     res.sendStatus(404)
 })
@@ -47,7 +63,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 })
 
 const PORT = process.env.PORT ?? 8080
-
+startFire()
 app.listen(PORT, () => {
     console.log(`Listening at http://127.0.0.1:${PORT}`)
 })

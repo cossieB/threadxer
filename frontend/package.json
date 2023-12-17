@@ -11,12 +11,10 @@
   "dependencies": {
     "@solidjs/router": "^0.10.3",
     "@tanstack/solid-query": "^5.13.4",
-    "@uploadthing/solid": "^6.0.0",
-    "attr-accept": "^2.2.2",
+    "firebase": "^10.7.1",
     "jwt-decode": "^4.0.0",
     "solid-js": "^1.7.8",
     "solid-transition-group": "^0.2.3",
-    "solidjs-dropzone": "^1.0.0",
     "uploadthing": "^6.1.0"
   },
   "devDependencies": {

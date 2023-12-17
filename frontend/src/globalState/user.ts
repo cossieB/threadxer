@@ -1,5 +1,7 @@
 import { JwtPayload, jwtDecode } from "jwt-decode";
 import { createStore } from "solid-js/store";
+import { auth } from "../../firebase";
+import { signInWithCustomToken } from "firebase/auth";
 
 export type User = {
     username: string,
@@ -30,7 +32,8 @@ export const [token, setToken] = createStore({
         } catch (error) {
             return null
         }
-    }
+    },
+    firebase: ""
 })
 
 export function deleteUser() {
@@ -53,4 +56,13 @@ export function createUser(jwt: string) {
     localStorage.setItem('user', JSON.stringify(decoded.user));
     setToken({ jwt })
     return decoded.user
+}
+
+export async function firebaseSignin(jwt: string) {
+    try {
+        await signInWithCustomToken(auth, jwt)
+        setToken('firebase', jwt)
+    } catch (error) {
+        console.log(error)
+    }
 }

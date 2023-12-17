@@ -1,4 +1,4 @@
-import { createUser, deleteUser, token } from "~/globalState/user";
+import { createUser, deleteUser, firebaseSignin, setToken, token } from "~/globalState/user";
 
 type U = Parameters<typeof fetch>[0]
 type V = Parameters<typeof fetch>[1]
@@ -23,11 +23,10 @@ export async function refresh() {
         return deleteUser()
         
     }
-        
+    if (result.ok) {
     const data = await result.json()
-    if (typeof data.jwt == 'string') {
-        return createUser(data.jwt)
-         
+        await firebaseSignin(data.fb)
+        return createUser(data.jwt)         
     }
     return {
         username: "",
