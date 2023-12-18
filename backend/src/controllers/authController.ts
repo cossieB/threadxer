@@ -105,7 +105,7 @@ export async function signupUser(req: Request, res: Response, next: NextFunction
 export async function loginUser(req: Request, res: Response, next: NextFunction) {
     try {
         const { email, password } = req.body as Record<string, string>;
-        let redirect = "/"
+        let redirect: string | undefined
         try {
             const url = new URL(req.get('Referrer') ?? "")
             if (url.searchParams.get('redirect'))

@@ -1,0 +1,42 @@
+@use '~/styles/mixins';
+
+.tabs {
+    display: flex;
+    position: relative;
+    --i: 0;
+    --width: calc(100% / 3);
+    height: 3rem;
+    margin-top: 1rem;
+    &::after {
+        width: var(--width);
+        background-color: white;
+        left: calc(var(--i) * var(--width) );
+        transition: left 250ms ease;
+        @extend %pseudo;
+    }
+    &::before {
+        width: 100%;
+        background-color: var(--gray1);
+        @extend %pseudo
+    }
+}
+
+.tab {
+    flex: 1;
+    &:hover {
+        background-color: var(--gray1);
+    }
+    a {
+        @include mixins.flexCenter;
+        text-decoration: none;
+        height: 100%;
+        width: 100%;
+    }
+}
+
+%pseudo {
+    content: "";
+    position: absolute;
+    height: 2px;
+    bottom: 0;
+}

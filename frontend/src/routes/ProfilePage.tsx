@@ -25,7 +25,7 @@ export default function PreferencesPage() {
     const errored = () => Object.values(fieldErrors).flat().length > 0;
     const queryClient = useQueryClient()
 
-    const query = useUser(user.username.toLowerCase())
+    const query = useUser(user.username)
     const {mutation, imageMutation} = useUserMutation(queryClient)
 
     return (
@@ -92,12 +92,12 @@ export default function PreferencesPage() {
 
                                 }}
                                 validationErrors={fieldErrors.website}
-
+                                value={query.data?.website}
                             />
                             <SubmitButton
                                 finished={mutation.isSuccess}
                                 loading={mutation.isPending}
-                                disabled={errored()}
+                                disabled={errored() || imageMutation.isPending || mutation.isPending}
                             />
                         </UserForm>
                     </div>

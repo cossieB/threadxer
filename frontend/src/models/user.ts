@@ -1,7 +1,7 @@
 import { customFetch } from "~/utils/customFetcher";
 import { handleApiError } from "./handleApiError";
 import { createQuery, createMutation, QueryClient } from "@tanstack/solid-query";
-import { user } from "~/globalState/user";
+import { setUser, user } from "~/globalState/user";
 
 type ApiUserResponse = {
     username: string;
@@ -12,14 +12,15 @@ type ApiUserResponse = {
     displayName: string;
     dob?: Date;
     location: string;
+    website: string
 };
 
 export function useUser(username: string) {
     const query = createQuery(() => ({
         get enabled() {
-            return !!user.username
+            return !!username
         },
-        queryKey: ['users', user.username.toLowerCase()],
+        queryKey: ['users', username.toLowerCase()],
         queryFn: (key) => fetchUser(key.queryKey[1]),
         refetchOnMount: false,
         refetchOnReconnect: false,
@@ -48,6 +49,9 @@ export function useUserMutation(queryClient: QueryClient) {
                 ...old,
                 [variables.field]: variables.url   
             }))
+            setUser(variables.field, variables.url)
+            const u = JSON.parse(localStorage.getItem('user') ?? '{}')
+            localStorage.setItem('user', JSON.stringify({...u, [variables.field]: variables.url}))
         },
     }))
     return {mutation, imageMutation}
@@ -70,7 +74,7 @@ async function mutateUserImage(obj: {field: 'avatar' | 'banner', url: string}) {
 }
 
 async function fetchUser(username: string) {
-    const res = await fetch(`api/users/${username.toLowerCase()}`);
+    const res = await fetch(`/api/users/${username.toLowerCase()}`);
     if (res.ok) {
         return await res.json() as ApiUserResponse;
     }

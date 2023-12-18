@@ -6,7 +6,7 @@ import { SubmitButton } from "~/components/shared/SubmitButton";
 import { createUser, user } from "~/globalState/user";
 import styles from '~/styles/components/VerificationCode.module.scss'
 import { customFetch } from "~/utils/customFetcher";
-import { CodeBlock } from "./CodeBlock";
+import { CodeBlock } from "../../components/CodeBlock";
 
 export default function VerifyEmail() {
     const navigate = useNavigate();

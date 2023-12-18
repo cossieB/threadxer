@@ -1,0 +1,50 @@
+@use '~/styles/mixins';
+
+.userImages {
+    width: 100%;
+    height: 200px;
+    @include mixins.centerBG;
+    @include mixins.flexCenter;
+    gap: 2rem;
+}
+.avatar {
+    @include mixins.centerBG;
+    @include mixins.flexCenter;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    translate: 0 50%;
+    width: 95px;
+    height: 95px;
+    border-radius: 50%;
+    object-fit: contain;
+    border: 5px solid var(--gray1);
+    background-color: white;
+    @media (min-width: 768px) {
+        width: 150px;
+        height: 150px;
+    }
+}
+.btns {
+    height: 5rem;
+    
+}
+
+.icons {
+    display: flex;
+    flex-wrap: wrap;
+
+    span {
+        margin-right: 1.5rem;
+        display: flex;
+        align-items: center;
+    }
+    color: hsl(0, 0%, 50%);
+    svg {
+        color: white;
+    }
+}
+
+.bio {
+    padding: 1rem 0;
+}

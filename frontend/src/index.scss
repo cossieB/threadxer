@@ -27,6 +27,12 @@ body {
 h1, h2, h3, h4, h5, h6 {
     margin: 0;
 }
+a {
+    color: inherit;
+    &:visited {
+        color: inherit;
+    }
+}
 main {
     flex-grow: 0;
     @media (max-width: 768px) {

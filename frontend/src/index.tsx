@@ -12,6 +12,7 @@ import ProfilePage from './routes/ProfilePage';
 import { Login } from './routes/auth/Login';
 import { SignUp } from './routes/auth/SignUp';
 import VerifyEmail from './routes/auth/Verify';
+import UserPage from './routes/[username]';
 
 const root = document.getElementById('root');
 const queryClient = new QueryClient
@@ -26,6 +27,9 @@ render(() =>
             <Route path="/create" component={PostComposer} />
             <Route path="*" component={NotFound} />
             <Route path="/profile" component={ProfilePage} />
+            <Route path="/users/:username" >
+                <Route path={["/", "replies", "media"]} component={UserPage}  />
+            </Route>
         </Router>
     </QueryClientProvider>
     , root!)

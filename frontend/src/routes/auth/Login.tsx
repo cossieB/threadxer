@@ -4,9 +4,9 @@ import { createStore } from 'solid-js/store';
 import { Popup } from '../../components/shared/Popup';
 import { Validator } from '../../utils/Validator';
 import { SubmitButton } from '../../components/shared/SubmitButton';
-import { Navigate, useLocation, useNavigate } from '@solidjs/router';
+import { Navigate, useNavigate } from '@solidjs/router';
 import { sendAuthRequest } from '~/utils/sendAuthRequest';
-import { Show, createEffect } from 'solid-js';
+import { Show } from 'solid-js';
 import { user } from '~/globalState/user';
 import Page from '~/components/shared/Page';
 
@@ -29,11 +29,6 @@ export function Login() {
         return validator.errors.email
     }
     const navigate = useNavigate()
-
-    createEffect(() => {
-        if (user.username)
-            navigate('/')
-    })
 
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault();
