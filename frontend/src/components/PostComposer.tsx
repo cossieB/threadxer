@@ -5,6 +5,10 @@ import { SubmitButton } from "./shared/SubmitButton";
 import { setComposerOpen } from "~/App";
 import clickOutside from "~/lib/clickOutside";
 import { CharacterCounter } from "./CharacterCounter";
+import { usePostMutation } from "~/models/post";
+import { useQueryClient } from "@tanstack/solid-query";
+import { Portal } from "solid-js/web";
+import { Popup } from "./shared/Popup";
 false && clickOutside
 
 export function PostComposer() {
@@ -19,6 +23,9 @@ export function PostComposer() {
         str = str.replace(rgx, `<span class="${styles.special}">$1</span>`)
         return str
     }
+    const queryClient = useQueryClient()
+    const mutation = usePostMutation(queryClient)
+
     return (
         <div class={styles.composer} >
             <div use:clickOutside={() => setComposerOpen(false)}>
@@ -27,22 +34,30 @@ export function PostComposer() {
                 </div>
                 <textarea
                     oninput={e => setInput(e.target.value)}
-                    maxLength={255}
+                    maxLength={180}
                     ref={textarea}
                 />
                 <div class={styles.bottom}>
                     <CharacterCounter
                         inputLength={input().length}
-                        max={255}
+                        max={180}
                     />
                     <SubmitButton
                         disabled={input().length === 0}
-                        finished={false}
-                        loading={false}
+                        finished={mutation.isSuccess}
+                        loading={mutation.isPending}
+                        onclick={() => mutation.mutate({text: input()})}
                     />
                 </div>
                 <div class={styles.preview} innerHTML={preview()} />
             </div>
+            <Portal>
+                <Popup
+                    close={mutation.reset}
+                    text={mutation.error?.message ?? ""}
+                    when={mutation.isError}
+                />
+            </Portal>
         </div>
     );
 }

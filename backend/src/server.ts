@@ -23,6 +23,7 @@ app.use('/api/auth', Routes.authRouter)
 app.use('/api/auth/verify', Routes.verificationRouter)
 app.use('/api/auth/refresh', Routes.refreshRoutes)
 app.use('/api/users', Routes.userRouter)
+app.use('/api/posts', Routes.postRouter)
 
 app.all('/api/*', (req, res) => {
     res.sendStatus(404)

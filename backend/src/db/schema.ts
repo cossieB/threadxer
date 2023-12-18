@@ -28,9 +28,9 @@ export const VerificationCodes = pgTable('verification_codes', {
 export const Post = pgTable('posts', {
     postId: uuid('post_id').primaryKey().defaultRandom(),
     userId: uuid('user_id').references(() => User.userId, { onDelete: 'cascade', onUpdate: 'cascade' }).notNull(),
-    text: varchar('text', { length: 255 }),
+    text: varchar('text', { length: 255 }).notNull(),
     dateCreated: timestamp('date_created', { withTimezone: true }).defaultNow().notNull(),
-    views: integer('views'),
+    views: integer('views').notNull().default(0),
     replyTo: uuid('reply_to'),
     didReply: boolean('did_reply').notNull().default(false),
     quotedPost: uuid('quoting'),
@@ -55,21 +55,9 @@ export const Repost = pgTable('reposts', {
 
 export const Media = pgTable('media', {
     mediaId: uuid('media_id').primaryKey().defaultRandom(),
-    postId: uuid('post_id').references(() => Post.postId, { onDelete: 'set null', onUpdate: 'cascade' }),
-    url: text('url').notNull(),
-    uploadThingResponse: jsonb('uploadthing_response').notNull().default(sql`'{}'::jsonb`)
+    postId: uuid('post_id').notNull().references(() => Post.postId, { onDelete: 'cascade', onUpdate: 'cascade' }),
+    url: text('url').notNull()
 })
-
-// export const Avatar = pgTable('avatars', {
-//     userId: uuid('user_id').references(() => User.userId, { onDelete: 'cascade', onUpdate: 'cascade' }).primaryKey(),
-//     url: text('url').notNull(),
-//     uploadThingResponse: jsonb('uploadthing_response').notNull().default(sql`'{}'::jsonb`)
-// })
-// export const Banner = pgTable('banners', {
-//     userId: uuid('user_id').references(() => User.userId, { onDelete: 'cascade', onUpdate: 'cascade' }).primaryKey(),
-//     url: text('url').notNull(),
-//     uploadThingResponse: jsonb('uploadthing_response').notNull().default(sql`'{}'::jsonb`)
-// })
 
 export const Likes = pgTable('likes', {
     likeId: uuid('like_id').primaryKey().defaultRandom(),
@@ -90,8 +78,10 @@ export const FollowerFollowee = pgTable('follower_followee', {
 
 export const Hashtags = pgTable('hashtags', {
     hashtag: varchar('hashtag').primaryKey(),
-    postId: uuid('post_id').references(() => Post.postId, { onDelete: 'set null', onUpdate: 'cascade' }),
-})
+    postId: uuid('post_id').notNull().references(() => Post.postId, { onDelete: 'cascade', onUpdate: 'cascade' }),
+}, t => ({
+    unique: unique().on(t.hashtag, t.postId)
+}))
 
 export const RefreshTokens = pgTable('refresh_tokens', {
     token: text('token').primaryKey(),

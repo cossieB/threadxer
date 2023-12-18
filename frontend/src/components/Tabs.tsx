@@ -1,5 +1,5 @@
 import { A, useLocation } from "@solidjs/router";
-import { For, Setter, createEffect, createSignal } from "solid-js";
+import { For, Setter, createSignal } from "solid-js";
 import titleCase from "~/lib/titleCase";
 import styles from "~/styles/components/Tabs.module.scss"
 
@@ -41,12 +41,13 @@ function Tab(props: P) {
     const location = useLocation()
     const label = typeof props.tab == 'string' ? props.tab : props.tab.label
     const path = typeof props.tab == 'string' ? props.tab : props.tab.path
-    if (location.pathname.includes(label))
+
+    if (location.pathname.toLowerCase().includes(label))
         props.setI(props.i)
 
     return (
         <div class={styles.tab}>
-            <A href={`/${props.prefix}/${path}`} onClick={() => props.setI(props.i)}>
+            <A href={`/${props.prefix}/${path}`} onClick={() => props.setI(props.i)} >
                 {titleCase(label)}
             </A>
         </div>
