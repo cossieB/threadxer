@@ -19,6 +19,8 @@ export async function getUser(req: Request, res: Response, next: NextFunction) {
 }
 
 export async function updateUser(req: Request, res: Response, next: NextFunction) {
+    if (Object.keys(req.body).length === 0)
+        return next(new AppError("Empty request body", 400))
     try {
         const user = res.locals.token!.user;
         if (req.body.website && !validateUrl(req.body.website))

@@ -1,5 +1,5 @@
 import { Navigate } from "@solidjs/router";
-import { createMutation, createQuery, useQueryClient } from "@tanstack/solid-query";
+import { useQueryClient } from "@tanstack/solid-query";
 import { Switch, Match } from "solid-js";
 import { createStore } from "solid-js/store";
 import { CustomInput } from "~/components/CustomInput";
@@ -14,9 +14,7 @@ import styles from "~/styles/routes/ProfilePage.module.scss"
 import { DeleteSvg } from "~/svgs";
 import { UploadBtn } from "../components/ImageUploader/UploadBtn";
 import { Popup } from "~/components/shared/Popup";
-import { useUser } from "~/models/user";
-import { customFetch } from "~/utils/customFetcher";
-import { handleApiError } from "~/models/handleApiError";
+import { useUser, useUserMutation } from "~/models/user";
 
 const [fieldErrors, setFieldErrors] = createStore({
     username: [] as string[],
@@ -27,7 +25,8 @@ export default function PreferencesPage() {
     const errored = () => Object.values(fieldErrors).flat().length > 0;
     const queryClient = useQueryClient()
 
-    const {query, mutation, imageMutation} = useUser(queryClient)
+    const query = useUser(user.username.toLowerCase())
+    const {mutation, imageMutation} = useUserMutation(queryClient)
 
     return (
         <Page title="Preferences">

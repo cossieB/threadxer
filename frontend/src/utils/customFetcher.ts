@@ -3,9 +3,9 @@ import { createUser, deleteUser, firebaseSignin, setToken, token } from "~/globa
 type U = Parameters<typeof fetch>[0]
 type V = Parameters<typeof fetch>[1]
 
-export async function customFetch(url: U, reqOpts?: V) {
+export async function customFetch(url: U, reqOpts?: V, shouldRefresh = true) {
     const isStale = (token.decoded()?.exp ?? 0) * 1000 < new Date().getTime() + 60000
-    if (isStale) {
+    if (isStale && shouldRefresh) {
         await refresh()
     }
     return fetch(url, {

@@ -28,16 +28,18 @@ export function validation(arr: (string | O)[]) {
 
             const options = typeof element === 'object' ? { ...defaults, ...element } : { ...defaults, property: element }
             const { property } = options
-            const bodyValue = req.body[property]; 
+            const bodyValue = req.body[property];
 
             if (options.required && !bodyValue) {
-                return next(new AppError("Please don't bypass client validation", 400))
+                return next(new AppError(`${bodyValue} is required`, 400))
             }
+            if (bodyValue === undefined) continue
+            
             if (typeof bodyValue != options.type)
-                return next(new AppError("Please don't bypass client validation", 400))
+                return next(new AppError(`Wrong type for ${property}`, 400))
 
-            if ((bodyValue.length) && (bodyValue.length > options.max || bodyValue.length < options.min))
-                return next(new AppError("Please don't bypass client validation", 400))
+            if ((typeof bodyValue === 'string') && (bodyValue.length > options.max || bodyValue.length < options.min))
+                return next(new AppError(`Invalid length for ${bodyValue}`, 400))
 
             if (options.regex && !options.regex.test(bodyValue))
                 return next(new AppError("Please don't bypass client validation", 400))

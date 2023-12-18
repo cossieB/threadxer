@@ -14,28 +14,7 @@ type ApiUserResponse = {
     location: string;
 };
 
-async function fetchUser(username: string) {
-    const res = await customFetch(`api/users/${username.toLowerCase()}`);
-    if (res.ok) {
-        return await res.json() as ApiUserResponse;
-    }
-    await handleApiError(res);
-}
-async function mutateUser(e: SubmitEvent) {
-    e.preventDefault();
-
-    const fd = new FormData(e.target as HTMLFormElement);
-    const res = await customFetch('/api/users', {
-        method: "POST",
-        headers: {
-            'Content-Type': "application/json"
-        },
-        body: JSON.stringify(Object.fromEntries(fd))
-    });
-    await handleApiError(res);
-}
-
-export function useUser(queryClient: QueryClient) {
+export function useUser(username: string) {
     const query = createQuery(() => ({
         get enabled() {
             return !!user.username
@@ -46,7 +25,11 @@ export function useUser(queryClient: QueryClient) {
         refetchOnReconnect: false,
         refetchOnWindowFocus: false,
     }))
-    
+
+    return query
+}
+
+export function useUserMutation(queryClient: QueryClient) {
     const mutation = createMutation(() => ({
         mutationFn: mutateUser,
         onSuccess() {
@@ -67,7 +50,7 @@ export function useUser(queryClient: QueryClient) {
             }))
         },
     }))
-    return {query, mutation, imageMutation}
+    return {mutation, imageMutation}
 }
 
 async function mutateUserImage(obj: {field: 'avatar' | 'banner', url: string}) {
@@ -83,5 +66,26 @@ async function mutateUserImage(obj: {field: 'avatar' | 'banner', url: string}) {
 
         return
     }   
+    await handleApiError(res);
+}
+
+async function fetchUser(username: string) {
+    const res = await fetch(`api/users/${username.toLowerCase()}`);
+    if (res.ok) {
+        return await res.json() as ApiUserResponse;
+    }
+    await handleApiError(res);
+}
+async function mutateUser(e: SubmitEvent) {
+    e.preventDefault();
+
+    const fd = new FormData(e.target as HTMLFormElement);
+    const res = await customFetch('/api/users', {
+        method: "POST",
+        headers: {
+            'Content-Type': "application/json"
+        },
+        body: JSON.stringify(Object.fromEntries(fd))
+    });
     await handleApiError(res);
 }
