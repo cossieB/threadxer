@@ -1,7 +1,8 @@
 import type { Request, Response, NextFunction } from "express";
 import { db } from "../db/drizzle";
-import { Hashtags, Media, Post } from "../db/schema";
+import { FollowerFollowee, Hashtags, Media, Post, User } from "../db/schema";
 import AppError from "../utils/AppError";
+import { asc, desc, eq } from "drizzle-orm";
 
 export async function getPost(req: Request, res: Response, next: NextFunction) {
 
@@ -14,7 +15,7 @@ export async function createPost(req: Request, res: Response, next: NextFunction
     if (text.length + media.length === 0)
         return next(new AppError("Empty posts are not allowed", 400))
 
-    const rgx = /(?<=\s|^)([#@]\w+)(?=\s|$)/g
+    const rgx = /(?<=\s|^)(#\w+)(?=\s|$)/g
     const matches = text.matchAll(rgx); 
     const uniqueTags = new Set<string>()
     for (const match of matches) {
@@ -51,6 +52,33 @@ export async function createPost(req: Request, res: Response, next: NextFunction
 }
 
 export async function getAllPosts(req: Request, res: Response, next: NextFunction) {
+    const currentUser = res.locals.token?.user
+    // if (currentUser) {
+    //     const subquery = db.select({
+    //         followeeId: FollowerFollowee.followeeId
+    //     })
+    //     .from(FollowerFollowee)
+    //     .where(eq(FollowerFollowee.followerId, currentUser.userId))
+    //     .as('sub')
+    // }
+    
+    const posts = await db.select({
+        post: Post,
+        user: {
+            userId: User.userId,
+            username: User.username,
+            avatar: User.avatar,
+            banner: User.avatar,
+            email: User.email,
+            displayName: User.displayName
+        }
+    })
+        .from(Post)
+        .innerJoin(User, eq(User.userId, Post.userId))
+        .limit(100)
+        .orderBy(desc(Post.dateCreated) )
 
+        
+    res.json(posts)
 }
 

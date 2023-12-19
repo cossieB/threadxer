@@ -77,10 +77,10 @@ export const FollowerFollowee = pgTable('follower_followee', {
 }))
 
 export const Hashtags = pgTable('hashtags', {
-    hashtag: varchar('hashtag').primaryKey(),
+    hashtag: varchar('hashtag'),
     postId: uuid('post_id').notNull().references(() => Post.postId, { onDelete: 'cascade', onUpdate: 'cascade' }),
 }, t => ({
-    unique: unique().on(t.hashtag, t.postId)
+    unique: primaryKey({columns: [t.hashtag, t.postId]})
 }))
 
 export const RefreshTokens = pgTable('refresh_tokens', {

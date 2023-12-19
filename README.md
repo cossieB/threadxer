@@ -8,11 +8,12 @@ My clone of _Threads_ app which is a clone of _The App Formerly Known As Twitter
 - Node.js
 - Express
 - Solid.js
+- Tanstack Solid Query
 - JSON Web Tokens
 - PostgreSQL
 - Drizzle ORM
 - Docker
-- UploadThing
+- Firebase Storage
 - Redis via IO Redis library
 - SASS
 - Deployment to Railway.app

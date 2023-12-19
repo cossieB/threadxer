@@ -23,8 +23,11 @@ export default function UserPage() {
                         <div class={styles.avatar} style={{ 'background-image': `url(${query.data?.avatar})` }} />
                     </div>
                     <div class={styles.btns}>
-                        {query.data?.username}
-                        {query.data?.displayName}
+                        <button>Follow</button>
+                    </div>
+                    <div class={styles.user}>
+                        <span>{query.data?.username}</span> <br />
+                        <span>@{query.data?.displayName}</span>
                     </div>
                     <div class={styles.bio}>
                         {query.data?.bio}
@@ -43,7 +46,7 @@ export default function UserPage() {
                             />
                         </Show>
                     </div>
-                    <Tabs arr={[{label: "posts", path: "/"}, "replies", "media"]} url={`users/${params.username}`} />
+                    <Tabs arr={[{ label: "posts", path: "/" }, "replies", "media"]} url={`users/${params.username}`} />
                 </Match>
             </Switch>
         </Page>

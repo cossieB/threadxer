@@ -61,17 +61,3 @@ export function PostComposer() {
         </div>
     );
 }
-
-function FormatText(props: { str: string }) {
-    return (
-        <Switch fallback={props.str + " "}>
-            <Match when={/(?:\s|^)(#\w+)(\s|$)/.test(props.str)}>
-                <span class={styles.hashtag}>{props.str}</span>{" "}
-            </Match>
-            <Match when={/(?:\s|^)(@\w+)(\s|$)/.test(props.str)}>
-                <span class={styles.at}>{props.str}</span>{" "}
-            </Match>
-        </Switch>
-    )
-}
-

@@ -9,7 +9,7 @@ export const [composerOpen, setComposerOpen] = createSignal(false)
 function App(props: { children?: JSXElement }) {
 
     onMount(() => {
-        refresh()
+        // refresh()
     })
     createEffect(() => {
         if (composerOpen())

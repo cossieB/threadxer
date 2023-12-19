@@ -11,6 +11,8 @@
     --nav-height: 3rem;
     --blue1: rgb(29, 155, 240);
     --gray1: #181818;
+    --gray2: hsl(0, 0%, 50%);
+    font-family: 'Roboto', sans-serif;
 }
 
 body {
@@ -29,6 +31,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 a {
     color: inherit;
+    text-decoration: none;
+    &:hover {
+        text-decoration: underline;
+    }
     &:visited {
         color: inherit;
     }
