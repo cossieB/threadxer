@@ -9,6 +9,9 @@
     &:is(:last-child) {
         border-bottom: $border;
     }
+    &:hover {
+        background-color: var(--gray1);
+    }
 }
 
 .avatar {
@@ -41,9 +44,34 @@
     font-weight: bold;
 }
 .content {
-    
+    padding-bottom: 0.75rem;
 }
 
 .special {
-    color: var(--blue1)
+    color: var(--blue1) !important
+}
+
+.btns {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.action {
+    --color: white;
+    display: flex;
+    align-items: center;
+    height: 2.5rem;
+    width: 2.5rem;
+    background: transparent;
+    text-shadow: 0 0 10px var(--color);
+    border-radius: 50%;
+    svg {
+        height: 1.5rem;
+        width: 1.5rem;
+    }
+    &:hover {
+        color: var(--color);
+        box-shadow: 0 0 50px var(--color);
+    }
 }

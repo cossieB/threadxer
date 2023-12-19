@@ -5,7 +5,7 @@ export default function NotFound() {
     const location = useLocation()
     return (
         <>
-            <main
+            <div
                 style={{
                     height: '100vh',
                     display: 'flex',
@@ -22,7 +22,7 @@ export default function NotFound() {
                 >
                     404
                 </h1>
-            </main>
+            </div>
         </>
     );
 }

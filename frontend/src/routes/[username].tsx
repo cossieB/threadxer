@@ -1,5 +1,6 @@
 import { useParams, useSearchParams } from "@solidjs/router";
 import { Match, Show, Switch } from "solid-js";
+import NotFound from "~/components/404";
 import { BioIcons } from "~/components/BioIcons";
 import { Tabs } from "~/components/Tabs";
 import Loader from "~/components/shared/Loader/Loader";
@@ -17,6 +18,12 @@ export default function UserPage() {
             <Switch>
                 <Match when={query.isLoading}>
                     <Loader />
+                </Match>
+                <Match when={query.isError && query.error.message.includes("No user with that username exists")}>
+                    <NotFound />
+                </Match>
+                <Match when={query.isError}>
+                    Error
                 </Match>
                 <Match when={query.isSuccess}>
                     <div class={styles.userImages} style={{ 'background-image': `url(${query.data?.banner})` }} >
