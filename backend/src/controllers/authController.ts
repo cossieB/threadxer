@@ -88,7 +88,7 @@ export async function signupUser(req: Request, res: Response, next: NextFunction
             .catch(e => console.log(e))
         const { accessToken, cookie } = await handleTokens({ ...user, isUnverified: true })
         res.header('Set-Cookie', cookie)
-        // draftVerificationEmail(username, code, email)
+        draftVerificationEmail(username, code, email)
         return res.status(201).json({ jwt: accessToken, redirect: '/auth/verify' })
     }
     catch (error) {
