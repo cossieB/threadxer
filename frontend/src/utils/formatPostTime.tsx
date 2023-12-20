@@ -12,8 +12,14 @@ export function formatPostTime(postDate: string | Date) {
         const hours = Math.round(diff / 3600);
         return `${hours} hrs ago`;
     }
+    if (diff < 3600 * 24 * 365.25)
+        return date.toLocaleDateString(['en-za'], {
+            day: 'numeric',
+            month: 'short'
+        });
     return date.toLocaleDateString(['en-za'], {
         day: 'numeric',
-        month: 'short'
-    });
+        month: 'short',
+        year: 'numeric'
+    })
 }

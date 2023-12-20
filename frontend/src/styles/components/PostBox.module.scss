@@ -61,17 +61,27 @@
     --color: white;
     display: flex;
     align-items: center;
-    height: 2.5rem;
-    width: 2.5rem;
-    background: transparent;
-    text-shadow: 0 0 10px var(--color);
-    border-radius: 50%;
+    position: relative;
     svg {
         height: 1.5rem;
         width: 1.5rem;
     }
+    &::after {
+        content: "";
+        position: absolute;
+        height: 2.5rem;
+        width: 2.5rem;
+        opacity: 0;
+        border-radius: 50%;
+        scale: 1.5;
+        transition: opacity 50ms ease;
+    }
     &:hover {
+        text-shadow: 0 0 10px var(--color);
         color: var(--color);
-        box-shadow: 0 0 50px var(--color);
+        &::after {
+            background: radial-gradient(var(--color), transparent);
+            opacity: 0.1;
+        }
     }
 }

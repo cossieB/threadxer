@@ -5,13 +5,17 @@ import styles from "~/styles/components/PostBox.module.scss"
 import { formatPostTime } from "../utils/formatPostTime";
 import { A, useNavigate } from "@solidjs/router";
 import { Switch, Match, For } from "solid-js";
-import ActionIcon from "./ActionIcon";
+import StatIcon from "./ActionIcon";
 import { CommentSvg, LikeSvg, QuoteSvg, RepostSvg, ViewsSvg } from "~/svgs";
+import { useLikes } from "~/models/likes";
+import { useQueryClient } from "@tanstack/solid-query";
 
 export function PostBox(props: { post: PostResponse }) {
+    const queryClient = useQueryClient()
     const navigate = useNavigate()
+    const mutation = useLikes(queryClient)
     return (
-        
+
         <div class={styles.box} onclick={() => navigate(`/posts/${props.post.post.postId}`)}>
             <div class={styles.avatar}>
                 <img src={props.post.user?.avatar} />
@@ -32,11 +36,26 @@ export function PostBox(props: { post: PostResponse }) {
                     </For>
                 </div>
                 <div class={styles.btns} >
-                    <ActionIcon icon={<CommentSvg />} text={0} color="rgb(29, 155, 240)" />
-                    <ActionIcon icon={<LikeSvg />} text={0} color="rgb(249, 24, 128)" />
-                    <ActionIcon icon={<QuoteSvg />} text={0} color="rgb(0,186,124)" />
-                    <ActionIcon icon={<RepostSvg />} text={0} />
-                    <ActionIcon icon={<ViewsSvg />} text={props.post.post.views} />
+                    <StatIcon
+                        icon={<CommentSvg />}
+                        number={123450}
+                        color="rgb(29, 155, 240)"
+                    />
+                    <StatIcon
+                        icon={<LikeSvg />}
+                        number={100000000}
+                        color="rgb(249, 24, 128)"
+                        onClick={() => mutation.mutate(props.post.post.postId)}
+                    />
+                    <StatIcon
+                        icon={<RepostSvg />}
+                        number={1230}
+                        color="rgb(0,186,124)"
+                    />
+                    <StatIcon
+                        icon={<ViewsSvg />}
+                        number={props.post.post.views}
+                    />
                 </div>
             </div>
         </div>
@@ -47,7 +66,7 @@ function PostFormatter(props: { str: string }) {
     return (
         <Switch fallback={props.str + " "}>
             <Match when={/(?:\s|^)(#\w+)(\s|$)/.test(props.str)}>
-                <A href={`/search/?hashtag=${props.str}`} class={styles.special}>{props.str}</A>{" "}
+                <A href={`/search?hashtag=${props.str}`} class={styles.special}>{props.str}</A>{" "}
             </Match>
             <Match when={/(?:\s|^)(@\w+)(\s|$)/.test(props.str)}>
                 <A href={`/users/${props.str.slice(1)}`} class={styles.special}>{props.str}</A>{" "}

@@ -4,6 +4,8 @@ import { handleApiError } from "./handleApiError";
 
 type CreatePost = {
     text: string,
+    replyTo?: string,
+    quoting?: string
     media?: string[]
 }
 
@@ -45,10 +47,8 @@ async function getPosts() {
     
     if (res.ok) {
         const data = await res.json() as PostResponse[];
-        console.log(data)
         return data
     }
-    
     await handleApiError(res);
 }
 

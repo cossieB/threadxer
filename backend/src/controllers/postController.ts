@@ -78,7 +78,6 @@ export async function getAllPosts(req: Request, res: Response, next: NextFunctio
         .limit(100)
         .orderBy(desc(Post.dateCreated) )
 
-        
     res.json(posts)
 }
 

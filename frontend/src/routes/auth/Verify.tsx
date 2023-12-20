@@ -3,7 +3,7 @@ import { Index, Setter, createEffect, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
 import { Popup } from "~/components/shared/Popup";
 import { SubmitButton } from "~/components/shared/SubmitButton";
-import { createUser, user } from "~/globalState/user";
+import { createUser, firebaseSignin, user } from "~/globalState/user";
 import styles from '~/styles/components/VerificationCode.module.scss'
 import { customFetch } from "~/utils/customFetcher";
 import { CodeBlock } from "../../components/CodeBlock";
@@ -34,6 +34,7 @@ export default function VerifyEmail() {
         }
         const data = await res.json();
         createUser(data.jwt)
+        data.fb && await firebaseSignin(data.fb)
         navigate("/profile")
     }
     async function handleResend() {

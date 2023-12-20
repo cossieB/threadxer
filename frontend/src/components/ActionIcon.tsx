@@ -3,16 +3,24 @@ import styles from "~/styles/components/PostBox.module.scss"
 
 type Props = {
     icon: JSXElement,
-    text: string | number
+    number: number
     onClick?: () => void
     color?: string
 }
 
-export default function ActionIcon(props: Props) {
+export default function StatIcon(props: Props) {
     return (
-        <div class={styles.action} style={{'--color': props.color}} onclick={props.onClick}>
+        <div class={styles.action}
+            style={{ '--color': props.color }}
+            onclick={(e) => {
+                props.onClick && props.onClick();
+                e.stopPropagation()
+            }}
+        >
             {props.icon}
-            <span> {props.text} </span>
+            <span>
+                {Intl.NumberFormat('en-za', { notation: 'compact' }).format(props.number)}
+            </span>
         </div>
     )
 }
