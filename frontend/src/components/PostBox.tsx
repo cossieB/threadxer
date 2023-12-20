@@ -13,7 +13,8 @@ import { useQueryClient } from "@tanstack/solid-query";
 export function PostBox(props: { post: PostResponse }) {
     const queryClient = useQueryClient()
     const navigate = useNavigate()
-    const mutation = useLikes(queryClient)
+    const likeMutation = useLikes(queryClient)
+    const repostMutation = useLikes(queryClient)
     return (
 
         <div class={styles.box} onclick={() => navigate(`/posts/${props.post.post.postId}`)}>
@@ -45,12 +46,13 @@ export function PostBox(props: { post: PostResponse }) {
                         icon={<LikeSvg />}
                         number={100000000}
                         color="rgb(249, 24, 128)"
-                        onClick={() => mutation.mutate(props.post.post.postId)}
+                        onClick={() => likeMutation.mutate(props.post.post.postId)}
                     />
                     <StatIcon
                         icon={<RepostSvg />}
                         number={1230}
                         color="rgb(0,186,124)"
+                        onClick={() => repostMutation.mutate(props.post.post.postId)}
                     />
                     <StatIcon
                         icon={<ViewsSvg />}
