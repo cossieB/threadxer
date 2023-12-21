@@ -1,8 +1,8 @@
 import type { Request, Response, NextFunction } from "express";
 import { db } from "../db/drizzle";
-import { FollowerFollowee, Hashtags, Media, Post, User } from "../db/schema";
+import { FollowerFollowee, Hashtags, Likes, Media, Post, Repost, User } from "../db/schema";
 import AppError from "../utils/AppError";
-import { asc, desc, eq } from "drizzle-orm";
+import { asc, count, desc, eq, sql } from "drizzle-orm";
 
 export async function getPost(req: Request, res: Response, next: NextFunction) {
 
@@ -61,9 +61,29 @@ export async function getAllPosts(req: Request, res: Response, next: NextFunctio
     //     .where(eq(FollowerFollowee.followerId, currentUser.userId))
     //     .as('sub')
     // }
+    const likeQ = db.$with('l').as(
+        db.select({
+            postId: Likes.postId,
+            c: count().as('like_count') 
+        })
+            .from(Likes)
+            .groupBy(Likes.postId)
+    )
+    const repostQ = db.$with('repost_count').as(
+        db.select({
+            postId: Repost.postId,
+            c: count().as('c') 
+        })
+            .from(Repost)
+            .groupBy(Repost.postId)
+    )
     
-    const posts = await db.select({
-        post: Post,
+    const posts = await db.with(likeQ, repostQ).select({
+        post: {
+            ...Post,
+            likes: sql<number>`COALESCE (${likeQ.c}::INT, 0)`,
+            reposts: sql<number>`COALESCE (${repostQ.c}::INT, 0)`,
+        },
         user: {
             userId: User.userId,
             username: User.username,
@@ -71,10 +91,12 @@ export async function getAllPosts(req: Request, res: Response, next: NextFunctio
             banner: User.avatar,
             email: User.email,
             displayName: User.displayName
-        }
+        },
     })
         .from(Post)
         .innerJoin(User, eq(User.userId, Post.userId))
+        .leftJoin(likeQ, eq(Post.postId, likeQ.postId))
+        .leftJoin(repostQ, eq(Post.postId, repostQ.postId))
         .limit(100)
         .orderBy(desc(Post.dateCreated) )
 

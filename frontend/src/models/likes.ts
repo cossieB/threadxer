@@ -24,5 +24,5 @@ async function likeOrUnlikePost(postId: string) {
     if (res.status === 200) {
         return -1
     }
-    await handleApiError(res)
+    throw await handleApiError(res)
 }

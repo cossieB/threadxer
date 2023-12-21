@@ -1,6 +1,7 @@
 import { QueryClient, createMutation, createQuery } from "@tanstack/solid-query";
 import { customFetch } from "~/utils/customFetcher";
 import { handleApiError } from "./handleApiError";
+import { useNavigate } from "@solidjs/router";
 
 type CreatePost = {
     text: string,
@@ -20,6 +21,8 @@ export type PostResponse = {
         didReply: boolean;
         quotedPost: string | null;
         didQuote: boolean;
+        likes: number,
+        reposts: number
     };
     user: {
         userId: string;
@@ -39,7 +42,10 @@ async function createPost(post: CreatePost) {
         },
         body: JSON.stringify(post)
     })
-    await handleApiError(res)
+    if (res.ok) {
+        
+    }
+    throw await handleApiError(res)
 }
 
 async function getPosts() {
@@ -49,7 +55,7 @@ async function getPosts() {
         const data = await res.json() as PostResponse[];
         return data
     }
-    await handleApiError(res);
+    throw await handleApiError(res);
 }
 
 export function usePost() {
@@ -62,12 +68,14 @@ export function usePost() {
 }
 
 export function usePostMutation(queryClient: QueryClient) {
+    const navigate = useNavigate()
     const mutation = createMutation(() => ({
         mutationFn: createPost,
         onSuccess(data, variables, context) {
             queryClient.invalidateQueries({
                 queryKey: ['posts']
             })
+            navigate(`/posts/${data}`)
         },
         onError(error) {
             console.log("HERE ")

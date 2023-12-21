@@ -3,7 +3,7 @@ import { handleApiError } from "./handleApiError";
 import { QueryClient, createMutation } from "@tanstack/solid-query";
 import { PostResponse } from "./post";
 
-export function useLikes(queryClient: QueryClient) {
+export function useRepost(queryClient: QueryClient) {
 
     const mutation = createMutation(() => ({
         mutationFn: repostOrUnrepost,
@@ -15,7 +15,7 @@ export function useLikes(queryClient: QueryClient) {
 }
 
 async function repostOrUnrepost(postId: string) {
-    const res = await customFetch(`/api/repost/${postId}`, {
+    const res = await customFetch(`/api/reposts/${postId}`, {
         method: "POST",
     })
     if (res.status === 201) {
@@ -24,5 +24,5 @@ async function repostOrUnrepost(postId: string) {
     if (res.status === 200) {
         return -1
     }
-    await handleApiError(res)
+    throw await handleApiError(res)
 }

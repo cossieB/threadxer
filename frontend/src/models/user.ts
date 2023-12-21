@@ -52,30 +52,30 @@ export function useUserMutation(queryClient: QueryClient) {
         onSuccess(data, variables, context) {
             queryClient.setQueryData(['users', user.username.toLowerCase()], (old: ApiUserResponse) => ({
                 ...old,
-                [variables.field]: variables.url   
+                [variables.field]: variables.url
             }))
             setUser(variables.field, variables.url)
             const u = JSON.parse(localStorage.getItem('user') ?? '{}')
-            localStorage.setItem('user', JSON.stringify({...u, [variables.field]: variables.url}))
+            localStorage.setItem('user', JSON.stringify({ ...u, [variables.field]: variables.url }))
         },
     }))
-    return {mutation, imageMutation}
+    return { mutation, imageMutation }
 }
 
-async function mutateUserImage(obj: {field: 'avatar' | 'banner', url: string}) {
-    const {field, url} = obj
+async function mutateUserImage(obj: { field: 'avatar' | 'banner', url: string }) {
+    const { field, url } = obj
     const res = await customFetch('/api/users', {
         method: "POST",
         headers: {
             'Content-Type': "application/json"
         },
-        body: JSON.stringify({[field]: url})
+        body: JSON.stringify({ [field]: url })
     })
     if (res.ok) {
 
         return
-    }   
-    await handleApiError(res);
+    }
+    throw await handleApiError(res);
 }
 
 async function fetchUser(username: string) {
@@ -83,7 +83,7 @@ async function fetchUser(username: string) {
     if (res.ok) {
         return await res.json() as ApiUserResponse;
     }
-    await handleApiError(res);
+    throw await handleApiError(res);
 }
 async function mutateUser(e: SubmitEvent) {
     e.preventDefault();
@@ -96,5 +96,6 @@ async function mutateUser(e: SubmitEvent) {
         },
         body: JSON.stringify(Object.fromEntries(fd))
     });
-    await handleApiError(res);
+    if (!res.ok)
+        throw await handleApiError(res);
 }

@@ -9,12 +9,13 @@ import StatIcon from "./ActionIcon";
 import { CommentSvg, LikeSvg, QuoteSvg, RepostSvg, ViewsSvg } from "~/svgs";
 import { useLikes } from "~/models/likes";
 import { useQueryClient } from "@tanstack/solid-query";
+import { useRepost } from "~/models/repost";
 
 export function PostBox(props: { post: PostResponse }) {
     const queryClient = useQueryClient()
     const navigate = useNavigate()
     const likeMutation = useLikes(queryClient)
-    const repostMutation = useLikes(queryClient)
+    const repostMutation = useRepost(queryClient)
     return (
 
         <div class={styles.box} onclick={() => navigate(`/posts/${props.post.post.postId}`)}>
@@ -44,13 +45,13 @@ export function PostBox(props: { post: PostResponse }) {
                     />
                     <StatIcon
                         icon={<LikeSvg />}
-                        number={100000000}
+                        number={props.post.post.likes}
                         color="rgb(249, 24, 128)"
                         onClick={() => likeMutation.mutate(props.post.post.postId)}
                     />
                     <StatIcon
                         icon={<RepostSvg />}
-                        number={1230}
+                        number={props.post.post.reposts}
                         color="rgb(0,186,124)"
                         onClick={() => repostMutation.mutate(props.post.post.postId)}
                     />

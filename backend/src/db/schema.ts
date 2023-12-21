@@ -51,7 +51,9 @@ export const Repost = pgTable('reposts', {
     userId: uuid('user_id').references(() => User.userId, { onDelete: 'cascade', onUpdate: 'cascade' }).notNull(),
     postId: uuid('post_id').references(() => Post.postId, { onDelete: 'cascade', onUpdate: 'cascade' }).notNull(),
     dateCreated: timestamp('date_created', { withTimezone: true }).defaultNow().notNull()
-})
+}, t => ({
+    uniq: unique().on(t.postId, t.userId)
+}))
 
 export const Media = pgTable('media', {
     mediaId: uuid('media_id').primaryKey().defaultRandom(),

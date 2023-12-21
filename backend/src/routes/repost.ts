@@ -5,4 +5,4 @@ import { authorize } from "../middleware/authenticate";
 
 export const repostRouter = express.Router()
 
-repostRouter.post('/:postId', authorize, rateLimiter('like', 10, 60), repostController.repost)
+repostRouter.post('/:postId', authorize, rateLimiter('repost', 10, 60), repostController.repost)

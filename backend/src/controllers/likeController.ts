@@ -7,7 +7,6 @@ import { eq } from "drizzle-orm";
 
 export async function likePost(req: Request, res: Response, next: NextFunction) {
     const user = res.locals.token!.user;
-    console.log(req.params)
 
     try {
         await db.insert(Likes).values({
