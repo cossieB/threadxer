@@ -31,7 +31,9 @@ export type PostResponse = {
         avatar: string;
         banner: string;
         displayName: string
-    };
+    }
+    liked?: boolean,
+    reposted?: boolean
 }
 
 async function createPost(post: CreatePost) {
@@ -43,7 +45,8 @@ async function createPost(post: CreatePost) {
         body: JSON.stringify(post)
     })
     if (res.ok) {
-        
+        const data = await res.json()
+        return data.postId as string
     }
     throw await handleApiError(res)
 }

@@ -6,6 +6,7 @@ type Props = {
     number: number
     onClick?: () => void
     color?: string
+    highlight?: boolean
 }
 
 export default function StatIcon(props: Props) {
@@ -16,6 +17,7 @@ export default function StatIcon(props: Props) {
                 props.onClick && props.onClick();
                 e.stopPropagation()
             }}
+            classList={{[styles.highlight]: props.highlight}}
         >
             {props.icon}
             <span>

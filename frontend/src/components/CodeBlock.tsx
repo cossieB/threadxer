@@ -28,7 +28,6 @@ export function CodeBlock(props: P) {
         props.setCode(props.i, e.key);
         if (next)
             next.focus();
-
         else
             document.querySelector('button')?.focus();
 
@@ -51,14 +50,15 @@ export function CodeBlock(props: P) {
                     return
                 for (let i = 0; i < clipboardData.length && i < 6; i++) {
                     const char = clipboardData[i]
-                    if (parseInt(char))
+                    if (/\d/.test(char))
                         newArr.push(char)
                 }
+
                 if (newArr.length == 6)
                     props.setCode(newArr)
             }}
             onauxclick={e => {
-                console.log("HERE")
+                
             }}
         />
     );

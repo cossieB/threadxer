@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction } from "express";
 import { db } from "../db/drizzle";
 import { FollowerFollowee, Hashtags, Likes, Media, Post, Repost, User } from "../db/schema";
 import AppError from "../utils/AppError";
-import { asc, count, desc, eq, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, isNotNull, sql } from "drizzle-orm";
 
 export async function getPost(req: Request, res: Response, next: NextFunction) {
 
@@ -16,18 +16,18 @@ export async function createPost(req: Request, res: Response, next: NextFunction
         return next(new AppError("Empty posts are not allowed", 400))
 
     const rgx = /(?<=\s|^)(#\w+)(?=\s|$)/g
-    const matches = text.matchAll(rgx); 
+    const matches = text.matchAll(rgx);
     const uniqueTags = new Set<string>()
     for (const match of matches) {
         uniqueTags.add(match[0].toLowerCase())
     }
-    const uniques = Array.from(uniqueTags); 
+    const uniques = Array.from(uniqueTags);
 
     try {
         const postId = await db.transaction(async tx => {
             const row = await tx.insert(Post).values({
                 userId: user.userId,
-                text,
+                text: text.trim(),
             }).returning({
                 postId: Post.postId
             })
@@ -48,7 +48,7 @@ export async function createPost(req: Request, res: Response, next: NextFunction
     catch (error) {
         next(error)
     }
-    res.sendStatus(200)
+    res.sendStatus(201)
 }
 
 export async function getAllPosts(req: Request, res: Response, next: NextFunction) {
@@ -64,21 +64,21 @@ export async function getAllPosts(req: Request, res: Response, next: NextFunctio
     const likeQ = db.$with('l').as(
         db.select({
             postId: Likes.postId,
-            c: count().as('like_count') 
+            c: count().as('like_count'),
         })
             .from(Likes)
             .groupBy(Likes.postId)
     )
-    const repostQ = db.$with('repost_count').as(
+    const repostQ = db.$with('r').as(
         db.select({
             postId: Repost.postId,
-            c: count().as('c') 
+            c: count().as('repost_count')
         })
             .from(Repost)
             .groupBy(Repost.postId)
     )
-    
-    const posts = await db.with(likeQ, repostQ).select({
+
+    const query = db.with(likeQ, repostQ).select({
         post: {
             ...Post,
             likes: sql<number>`COALESCE (${likeQ.c}::INT, 0)`,
@@ -92,13 +92,23 @@ export async function getAllPosts(req: Request, res: Response, next: NextFunctio
             email: User.email,
             displayName: User.displayName
         },
+        ...currentUser && ({
+            liked: isNotNull(Likes.userId),
+            reposted: isNotNull(Repost.userId)
+        })
     })
         .from(Post)
         .innerJoin(User, eq(User.userId, Post.userId))
         .leftJoin(likeQ, eq(Post.postId, likeQ.postId))
         .leftJoin(repostQ, eq(Post.postId, repostQ.postId))
         .limit(100)
-        .orderBy(desc(Post.dateCreated) )
+        .orderBy(desc(Post.dateCreated))
+
+    if (currentUser) {
+        query.leftJoin(Likes, and(eq(Post.postId, Likes.postId), eq(Likes.userId, currentUser?.userId)))
+        query.leftJoin(Repost, and(eq(Post.postId, Repost.postId), eq(Repost.userId, currentUser?.userId)))
+    }
+    const posts = await query
 
     res.json(posts)
 }

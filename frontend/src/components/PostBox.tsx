@@ -48,12 +48,14 @@ export function PostBox(props: { post: PostResponse }) {
                         number={props.post.post.likes}
                         color="rgb(249, 24, 128)"
                         onClick={() => likeMutation.mutate(props.post.post.postId)}
+                        highlight={props.post.liked}
                     />
                     <StatIcon
                         icon={<RepostSvg />}
                         number={props.post.post.reposts}
                         color="rgb(0,186,124)"
                         onClick={() => repostMutation.mutate(props.post.post.postId)}
+                        highlight={props.post.reposted}
                     />
                     <StatIcon
                         icon={<ViewsSvg />}
