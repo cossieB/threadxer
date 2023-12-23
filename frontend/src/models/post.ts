@@ -1,7 +1,7 @@
 import { QueryClient, createMutation, createQuery } from "@tanstack/solid-query";
 import { customFetch } from "~/utils/customFetcher";
 import { handleApiError } from "./handleApiError";
-import { useNavigate } from "@solidjs/router";
+import { Params, useNavigate } from "@solidjs/router";
 
 type CreatePost = {
     text: string,
@@ -79,16 +79,16 @@ export function usePosts() {
     return query
 }
 
-export function usePost(queryClient: QueryClient, postId: string) {
+export function usePost(queryClient: QueryClient, params: Params) {
     const query = createQuery(() => ({
         get enabled() {
-            return !!postId
+            return !!params.postId
         },
-        queryKey: ['posts', postId],
+        queryKey: ['posts', params.postId],
         queryFn: key => getPost(key.queryKey[1]),
         initialData: () => {
             const posts = queryClient.getQueryData(['posts']) as PostResponse[]
-            return posts?.find(p => p.post.postId == postId)
+            return posts?.find(p => p.post.postId == params.postId)
         },
     }))
     return query

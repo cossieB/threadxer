@@ -30,7 +30,7 @@ export async function updateUser(req: Request, res: Response, next: NextFunction
         await db
             .update(User)
             .set({ displayName, bio, website, location, avatar, banner })
-            .where(eq(User.email, user.email))
+            .where(eq(User.userId, user.userId))
  
         return res.sendStatus(200)
     } 

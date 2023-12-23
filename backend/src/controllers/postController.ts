@@ -80,7 +80,6 @@ export async function getPost(req: Request, res: Response, next: NextFunction) {
             username: User.username,
             avatar: User.avatar,
             banner: User.avatar,
-            email: User.email,
             displayName: User.displayName
         },
         ...currentUser && ({
@@ -143,7 +142,6 @@ export async function getAllPosts(req: Request, res: Response, next: NextFunctio
             username: User.username,
             avatar: User.avatar,
             banner: User.avatar,
-            email: User.email,
             displayName: User.displayName
         },
         ...currentUser && ({

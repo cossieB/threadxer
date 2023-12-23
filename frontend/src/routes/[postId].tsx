@@ -7,9 +7,9 @@ import Page from "~/components/shared/Page";
 import { usePost } from "~/models/post";
 
 export function PostPage() {
-    const { postId } = useParams()
+    const params = useParams()
     const queryClient = useQueryClient()
-    const query = usePost(queryClient, postId)
+    const query = usePost(queryClient, params)
 
     return (
         <Switch>
