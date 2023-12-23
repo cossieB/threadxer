@@ -31,6 +31,7 @@ ARG REDIS_PRIVATE_URL
 ENV DATABASE_URL=${DATABASE_URL} \
     REDIS_URL=${REDIS_URL} \
     REDIS_PRIVATE_URL=${REDIS_PRIVATE_URL} \
-    NODE_ENV="production"
+    NODE_ENV="production" \
+    DOMAIN="https://threadxer.cossie.dev"
 
 CMD ["npm", "run", "start:railway"]

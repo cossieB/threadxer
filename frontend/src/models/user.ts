@@ -1,7 +1,7 @@
 import { customFetch } from "~/utils/customFetcher";
 import { handleApiError } from "./handleApiError";
 import { createQuery, createMutation, QueryClient } from "@tanstack/solid-query";
-import { setUser, user } from "~/globalState/user";
+import { modifyUser, setUser, user } from "~/globalState/user";
 
 type ApiUserResponse = {
     username: string;
@@ -70,7 +70,7 @@ async function mutateUserImage(obj: { field: 'avatar' | 'banner', url: string })
         body: JSON.stringify({ [field]: url })
     })
     if (res.ok) {
-
+        modifyUser({[field]: url})
         return
     }
     throw await handleApiError(res);

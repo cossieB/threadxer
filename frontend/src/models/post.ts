@@ -90,6 +90,9 @@ export function usePost(queryClient: QueryClient, params: Params) {
             const posts = queryClient.getQueryData(['posts']) as PostResponse[]
             return posts?.find(p => p.post.postId == params.postId)
         },
+        retry(failureCount, error) {
+            return failureCount < 3 && !error.message.includes("post doesn't exist")
+        },
     }))
     return query
 }

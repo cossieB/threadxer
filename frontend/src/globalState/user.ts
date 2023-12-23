@@ -66,3 +66,9 @@ export async function firebaseSignin(jwt: string) {
         console.log(error)
     }
 }
+
+export function modifyUser(partialUser: Partial<User>) {
+    const newUser = {...user, ...partialUser}
+    setUser(newUser)
+    localStorage.setItem('user', JSON.stringify(newUser))
+}
