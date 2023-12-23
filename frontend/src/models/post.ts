@@ -51,7 +51,7 @@ async function createPost(post: CreatePost) {
     throw await handleApiError(res)
 }
 
-async function getPosts() {
+async function getAllPosts() {
     const res = await customFetch('/api/posts');
     
     if (res.ok) {
@@ -61,7 +61,7 @@ async function getPosts() {
     throw await handleApiError(res);
 }
 
-async function fetchPost(postId: string) {
+async function getPost(postId: string) {
     const res = await customFetch(`/api/posts/${postId}`)
     if (res.ok) {
         const data = await res.json();
@@ -73,17 +73,25 @@ async function fetchPost(postId: string) {
 export function usePosts() {
     const query = createQuery(() => ({
         queryKey: ['posts'],
-        queryFn: getPosts,
+        queryFn: getAllPosts,
         
     }))
     return query
 }
 
-export function usePost(postId: string) {
+export function usePost(queryClient: QueryClient, postId: string) {
     const query = createQuery(() => ({
-        queryKey: ['postById', postId],
-        queryFn: key => fetchPost(key.queryKey[1])
+        get enabled() {
+            return !!postId
+        },
+        queryKey: ['posts', postId],
+        queryFn: key => getPost(key.queryKey[1]),
+        initialData: () => {
+            const posts = queryClient.getQueryData(['posts']) as PostResponse[]
+            return posts?.find(p => p.post.postId == postId)
+        },
     }))
+    return query
 }
 
 export function usePostMutation(queryClient: QueryClient) {
@@ -96,9 +104,6 @@ export function usePostMutation(queryClient: QueryClient) {
             })
             navigate(`/posts/${data}`)
         },
-        onError(error) {
-            console.log("HERE ")
-        }
     }))
     return mutation
 }

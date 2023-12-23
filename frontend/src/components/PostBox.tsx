@@ -40,7 +40,7 @@ export function PostBox(props: { post: PostResponse }) {
                 <div class={styles.btns} >
                     <StatIcon
                         icon={<CommentSvg />}
-                        number={123450}
+                        number={0}
                         color="rgb(29, 155, 240)"
                     />
                     <StatIcon

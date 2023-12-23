@@ -13,6 +13,7 @@ import { Login } from './routes/auth/Login';
 import { SignUp } from './routes/auth/SignUp';
 import VerifyEmail from './routes/auth/Verify';
 import UserPage from './routes/[username]';
+import { PostPage } from './routes/[postId]';
 
 const root = document.getElementById('root');
 const queryClient = new QueryClient({
@@ -41,6 +42,7 @@ render(() =>
             <Route path="/users/:username" >
                 <Route path={["/", "replies", "media"]} component={UserPage}  />
             </Route>
+            <Route path="/posts/:postId" component={PostPage} />
         </Router>
     </QueryClientProvider>
     , root!)
