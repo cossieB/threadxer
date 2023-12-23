@@ -15,7 +15,18 @@ import VerifyEmail from './routes/auth/Verify';
 import UserPage from './routes/[username]';
 
 const root = document.getElementById('root');
-const queryClient = new QueryClient
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            refetchOnMount: false,
+            refetchOnReconnect: false,
+            refetchOnWindowFocus: false,
+            retry(failureCount, error) {
+                return failureCount < 3 && !error.message.toLowerCase().includes("unauthorized")
+            },
+        },
+    }
+})
 
 render(() =>
     <QueryClientProvider client={queryClient}>

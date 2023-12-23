@@ -2,10 +2,10 @@ import { For, Match, Switch } from "solid-js"
 import { PostBox } from "~/components/PostBox"
 import Loader from "~/components/shared/Loader/Loader"
 import Page from "~/components/shared/Page"
-import {  usePost } from "~/models/post"
+import {  usePosts } from "~/models/post"
 
 export default function Home() {
-    const query = usePost()
+    const query = usePosts()
     return (
         <Page title="Home">
             <Switch>

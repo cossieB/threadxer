@@ -10,8 +10,19 @@ export function useLikes(queryClient: QueryClient) {
     const mutation = createMutation(() => ({
         mutationFn: likeOrUnlikePost,
         onSuccess(data, variables, context) {
-            queryClient.invalidateQueries({
-                queryKey: ['posts']
+            // queryClient.invalidateQueries({
+            //     queryKey: ['posts']
+            // })
+            queryClient.setQueryData(['posts'], (old: PostResponse[]) => {
+                const post = old.find(x => x.post.postId == variables)
+                if (!post) {
+                    console.log(variables)
+                    return old
+                }
+                const newPost: PostResponse =  JSON.parse(JSON.stringify(post))
+                newPost.liked = data === 1
+                newPost.post.likes += data
+                return old.map(x => x.post.postId === variables ? newPost : x)
             })
         },
     }))

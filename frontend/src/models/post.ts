@@ -61,13 +61,29 @@ async function getPosts() {
     throw await handleApiError(res);
 }
 
-export function usePost() {
+async function fetchPost(postId: string) {
+    const res = await customFetch(`/api/posts/${postId}`)
+    if (res.ok) {
+        const data = await res.json();
+        return data as PostResponse
+    }
+    throw await handleApiError(res)
+}
+
+export function usePosts() {
     const query = createQuery(() => ({
         queryKey: ['posts'],
         queryFn: getPosts,
         
     }))
     return query
+}
+
+export function usePost(postId: string) {
+    const query = createQuery(() => ({
+        queryKey: ['postById', postId],
+        queryFn: key => fetchPost(key.queryKey[1])
+    }))
 }
 
 export function usePostMutation(queryClient: QueryClient) {

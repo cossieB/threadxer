@@ -9,8 +9,19 @@ export function useRepost(queryClient: QueryClient) {
     const mutation = createMutation(() => ({
         mutationFn: repostOrUnrepost,
         onSuccess(data, variables, context) {
-            queryClient.invalidateQueries({
-                queryKey: ['posts']
+            // queryClient.invalidateQueries({
+            //     queryKey: ['posts']
+            // })
+            queryClient.setQueryData(['posts'], (old: PostResponse[]) => {
+                const post = old.find(x => x.post.postId == variables)
+                if (!post) {
+                    console.log(variables)
+                    return old
+                }
+                const newPost: PostResponse =  JSON.parse(JSON.stringify(post))
+                newPost.reposted = data === 1
+                newPost.post.reposts += data
+                return old.map(x => x.post.postId === variables ? newPost : x)
             })
         },
     }))

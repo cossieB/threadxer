@@ -26,9 +26,7 @@ export function useUser(username: string) {
         refetchOnReconnect: false,
         refetchOnWindowFocus: false,
         retry(failureCount, error) {
-            if (error.message.includes("No user with that username exists"))
-                return false
-            return failureCount < 3
+            return !error.message.includes("No user with that username exists") && failureCount < 3
         },
     }))
 

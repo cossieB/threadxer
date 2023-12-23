@@ -1,12 +1,8 @@
 import type { Request, Response, NextFunction } from "express";
 import { db } from "../db/drizzle";
-import { FollowerFollowee, Hashtags, Likes, Media, Post, Repost, User } from "../db/schema";
+import { Hashtags, Likes, Media, Post, Repost, User } from "../db/schema";
 import AppError from "../utils/AppError";
-import { and, asc, count, desc, eq, isNotNull, sql } from "drizzle-orm";
-
-export async function getPost(req: Request, res: Response, next: NextFunction) {
-
-}
+import { and, count, desc, eq, isNotNull, sql } from "drizzle-orm";
 
 export async function createPost(req: Request, res: Response, next: NextFunction) {
     const user = res.locals.token!.user
@@ -25,12 +21,13 @@ export async function createPost(req: Request, res: Response, next: NextFunction
 
     try {
         const postId = await db.transaction(async tx => {
-            const row = await tx.insert(Post).values({
-                userId: user.userId,
-                text: text.trim(),
-            }).returning({
-                postId: Post.postId
-            })
+            const row = await tx.insert(Post)
+                .values({
+                    userId: user.userId,
+                    text: text.trim(),
+                }).returning({
+                    postId: Post.postId
+                })
             if (media.length > 0)
                 await tx.insert(Media).values(media.map(url => ({
                     postId: row[0].postId,
@@ -49,6 +46,10 @@ export async function createPost(req: Request, res: Response, next: NextFunction
         next(error)
     }
     res.sendStatus(201)
+}
+
+export async function getPost(req: Request, res: Response, next: NextFunction) {
+
 }
 
 export async function getAllPosts(req: Request, res: Response, next: NextFunction) {
