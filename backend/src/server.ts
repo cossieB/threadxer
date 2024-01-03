@@ -12,6 +12,7 @@ dotenv.config()
 const app = express()
 
 // Express Middleware
+app.disable('x-powered-by')
 app.use(cors())
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json())

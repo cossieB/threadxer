@@ -14,11 +14,11 @@ export async function draftVerificationEmail(name: string, code: string, to: str
                 Thank you for creating an account with Threadxer. Before you can join in on the fun, you first have to verify this email address. Your verification code is
             </p>
             <center>
-                <code style="background-color: rgb(29, 155, 240); padding: 1rem; border-radius: 3rem; color: white">
+                <div style="background-color: rgb(29, 155, 240); padding: 1rem; border-radius: 3rem; color: white">
                     <strong>
                         ${code}
                     </strong>
-                </code>
+                </div>
             </center>
             <aside style="margin-top: 50px">Be advised this code will expire in 72 hours.</aside>
         </body>
