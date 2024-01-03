@@ -3,10 +3,10 @@ import { JSX, Show, createSignal } from "solid-js"
 import styles from "~/styles/components/Nav.module.scss"
 import { deleteUser, user } from "../globalState/user"
 import { CompostSvg, HomeSvg, LogoutSvg, RegisterSvg, SearchSvg, SettingsSvg, UnlockSvg } from "../svgs"
-import { setComposerOpen } from "~/App"
 import { customFetch } from "~/utils/customFetcher"
 import Modal from "./Modal";
 import clickOutside from "~/lib/clickOutside"
+import { setComposerState } from "~/globalState/composer"
 false && clickOutside
 
 async function logout() {
@@ -56,7 +56,7 @@ export default function Navbar() {
                     <NavItem
                         icon={<CompostSvg />}
                         text="Compose"
-                        onclick={() => { setComposerOpen(prev => !prev) }}
+                        onclick={() => { setComposerState('isOpen', prev => !prev) }}
                     />
                 </Show>
                 <NavLink

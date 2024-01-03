@@ -1,14 +1,15 @@
-import { Match, Switch, createSignal, onMount } from "solid-js";
+import { Match, Show, Switch, createSignal, onMount } from "solid-js";
 import styles from "~/styles/components/Composer.module.scss"
 import { CloseBtn } from "./shared/CloseBtn";
 import { SubmitButton } from "./shared/SubmitButton";
-import { setComposerOpen } from "~/App";
 import clickOutside from "~/lib/clickOutside";
 import { CharacterCounter } from "./CharacterCounter";
 import { usePostMutation } from "~/models/post";
 import { useQueryClient } from "@tanstack/solid-query";
 import { Portal } from "solid-js/web";
 import { Popup } from "./shared/Popup";
+import { composerState, setComposerState } from "~/globalState/composer";
+import { PostBox, QuoteBox } from "./PostBox";
 false && clickOutside
 
 export function PostComposer() {
@@ -28,9 +29,9 @@ export function PostComposer() {
 
     return (
         <div class={styles.composer} >
-            <div use:clickOutside={() => setComposerOpen(false)}>
+            <div use:clickOutside={() => setComposerState({isOpen: false})}>
                 <div class={styles.top}>
-                    <CloseBtn onclick={() => { setComposerOpen(false) }} />
+                    <CloseBtn onclick={() => { setComposerState({isOpen: false}) }} />
                 </div>
                 <textarea
                     oninput={e => setInput(e.target.value)}
@@ -50,6 +51,9 @@ export function PostComposer() {
                     />
                 </div>
                 <div class={styles.preview} innerHTML={preview()} />
+                <Show when={!!composerState.quotedPost}>
+                    <QuoteBox post={composerState.quotedPost!} />
+                </Show>
             </div>
             <Portal>
                 <Popup

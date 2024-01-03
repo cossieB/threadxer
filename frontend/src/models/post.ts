@@ -2,6 +2,7 @@ import { QueryClient, createMutation, createQuery } from "@tanstack/solid-query"
 import { customFetch } from "~/utils/customFetcher";
 import { handleApiError } from "./handleApiError";
 import { Params, useNavigate } from "@solidjs/router";
+import { setComposerState } from "~/globalState/composer";
 
 type CreatePost = {
     text: string,
@@ -106,6 +107,7 @@ export function usePostMutation(queryClient: QueryClient) {
                 queryKey: ['posts']
             })
             navigate(`/posts/${data}`)
+            setComposerState('isOpen', false)
         },
     }))
     return mutation
