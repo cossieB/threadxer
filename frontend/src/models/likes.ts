@@ -2,7 +2,7 @@ import { customFetch } from "~/utils/customFetcher";
 import { handleApiError } from "./handleApiError";
 import { QueryClient, createMutation } from "@tanstack/solid-query";
 import { PostResponse } from "./post";
-import { user } from "~/globalState/user";
+import auth from "~/globalState/auth";
 
 export function useLikes(queryClient: QueryClient) {
 
@@ -36,7 +36,7 @@ export function useLikes(queryClient: QueryClient) {
 }
 
 async function likeOrUnlikePost(postId: string) {
-    if (!user.username)
+    if (!auth.user.username)
         throw new Error("Please login to like")
     const res = await customFetch(`/api/likes/${postId}`, {
         method: "POST",

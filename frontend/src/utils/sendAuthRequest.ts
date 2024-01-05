@@ -1,6 +1,6 @@
 import { type Navigator } from '@solidjs/router';
 import { SetStoreFunction } from 'solid-js/store';
-import { createUser, firebaseSignin } from '~/globalState/user';
+import auth from '~/globalState/auth';
 
 export async function sendAuthRequest(
     url: string,
@@ -20,8 +20,8 @@ export async function sendAuthRequest(
         if (res.ok) {
             setState('success', true);
             const data = await res.json(); 
-            createUser(data.jwt);
-            data.fb && await firebaseSignin(data.fb)
+            auth.createUser(data.jwt);
+            data.fb && await auth.firebaseSignin(data.fb)
             const redirect =  (data.redirect as string) ?? -1
             navigate(redirect)
         }

@@ -1,7 +1,7 @@
 import { customFetch } from "~/utils/customFetcher";
 import { handleApiError } from "./handleApiError";
 import { createQuery, createMutation, QueryClient } from "@tanstack/solid-query";
-import { modifyUser, setUser, user } from "~/globalState/user";
+import auth from "~/globalState/auth";
 
 type ApiUserResponse = {
     username: string;
@@ -38,7 +38,7 @@ export function useUserMutation(queryClient: QueryClient) {
         mutationFn: mutateUser,
         onSuccess() {
             queryClient.invalidateQueries({
-                queryKey: ['users', user.username.toLowerCase()]
+                queryKey: ['users', auth.user.username.toLowerCase()]
             })
         },
         onError(error) {
@@ -48,11 +48,11 @@ export function useUserMutation(queryClient: QueryClient) {
     const imageMutation = createMutation(() => ({
         mutationFn: mutateUserImage,
         onSuccess(data, variables, context) {
-            queryClient.setQueryData(['users', user.username.toLowerCase()], (old: ApiUserResponse) => ({
+            queryClient.setQueryData(['users', auth.user.username.toLowerCase()], (old: ApiUserResponse) => ({
                 ...old,
                 [variables.field]: variables.url
             }))
-            setUser(variables.field, variables.url)
+            auth.modifyUser({[variables.field]: variables.url})
             const u = JSON.parse(localStorage.getItem('user') ?? '{}')
             localStorage.setItem('user', JSON.stringify({ ...u, [variables.field]: variables.url }))
         },
@@ -70,7 +70,7 @@ async function mutateUserImage(obj: { field: 'avatar' | 'banner', url: string })
         body: JSON.stringify({ [field]: url })
     })
     if (res.ok) {
-        modifyUser({[field]: url})
+        auth.modifyUser({[field]: url})
         return
     }
     throw await handleApiError(res);

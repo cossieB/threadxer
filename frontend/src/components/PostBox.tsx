@@ -19,7 +19,7 @@ export function PostBox(props: { post: PostResponse }) {
     const repostMutation = useRepost(queryClient)
     return (
 
-        <A class={styles.box} href={`/posts/${props.post.post.postId}`}>
+        <div class={styles.box} onclick={() => navigate(`/posts/${props.post.post.postId}`)}>
             <div class={styles.avatar}>
                 <img src={props.post.user?.avatar} />
             </div>
@@ -75,7 +75,7 @@ export function PostBox(props: { post: PostResponse }) {
                     />
                 </div>
             </div>
-        </A>
+        </div>
     )
 }
 

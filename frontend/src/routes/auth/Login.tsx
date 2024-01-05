@@ -7,7 +7,7 @@ import { SubmitButton } from '../../components/shared/SubmitButton';
 import { Navigate, useNavigate } from '@solidjs/router';
 import { sendAuthRequest } from '~/utils/sendAuthRequest';
 import { Show } from 'solid-js';
-import { user } from '~/globalState/user';
+import auth from '~/globalState/auth';
 import Page from '~/components/shared/Page';
 
 const [userState, setUserState] = createStore({
@@ -35,7 +35,7 @@ export function Login() {
         await sendAuthRequest('/api/auth/login', setState, userState, navigate)
     }
     return (
-        <Show when={!user.username} fallback={<Navigate href="/" />}>
+        <Show when={!auth.user.username} fallback={<Navigate href="/" />}>
             <Page title='Log In'>
                 <UserForm onsubmit={handleSubmit}>
                     <FormInput

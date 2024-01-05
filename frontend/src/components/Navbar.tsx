@@ -1,7 +1,7 @@
 import { A } from "@solidjs/router"
 import { JSX, Show, createSignal } from "solid-js"
 import styles from "~/styles/components/Nav.module.scss"
-import { deleteUser, user } from "../globalState/user"
+import auth from "~/globalState/auth"
 import { CompostSvg, HomeSvg, LogoutSvg, RegisterSvg, SearchSvg, SettingsSvg, UnlockSvg } from "../svgs"
 import { customFetch } from "~/utils/customFetcher"
 import Modal from "./Modal";
@@ -14,7 +14,7 @@ async function logout() {
         method: "DELETE"
     })
     if (res.ok) {
-        deleteUser();
+        auth.deleteUser();
         location.reload()
     }
 }
@@ -36,7 +36,7 @@ export default function Navbar() {
                 icon={<SearchSvg />}
             />
             <Show
-                when={user.username}
+                when={auth.user.username}
                 fallback={
                     <>
                         <NavLink
@@ -52,7 +52,7 @@ export default function Navbar() {
                     </>
                 }
             >
-                <Show when={!user.isUnverified}>
+                <Show when={!auth.user.isUnverified}>
                     <NavItem
                         icon={<CompostSvg />}
                         text="Compose"
@@ -60,9 +60,9 @@ export default function Navbar() {
                     />
                 </Show>
                 <NavLink
-                    href={`/users/${user.username}`}
-                    text={user.username}
-                    icon={<img src={user.avatar} />}
+                    href={`/users/${auth.user.username}`}
+                    text={auth.user.username}
+                    icon={<img src={auth.user.avatar} />}
                 />
                 <NavLink
                     href="/profile"

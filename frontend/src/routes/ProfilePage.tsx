@@ -8,7 +8,7 @@ import Loader from "~/components/shared/Loader/Loader";
 import Page from "~/components/shared/Page";
 import { SubmitButton } from "~/components/shared/SubmitButton";
 import UserForm from "~/components/shared/UserForm";
-import { user } from "~/globalState/user";
+import auth from "~/globalState/auth";
 import { validateUrl } from "~/lib/validateUrl";
 import styles from "~/styles/routes/ProfilePage.module.scss"
 import { DeleteSvg } from "~/svgs";
@@ -25,13 +25,13 @@ export default function PreferencesPage() {
     const errored = () => Object.values(fieldErrors).flat().length > 0;
     const queryClient = useQueryClient()
 
-    const query = useUser(user.username)
+    const query = useUser(auth.user.username)
     const {mutation, imageMutation} = useUserMutation(queryClient)
 
     return (
         <Page title="Preferences">
             <Switch>
-                <Match when={!user.username}>
+                <Match when={!auth.user.username}>
                     <Navigate href="/auth/login?redirect=%2Fprofile" />
                 </Match>
                 <Match when={query.isLoading}>

@@ -12,10 +12,13 @@
     display: flex;
     align-items: center;
     flex-shrink: 0;
+    position: fixed;
     @media (max-width: 768px) {
+        background-color: black;
         justify-content: space-around;
         width: 100vw;
         height: var(--nav-height);
+        bottom: 0;
     }
     @media (min-width: 768px) {
         flex-direction: column;

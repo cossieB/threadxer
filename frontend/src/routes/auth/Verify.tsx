@@ -3,7 +3,7 @@ import { Index, Setter, createEffect, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
 import { Popup } from "~/components/shared/Popup";
 import { SubmitButton } from "~/components/shared/SubmitButton";
-import { createUser, firebaseSignin, user } from "~/globalState/user";
+import auth from "~/globalState/auth";
 import styles from '~/styles/components/VerificationCode.module.scss'
 import { customFetch } from "~/utils/customFetcher";
 import { CodeBlock } from "../../components/CodeBlock";
@@ -33,8 +33,8 @@ export default function VerifyEmail() {
             return setState('error', data?.error ?? "")
         }
         const data = await res.json();
-        createUser(data.jwt)
-        data.fb && await firebaseSignin(data.fb)
+        auth.createUser(data.jwt)
+        data.fb && await auth.firebaseSignin(data.fb)
         navigate("/profile")
     }
     async function handleResend() {
@@ -60,8 +60,8 @@ export default function VerifyEmail() {
     })
     createEffect(() => {
         const encoded = encodeURIComponent("/auth/verify")
-        if (!user.username) navigate(`/auth/login?redirect=${encoded}`, { state: { message: "Please login to verify your account" } })
-        if (user.isUnverified === false) navigate("/")
+        if (!auth.user.username) navigate(`/auth/login?redirect=${encoded}`, { state: { message: "Please login to verify your account" } })
+        if (auth.user.isUnverified === false) navigate("/")
     })
     return (
         <main class={styles.main}>

@@ -2,7 +2,7 @@ import { customFetch } from "~/utils/customFetcher";
 import { handleApiError } from "./handleApiError";
 import { QueryClient, createMutation } from "@tanstack/solid-query";
 import { PostResponse } from "./post";
-import { user } from "~/globalState/user";
+import auth from "~/globalState/auth";
 
 export function useRepost(queryClient: QueryClient) {
 
@@ -36,7 +36,7 @@ export function useRepost(queryClient: QueryClient) {
 }
 
 async function repostOrUnrepost(postId: string) {
-    if (!user.username)
+    if (!auth.user.username)
         throw new Error("Please log in to repost")
     const res = await customFetch(`/api/reposts/${postId}`, {
         method: "POST",

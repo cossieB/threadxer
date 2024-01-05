@@ -3,7 +3,7 @@ import { createSignal, mergeProps } from "solid-js";
 import { ChangeEvent } from "~/lib/solidTypes";
 import { UploadSvg } from "~/svgs";
 import { storage } from "../../../firebase";
-import { user } from "~/globalState/user";
+import auth from "~/globalState/auth";
 import type { CreateMutationResult, QueryKey } from "@tanstack/solid-query";
 import { Popup } from "../shared/Popup";
 import { Portal } from "solid-js/web";
@@ -23,7 +23,7 @@ export function UploadBtn(props: Props) {
     const [error, setError] = createSignal("")
     
     async function selectFiles(e: ChangeEvent<HTMLInputElement>) {
-        if (!user.userId) return
+        if (!auth.user.userId) return
         const files = Array.from(e.target.files ?? []).slice(0, merged.limit)
         try {
             const urls = await Promise.all(validateAndUpload(files, `${merged.path}s`))
@@ -57,7 +57,7 @@ function validateAndUpload(files: File[], path: string, maxSize = 1) {
 }
 
 async function uploadFile(file: File, path: string) {
-    const imageRef = ref(storage, `${user.userId}/${path}/${file.name}`)
+    const imageRef = ref(storage, `${auth.user.userId}/${path}/${file.name}`)
     const res = await uploadBytes(imageRef, file)
     return getDownloadURL(res.ref)
 }

@@ -8,7 +8,7 @@ import { Validator } from '../../utils/Validator';
 import { SubmitButton } from '../../components/shared/SubmitButton';
 import { sendAuthRequest } from '~/utils/sendAuthRequest';
 import { Navigate, useNavigate } from '@solidjs/router';
-import { user } from '~/globalState/user';
+import auth from '~/globalState/auth';
 import Page from '~/components/shared/Page';
 
 const initialState = {
@@ -69,7 +69,7 @@ export function SignUp() {
         await sendAuthRequest('/api/auth/signup', setState, userState, navigate);
     }
     return (
-        <Show when={!user.username} fallback={<Navigate href="/" />}>
+        <Show when={!auth.user.username} fallback={<Navigate href="/" />}>
             <Page title='Sign Up'>
 
                 <UserForm onsubmit={handleSubmit}>

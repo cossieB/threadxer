@@ -5,10 +5,10 @@
     width: 100vw;
     height: 100vh;
 };
-@include mixins.hideScrollbar('main');
+@include mixins.hideScrollbar('body');
 :root {
     --sidepanelWidth: 25%;
-    --nav-height: 3rem;
+    --nav-height: 5rem;
     --blue1: rgb(29, 155, 240);
     --gray1: #181818;
     --gray2: hsl(0, 0%, 50%);
@@ -49,11 +49,9 @@ main {
         height: calc(100vh - var(--nav-height));
     }
     @media (min-width: 768px) {
+        margin-left: var(--sidepanelWidth);
         width: calc(100% - 2 * var(--sidepanelWidth));
     }
-}
-img {
-    max-width: 100%;
 }
 code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
