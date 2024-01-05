@@ -1,14 +1,15 @@
 import { QueryClient, createMutation, createQuery, useQueryClient } from "@tanstack/solid-query";
 import { customFetch } from "~/utils/customFetcher";
 import { handleApiError } from "./handleApiError";
-import { Params, useNavigate, useParams } from "@solidjs/router";
+import { Params, useMatch, useNavigate, useParams } from "@solidjs/router";
 import { setComposerState } from "~/globalState/composer";
 
 export function usePost() {
     const params = useParams()
     const queryClient = useQueryClient()
     const navigate = useNavigate()
-
+    const matches = useMatch(() => "/")
+    
     const postQuery = createQuery(() => ({
         get enabled() {
             return !!params.postId
@@ -34,6 +35,9 @@ export function usePost() {
         },
     }))
     const allPostsQuery = createQuery(() => ({
+        get enabled() {
+            return !!matches()
+        },
         queryKey: ['posts'],
         queryFn: getAllPosts,
         
@@ -79,7 +83,7 @@ async function getPost(postId: string) {
 type CreatePost = {
     text: string,
     replyTo?: string,
-    quoting?: string
+    quotedPost?: string
     media?: string[]
 }
 

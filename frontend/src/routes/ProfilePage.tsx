@@ -1,5 +1,4 @@
 import { Navigate } from "@solidjs/router";
-import { useQueryClient } from "@tanstack/solid-query";
 import { Switch, Match } from "solid-js";
 import { createStore } from "solid-js/store";
 import { CustomInput } from "~/components/CustomInput";

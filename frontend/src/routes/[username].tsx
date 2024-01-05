@@ -33,8 +33,8 @@ export default function UserPage() {
                         <button>Follow</button>
                     </div>
                     <div class={styles.user}>
-                        <span>{query.data?.username}</span> <br />
-                        <span>@{query.data?.displayName}</span>
+                        <span>{query.data?.displayName}</span> <br />
+                        <span>@{query.data?.username}</span>
                     </div>
                     <div class={styles.bio}>
                         {query.data?.bio}

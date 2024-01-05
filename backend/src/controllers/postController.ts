@@ -2,7 +2,9 @@ import type { Request, Response, NextFunction } from "express";
 import { db } from "../db/drizzle";
 import { Hashtags, Likes, Media, Post, Repost, User } from "../db/schema";
 import AppError from "../utils/AppError";
-import { and, count, desc, eq, isNotNull, sql } from "drizzle-orm";
+import { and, count, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
+import { getHashtags } from "../utils/getHashtags";
+import { alias } from "drizzle-orm/pg-core";
 
 export async function createPost(req: Request, res: Response, next: NextFunction) {
     const user = res.locals.token!.user
@@ -11,13 +13,7 @@ export async function createPost(req: Request, res: Response, next: NextFunction
     if (text.length + media.length === 0)
         return next(new AppError("Empty posts are not allowed", 400))
 
-    const rgx = /(?<=\s|^)(#\w+)(?=\s|$)/g
-    const matches = text.matchAll(rgx);
-    const uniqueTags = new Set<string>()
-    for (const match of matches) {
-        uniqueTags.add(match[0].toLowerCase())
-    }
-    const uniques = Array.from(uniqueTags);
+    const uniques = getHashtags(text);
 
     try {
         const postId = await db.transaction(async tx => {
@@ -25,6 +21,10 @@ export async function createPost(req: Request, res: Response, next: NextFunction
                 .values({
                     userId: user.userId,
                     text: text.trim(),
+                    quotedPost: req.body.quotedPost,
+                    didQuote: !!req.body.quotedPost,
+                    replyTo: req.body.replyTo,
+                    didReply: !!req.body.replyTo
                 }).returning({
                     postId: Post.postId
                 })
@@ -49,7 +49,7 @@ export async function createPost(req: Request, res: Response, next: NextFunction
 }
 
 export async function getPost(req: Request, res: Response, next: NextFunction) {
-    const {postId} = req.params;
+    const { postId } = req.params;
     const currentUser = res.locals.token?.user
 
     const likeQ = db.$with('l').as(
@@ -68,6 +68,10 @@ export async function getPost(req: Request, res: Response, next: NextFunction) {
             .from(Repost)
             .groupBy(Repost.postId)
     )
+    const quote = alias(Post, 'q')
+    const quoteAuthor = alias(User, 'qa')
+    const originalPost = alias(Post, 'op')
+    const originalPostAuthor = alias(User, 'opa')
 
     const query = db.with(likeQ, repostQ).select({
         post: {
@@ -82,25 +86,52 @@ export async function getPost(req: Request, res: Response, next: NextFunction) {
             banner: User.avatar,
             displayName: User.displayName
         },
+        quotedPost: {
+            ...quote,
+            userId: quoteAuthor.userId,
+            username: quoteAuthor.username,
+            avatar: quoteAuthor.avatar,
+            banner: quoteAuthor.avatar,
+            displayName: quoteAuthor.displayName
+        },
+        replyingTo: {
+            ...originalPost,
+            userId: originalPostAuthor.userId,
+            username: originalPostAuthor.username,
+            avatar: originalPostAuthor.avatar,
+            banner: originalPostAuthor.avatar,
+            displayName: originalPostAuthor.displayName
+        },
         ...currentUser && ({
             liked: isNotNull(Likes.userId),
             reposted: isNotNull(Repost.userId)
-        })
+        }),
     })
         .from(Post)
         .innerJoin(User, eq(User.userId, Post.userId))
         .leftJoin(likeQ, eq(Post.postId, likeQ.postId))
         .leftJoin(repostQ, eq(Post.postId, repostQ.postId))
+        .leftJoin(quote, eq(quote.postId, Post.quotedPost))
+        .leftJoin(quoteAuthor, eq(quote.userId, quoteAuthor.userId))
+        .leftJoin(originalPost, eq(originalPost.postId, Post.replyTo))
+        .leftJoin(originalPostAuthor, eq(originalPost.userId, originalPostAuthor.userId))
         .where(eq(Post.postId, postId))
 
     if (currentUser) {
         query.leftJoin(Likes, and(eq(Post.postId, Likes.postId), eq(Likes.userId, currentUser?.userId)))
         query.leftJoin(Repost, and(eq(Post.postId, Repost.postId), eq(Repost.userId, currentUser?.userId)))
     }
+
     const posts = await query
-    const post = posts.at(0);
+    const post = posts.at(0); console.log(post)
     if (!post)
         return next(new AppError("That post doesn't exist", 404))
+    if (!post.quotedPost?.postId)
+        //@ts-expect-error
+        delete post.quotedPost
+    if (!post.replyingTo?.postId)
+        //@ts-expect-error
+        delete post.replyingTo
     return res.json(post)
 }
 
@@ -130,7 +161,10 @@ export async function getAllPosts(req: Request, res: Response, next: NextFunctio
             .from(Repost)
             .groupBy(Repost.postId)
     )
-
+    const quote = alias(Post, 'q')
+    const quoteAuthor = alias(User, 'qa')
+    const originalPost = alias(Post, 'op')
+    const originalPostAuthor = alias(User, 'opa')
     const query = db.with(likeQ, repostQ).select({
         post: {
             ...Post,
@@ -144,6 +178,22 @@ export async function getAllPosts(req: Request, res: Response, next: NextFunctio
             banner: User.avatar,
             displayName: User.displayName
         },
+        quotedPost: {
+            ...quote,
+            userId: quoteAuthor.userId,
+            username: quoteAuthor.username,
+            avatar: quoteAuthor.avatar,
+            banner: quoteAuthor.avatar,
+            displayName: quoteAuthor.displayName
+        },
+        replyingTo: {
+            ...originalPost,
+            userId: originalPostAuthor.userId,
+            username: originalPostAuthor.username,
+            avatar: originalPostAuthor.avatar,
+            banner: originalPostAuthor.avatar,
+            displayName: originalPostAuthor.displayName
+        },
         ...currentUser && ({
             liked: isNotNull(Likes.userId),
             reposted: isNotNull(Repost.userId)
@@ -153,6 +203,11 @@ export async function getAllPosts(req: Request, res: Response, next: NextFunctio
         .innerJoin(User, eq(User.userId, Post.userId))
         .leftJoin(likeQ, eq(Post.postId, likeQ.postId))
         .leftJoin(repostQ, eq(Post.postId, repostQ.postId))
+        .leftJoin(quote, eq(quote.postId, Post.quotedPost))
+        .leftJoin(quoteAuthor, eq(quote.userId, quoteAuthor.userId))
+        .leftJoin(originalPost, eq(originalPost.postId, Post.replyTo))
+        .leftJoin(originalPostAuthor, eq(originalPost.userId, originalPostAuthor.userId))
+        .where(and(isNull(Post.replyTo)))
         .limit(100)
         .orderBy(desc(Post.dateCreated))
 
@@ -162,6 +217,14 @@ export async function getAllPosts(req: Request, res: Response, next: NextFunctio
     }
     const posts = await query
 
-    res.json(posts)
+    res.json(
+        posts.map(p => {
+            const { replyingTo, quotedPost, ...x } = p
+            return {
+                ...x,
+                ...replyingTo?.postId && { replyingTo },
+                ...quotedPost?.postId && { quotedPost },
+            }
+        }))
 }
 

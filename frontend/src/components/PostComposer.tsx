@@ -45,7 +45,11 @@ export function PostComposer() {
                         disabled={input().length === 0}
                         finished={mutation.isSuccess}
                         loading={mutation.isPending}
-                        onclick={() => mutation.mutate({text: input()})}
+                        onclick={() => mutation.mutate({
+                            text: input(),
+                            quotedPost: composerState.quotedPost?.post.postId,
+                            replyTo: composerState.replyTo?.post.postId
+                        })}
                     />
                 </div>
                 <div class={styles.preview} innerHTML={preview()} />

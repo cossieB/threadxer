@@ -5,19 +5,17 @@ import { A, useNavigate } from "@solidjs/router";
 import { Switch, Match, For } from "solid-js";
 import StatIcon from "./ActionIcon";
 import { CommentSvg, LikeSvg, QuoteSvg, RepostSvg, ViewsSvg } from "~/svgs";
-import { useQueryClient } from "@tanstack/solid-query";
 import { setComposerState } from "~/globalState/composer";
 import { useLikes } from "~/data/likes";
 import { PostResponse } from "~/data/post";
 import { useRepost } from "~/data/repost";
 
 export function PostBox(props: { post: PostResponse }) {
-    const queryClient = useQueryClient()
     const navigate = useNavigate()
     const likeMutation = useLikes()
     const repostMutation = useRepost()
+    
     return (
-
         <div class={styles.box} onclick={() => navigate(`/posts/${props.post.post.postId}`)}>
             <div class={styles.avatar}>
                 <img src={props.post.user?.avatar} />
@@ -87,8 +85,8 @@ export function QuoteBox(props: { post: PostResponse }) {
             <div class={styles.div} >
                 <div class={styles.header} >
                     <A href={`/users/${props.post.user.username}`} >
-                        <span class={styles.username} > {props.post.user?.username} </span> &nbsp;
-                        <span class={styles.displayName} > @{props.post.user?.displayName} </span>
+                        <span class={styles.username} > {props.post.user?.displayName} </span> &nbsp;
+                        <span class={styles.displayName} > @{props.post.user?.username} </span>
                     </A>
                     <span class={styles.date} title={formatDate(props.post.post.dateCreated)} >
                         {formatPostTime(props.post.post.dateCreated)}
