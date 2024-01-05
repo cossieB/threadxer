@@ -29,8 +29,6 @@ class Auth {
             userId: ""
         }
         const [user, setUser] = createStore(storedUser);
-        this._user = user
-        this._setUser = setUser
         const [token, setToken] = createStore({
             jwt: "",
             decoded: () => {
@@ -42,6 +40,8 @@ class Auth {
             },
             firebase: ""
         })
+        this._user = user
+        this._setUser = setUser
         this._token = token
         this._setToken = setToken
     }

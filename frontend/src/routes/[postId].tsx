@@ -5,27 +5,26 @@ import NotFound from "~/components/404";
 import { PostBox } from "~/components/PostBox";
 import Loader from "~/components/shared/Loader/Loader";
 import Page from "~/components/shared/Page";
-import { usePost } from "~/models/post";
+import { usePost } from "~/data/post";
 
 export function PostPage() {
-    const params = useParams()
-    const queryClient = useQueryClient()
-    const query = usePost(queryClient, params)
+
+    const {postQuery} = usePost()
 
     return (
         <Switch>
-            <Match when={query.isLoading}>
+            <Match when={postQuery.isLoading}>
                 <Loader />
             </Match>
-            <Match when={query.isError && query.error.message.includes("post doesn't exist")}>
+            <Match when={postQuery.isError && postQuery.error.message.includes("post doesn't exist")}>
                 <NotFound />
             </Match>
-            <Match when={query.isError}>
-                {query.error?.message}
+            <Match when={postQuery.isError}>
+                {postQuery.error?.message}
             </Match>
-            <Match when={query.isSuccess}>
-                <Page title={query.data?.post.postId!}>
-                    <PostBox post={query.data!} />
+            <Match when={postQuery.isSuccess}>
+                <Page title={postQuery.data?.post.postId!}>
+                    <PostBox post={postQuery.data!} />
                 </Page>
             </Match>
         </Switch>

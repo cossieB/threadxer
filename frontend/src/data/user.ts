@@ -1,21 +1,10 @@
 import { customFetch } from "~/utils/customFetcher";
 import { handleApiError } from "./handleApiError";
-import { createQuery, createMutation, QueryClient } from "@tanstack/solid-query";
+import { createQuery, createMutation, useQueryClient } from "@tanstack/solid-query";
 import auth from "~/globalState/auth";
 
-type ApiUserResponse = {
-    username: string;
-    dateJoined: Date;
-    bio: string;
-    avatar: string;
-    banner: string;
-    displayName: string;
-    dob?: Date;
-    location: string;
-    website: string
-};
-
 export function useUser(username: string) {
+    const queryClient = useQueryClient()
     const query = createQuery(() => ({
         get enabled() {
             return !!username
@@ -30,10 +19,6 @@ export function useUser(username: string) {
         },
     }))
 
-    return query
-}
-
-export function useUserMutation(queryClient: QueryClient) {
     const mutation = createMutation(() => ({
         mutationFn: mutateUser,
         onSuccess() {
@@ -53,13 +38,12 @@ export function useUserMutation(queryClient: QueryClient) {
                 [variables.field]: variables.url
             }))
             auth.modifyUser({[variables.field]: variables.url})
-            const u = JSON.parse(localStorage.getItem('user') ?? '{}')
-            localStorage.setItem('user', JSON.stringify({ ...u, [variables.field]: variables.url }))
         },
     }))
-    return { mutation, imageMutation }
+    return { mutation, imageMutation, query }
 }
 
+// fetchers
 async function mutateUserImage(obj: { field: 'avatar' | 'banner', url: string }) {
     const { field, url } = obj
     const res = await customFetch('/api/users', {
@@ -75,7 +59,17 @@ async function mutateUserImage(obj: { field: 'avatar' | 'banner', url: string })
     }
     throw await handleApiError(res);
 }
-
+type ApiUserResponse = {
+    username: string;
+    dateJoined: Date;
+    bio: string;
+    avatar: string;
+    banner: string;
+    displayName: string;
+    dob?: Date;
+    location: string;
+    website: string
+};
 async function fetchUser(username: string) {
     const res = await fetch(`/api/users/${username.toLowerCase()}`);
     if (res.ok) {
@@ -83,6 +77,7 @@ async function fetchUser(username: string) {
     }
     throw await handleApiError(res);
 }
+
 async function mutateUser(e: SubmitEvent) {
     e.preventDefault();
 

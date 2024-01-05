@@ -1,22 +1,21 @@
-import { unwrap } from "solid-js/store";
 import { formatDate } from "~/lib/formatDate";
-import { PostResponse } from "~/models/post";
 import styles from "~/styles/components/PostBox.module.scss"
 import { formatPostTime } from "../utils/formatPostTime";
 import { A, useNavigate } from "@solidjs/router";
 import { Switch, Match, For } from "solid-js";
 import StatIcon from "./ActionIcon";
 import { CommentSvg, LikeSvg, QuoteSvg, RepostSvg, ViewsSvg } from "~/svgs";
-import { useLikes } from "~/models/likes";
 import { useQueryClient } from "@tanstack/solid-query";
-import { useRepost } from "~/models/repost";
 import { setComposerState } from "~/globalState/composer";
+import { useLikes } from "~/data/likes";
+import { PostResponse } from "~/data/post";
+import { useRepost } from "~/data/repost";
 
 export function PostBox(props: { post: PostResponse }) {
     const queryClient = useQueryClient()
     const navigate = useNavigate()
-    const likeMutation = useLikes(queryClient)
-    const repostMutation = useRepost(queryClient)
+    const likeMutation = useLikes()
+    const repostMutation = useRepost()
     return (
 
         <div class={styles.box} onclick={() => navigate(`/posts/${props.post.post.postId}`)}>
@@ -56,7 +55,7 @@ export function PostBox(props: { post: PostResponse }) {
                         number={props.post.post.reposts}
                         color="rgb(0,186,124)"
                         onClick={() => repostMutation.mutate(props.post.post.postId)}
-                        highlight={props.post.reposted}
+                        highlight={props.post.didRepost}
                     />
                     <StatIcon
                         icon={<QuoteSvg />}
@@ -117,5 +116,3 @@ function PostFormatter(props: { str: string }) {
         </Switch>
     )
 }
-
-

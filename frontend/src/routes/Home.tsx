@@ -2,21 +2,21 @@ import { For, Match, Switch } from "solid-js"
 import { PostBox } from "~/components/PostBox"
 import Loader from "~/components/shared/Loader/Loader"
 import Page from "~/components/shared/Page"
-import {  usePosts } from "~/models/post"
+import { usePost } from "~/data/post"
 
 export default function Home() {
-    const query = usePosts()
+    const {allPostsQuery} = usePost()
     return (
         <Page title="Home">
             <Switch>
-                <Match when={query.isLoading}>
+                <Match when={allPostsQuery.isLoading}>
                     <Loader />
                 </Match>
-                <Match when={query.isError}>
+                <Match when={allPostsQuery.isError}>
                     ERROR
                 </Match>
-                <Match when={query.isSuccess}>
-                    <For each={query.data ?? []} >
+                <Match when={allPostsQuery.isSuccess}>
+                    <For each={allPostsQuery.data ?? []} >
                         {post => <PostBox post={post} /> }
                     </For>
                 </Match>

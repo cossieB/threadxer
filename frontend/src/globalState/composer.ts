@@ -1,5 +1,5 @@
 import { createStore } from "solid-js/store";
-import { PostResponse } from "~/models/post";
+import { PostResponse } from "~/data/post";
 
 type Post = {
     post: {

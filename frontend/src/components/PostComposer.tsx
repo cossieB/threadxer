@@ -1,15 +1,14 @@
-import { Match, Show, Switch, createSignal, onMount } from "solid-js";
+import { Show, createSignal, onMount } from "solid-js";
 import styles from "~/styles/components/Composer.module.scss"
 import { CloseBtn } from "./shared/CloseBtn";
 import { SubmitButton } from "./shared/SubmitButton";
 import clickOutside from "~/lib/clickOutside";
 import { CharacterCounter } from "./CharacterCounter";
-import { usePostMutation } from "~/models/post";
-import { useQueryClient } from "@tanstack/solid-query";
 import { Portal } from "solid-js/web";
 import { Popup } from "./shared/Popup";
 import { composerState, setComposerState } from "~/globalState/composer";
-import { PostBox, QuoteBox } from "./PostBox";
+import { QuoteBox } from "./PostBox";
+import { usePost } from "~/data/post";
 false && clickOutside
 
 export function PostComposer() {
@@ -24,8 +23,7 @@ export function PostComposer() {
         str = str.replace(rgx, `<span class="${styles.special}">$1</span>`)
         return str
     }
-    const queryClient = useQueryClient()
-    const mutation = usePostMutation(queryClient)
+    const {mutation} = usePost()
 
     return (
         <div class={styles.composer} >

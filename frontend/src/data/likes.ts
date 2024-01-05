@@ -1,11 +1,11 @@
 import { customFetch } from "~/utils/customFetcher";
 import { handleApiError } from "./handleApiError";
-import { QueryClient, createMutation } from "@tanstack/solid-query";
+import { QueryClient, createMutation, useQueryClient } from "@tanstack/solid-query";
 import { PostResponse } from "./post";
 import auth from "~/globalState/auth";
 
-export function useLikes(queryClient: QueryClient) {
-
+export function useLikes() {
+    const queryClient = useQueryClient()
     const mutation = createMutation(() => ({
         mutationFn: likeOrUnlikePost,
         onSuccess(data, variables, context) {

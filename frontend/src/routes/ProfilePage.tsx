@@ -14,7 +14,7 @@ import styles from "~/styles/routes/ProfilePage.module.scss"
 import { DeleteSvg } from "~/svgs";
 import { UploadBtn } from "../components/ImageUploader/UploadBtn";
 import { Popup } from "~/components/shared/Popup";
-import { useUser, useUserMutation } from "~/models/user";
+import { useUser } from "~/data/user";
 
 const [fieldErrors, setFieldErrors] = createStore({
     username: [] as string[],
@@ -23,10 +23,7 @@ const [fieldErrors, setFieldErrors] = createStore({
 
 export default function PreferencesPage() {
     const errored = () => Object.values(fieldErrors).flat().length > 0;
-    const queryClient = useQueryClient()
-
-    const query = useUser(auth.user.username)
-    const {mutation, imageMutation} = useUserMutation(queryClient)
+    const {query, imageMutation, mutation} = useUser(auth.user.username)
 
     return (
         <Page title="Preferences">

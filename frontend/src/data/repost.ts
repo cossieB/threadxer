@@ -1,11 +1,12 @@
 import { customFetch } from "~/utils/customFetcher";
 import { handleApiError } from "./handleApiError";
-import { QueryClient, createMutation } from "@tanstack/solid-query";
+import { QueryClient, createMutation, useQueryClient } from "@tanstack/solid-query";
 import { PostResponse } from "./post";
 import auth from "~/globalState/auth";
 
-export function useRepost(queryClient: QueryClient) {
-
+export function useRepost() {
+    const queryClient = useQueryClient()
+    
     const mutation = createMutation(() => ({
         mutationFn: repostOrUnrepost,
         onSuccess(data, variables, context) {
@@ -19,13 +20,13 @@ export function useRepost(queryClient: QueryClient) {
                         return old
                     }
                     const newPost: PostResponse = JSON.parse(JSON.stringify(post))
-                    newPost.reposted = data === 1
+                    newPost.didRepost = data === 1
                     newPost.post.reposts += data
                     return old.map(x => x.post.postId === variables ? newPost : x)
                 }
                 else if (old && old.post.postId === variables)  {
                     const newPost: PostResponse = JSON.parse(JSON.stringify(old))
-                    newPost.reposted = data === 1
+                    newPost.didRepost = data === 1
                     newPost.post.reposts += data
                     return newPost
                 }

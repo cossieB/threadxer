@@ -5,13 +5,13 @@ import { BioIcons } from "~/components/BioIcons";
 import { Tabs } from "~/components/Tabs";
 import Loader from "~/components/shared/Loader/Loader";
 import Page from "~/components/shared/Page";
-import { useUser } from "~/models/user";
+import { useUser } from "~/data/user";
 import styles from "~/styles/routes/[username].module.scss"
 import { LinkSvg, LocationSvg } from "~/svgs";
 
 export default function UserPage() {
     const params = useParams();
-    const query = useUser(params.username);
+    const {query} = useUser(params.username);
 
     return (
         <Page title={params.username}>
