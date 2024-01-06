@@ -7,6 +7,7 @@
     border-top: $border;
     border-left: $border;
     border-right: $border;
+
     &:is(:last-child) {
         border-bottom: $border;
     }
@@ -23,9 +24,23 @@
         }
     }
 }
-
+.reply ~ .box {
+    border-top: none;
+    position: relative;
+    &::before {
+        content: "";
+        position: absolute;
+        z-index: 0;
+        height: 5rem;
+        width: 1px;
+        top: 0;
+        left: calc(1rem + 25px);
+        translate: -50% -50%;
+        background-color: white;
+    }
+}
 .avatar {
-    grid-area: 1 / 1 / 2 / 2;
+    grid-row: span 2;
     width: 75px;
     display: flex;
     flex-shrink: 0;
@@ -34,6 +49,7 @@
         height: 50px;
         border-radius: 50%;
         object-fit: cover;
+        z-index: 5;
     }
 }
 .div {

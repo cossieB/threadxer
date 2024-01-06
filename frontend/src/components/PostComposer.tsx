@@ -6,7 +6,7 @@ import clickOutside from "~/lib/clickOutside";
 import { CharacterCounter } from "./CharacterCounter";
 import { Portal } from "solid-js/web";
 import { Popup } from "./shared/Popup";
-import { composerState, setComposerState } from "~/globalState/composer";
+import { composerState } from "~/globalState/composer";
 import { QuoteBox } from "./PostBox/PostBox";
 import { usePost } from "~/data/post";
 false && clickOutside
