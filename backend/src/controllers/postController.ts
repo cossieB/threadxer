@@ -123,7 +123,7 @@ export async function getPost(req: Request, res: Response, next: NextFunction) {
     }
 
     const posts = await query
-    const post = posts.at(0); console.log(post)
+    const post = posts.at(0);
     if (!post)
         return next(new AppError("That post doesn't exist", 404))
     if (!post.quotedPost?.postId)
@@ -179,20 +179,18 @@ export async function getAllPosts(req: Request, res: Response, next: NextFunctio
             displayName: User.displayName
         },
         quotedPost: {
-            ...quote,
-            userId: quoteAuthor.userId,
             username: quoteAuthor.username,
             avatar: quoteAuthor.avatar,
             banner: quoteAuthor.avatar,
-            displayName: quoteAuthor.displayName
+            displayName: quoteAuthor.displayName,
+            ...quote,
         },
         replyingTo: {
-            ...originalPost,
-            userId: originalPostAuthor.userId,
             username: originalPostAuthor.username,
             avatar: originalPostAuthor.avatar,
             banner: originalPostAuthor.avatar,
-            displayName: originalPostAuthor.displayName
+            displayName: originalPostAuthor.displayName,
+            ...originalPost,
         },
         ...currentUser && ({
             liked: isNotNull(Likes.userId),
@@ -216,7 +214,7 @@ export async function getAllPosts(req: Request, res: Response, next: NextFunctio
         query.leftJoin(Repost, and(eq(Post.postId, Repost.postId), eq(Repost.userId, currentUser?.userId)))
     }
     const posts = await query
-
+    type T = typeof posts[number]['quotedPost']
     res.json(
         posts.map(p => {
             const { replyingTo, quotedPost, ...x } = p

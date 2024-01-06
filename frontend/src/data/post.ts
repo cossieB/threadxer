@@ -109,6 +109,36 @@ export type PostResponse = {
         banner: string;
         displayName: string
     }
+    replyingTo?: {
+        userId: string;
+        postId: string;
+        text: string;
+        dateCreated: Date;
+        views: number;
+        replyTo: string | null;
+        didReply: boolean;
+        quotedPost: string | null;
+        didQuote: boolean;
+        username: string
+        avatar: string
+        banner: string
+        displayName: string
+    }
+    quotedPost?: {
+        userId: string;
+        postId: string;
+        text: string;
+        dateCreated: Date;
+        views: number;
+        replyTo: string | null;
+        didReply: boolean;
+        quotedPost: string | null;
+        didQuote: boolean;
+        username: string
+        avatar: string
+        banner: string
+        displayName: string
+    }
     liked?: boolean,
-    didRepost?: boolean
+    reposted?: boolean
 }

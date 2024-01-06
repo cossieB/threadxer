@@ -13,6 +13,10 @@
     display: none;
     flex-shrink: 0;
     @media (min-width: 768px) {
+        top: 0;
+        right: 0;
+        position: fixed;
+        display: block;
         width: var(--sidepanelWidth);
     }
 }

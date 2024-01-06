@@ -14,8 +14,8 @@ export type User = {
 
 class Auth {
     private readonly _user
-    private readonly _setUser
-    private readonly _setToken
+    private readonly setUser
+    private readonly setToken
     private readonly _token
 
     constructor() {
@@ -41,20 +41,20 @@ class Auth {
             firebase: ""
         })
         this._user = user
-        this._setUser = setUser
+        this.setUser = setUser
         this._token = token
-        this._setToken = setToken
+        this.setToken = setToken
     }
     createUser = (jwt: string) => {
         const decoded = jwtDecode<{ user: User } & JwtPayload>(jwt);
-        this._setUser(decoded.user);
+        this.setUser(decoded.user);
         localStorage.setItem('user', JSON.stringify(decoded.user));
-        this._setToken({ jwt })
+        this.setToken({ jwt }); 
         return decoded.user
     }
     modifyUser = (partialUser: Partial<User>) => {
         const newUser = { ...this._user, ...partialUser }
-        this._setUser(newUser)
+        this.setUser(newUser)
         localStorage.setItem('user', JSON.stringify(newUser))
     }
     deleteUser = () => {
@@ -66,15 +66,15 @@ class Auth {
             isUnverified: false,
             userId: ""
         };
-        this._setUser(blankUser)
+        this.setUser(blankUser)
         localStorage.removeItem('user')
-        this._setToken("jwt", "")
+        this.setToken("jwt", "")
         return blankUser
     }
     firebaseSignin = async (jwt: string) => {
         try {
             await signInWithCustomToken(firebaseAuth, jwt)
-            this._setToken('firebase', jwt)
+            this.setToken('firebase', jwt)
         } catch (error) {
             console.log(error)
         }

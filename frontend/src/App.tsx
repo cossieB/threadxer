@@ -1,15 +1,11 @@
 import Navbar from './components/Navbar';
-import { JSXElement, Show, createEffect, onMount } from 'solid-js';
+import { JSXElement, Show, createEffect } from 'solid-js';
 import auth from './globalState/auth';
 import { PostComposer } from './components/PostComposer';
 import { composerState } from './globalState/composer';
-import { useMatch } from '@solidjs/router';
 
 function App(props: { children?: JSXElement }) {
-    const matches = useMatch(() => "/")
-    createEffect(() => {
-        console.log(matches())
-    })
+
     createEffect(() => {
         if (composerState.isOpen)
             document.body.classList.add("modalOpen")
@@ -22,7 +18,7 @@ function App(props: { children?: JSXElement }) {
                 <Navbar />
             </Show>
             {props.children}
-            <div class="sidepanel"></div>
+            <div class="sidepanel" />
             <Show when={composerState.isOpen}>
                 <PostComposer />
             </Show>

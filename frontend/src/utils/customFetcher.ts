@@ -4,7 +4,7 @@ type U = Parameters<typeof fetch>[0]
 type V = Parameters<typeof fetch>[1]
 
 export async function customFetch(url: U, reqOpts?: V) {
-    const isStale = (auth.token.decoded()?.exp ?? Number.POSITIVE_INFINITY) * 1000 < new Date().getTime() + 60000
+    const isStale = (auth.token.decoded()?.exp ?? 0) * 1000 < new Date().getTime() + 60000
     if (isStale) {
         await refresh()
     }

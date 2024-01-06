@@ -1,5 +1,6 @@
 .box {
-    display: flex;
+    display: grid;
+    grid-template-columns: 75px 1fr ;
     width: 100%;
     padding: 1rem;
     $border: 1px solid var(--gray2);
@@ -13,9 +14,18 @@
         background-color: var(--gray1);
         text-decoration: none;
     }
+    >.box {
+        grid-column: span 3;
+        margin-top: 1.5rem;
+        border-radius: 0.75rem;
+        &:hover {
+            filter: brightness(1.2);
+        }
+    }
 }
 
 .avatar {
+    grid-area: 1 / 1 / 2 / 2;
     width: 75px;
     display: flex;
     flex-shrink: 0;

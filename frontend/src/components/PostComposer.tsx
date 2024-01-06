@@ -47,14 +47,14 @@ export function PostComposer() {
                         loading={mutation.isPending}
                         onclick={() => mutation.mutate({
                             text: input(),
-                            quotedPost: composerState.quotedPost?.post.postId,
-                            replyTo: composerState.replyTo?.post.postId
+                            quotedPost: composerState.quotedPost?.postId,
+                            replyTo: composerState.replyTo?.postId
                         })}
                     />
                 </div>
                 <div class={styles.preview} innerHTML={preview()} />
                 <Show when={!!composerState.quotedPost}>
-                    <QuoteBox post={composerState.quotedPost!} />
+                    <QuoteBox quotedPost={composerState.quotedPost!} />
                 </Show>
             </div>
             <Portal>
