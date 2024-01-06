@@ -56,7 +56,7 @@ export default function Navbar() {
                     <NavItem
                         icon={<CompostSvg />}
                         text="Compose"
-                        onclick={() => { setComposerState('isOpen', prev => !prev) }}
+                        onclick={() => { setComposerState('isOpen', true) }}
                     />
                 </Show>
                 <NavLink

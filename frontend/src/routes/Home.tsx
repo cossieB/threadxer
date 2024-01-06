@@ -1,5 +1,5 @@
 import { For, Match, Switch } from "solid-js"
-import { PostBox } from "~/components/PostBox"
+import { PostBox } from "~/components/PostBox/PostBox"
 import Loader from "~/components/shared/Loader/Loader"
 import Page from "~/components/shared/Page"
 import { usePost } from "~/data/post"

@@ -7,7 +7,7 @@ import { CharacterCounter } from "./CharacterCounter";
 import { Portal } from "solid-js/web";
 import { Popup } from "./shared/Popup";
 import { composerState, setComposerState } from "~/globalState/composer";
-import { QuoteBox } from "./PostBox";
+import { QuoteBox } from "./PostBox/PostBox";
 import { usePost } from "~/data/post";
 false && clickOutside
 
@@ -27,10 +27,13 @@ export function PostComposer() {
 
     return (
         <div class={styles.composer} >
-            <div use:clickOutside={() => setComposerState({isOpen: false})}>
+            <div use:clickOutside={composerState.close}>
                 <div class={styles.top}>
-                    <CloseBtn onclick={() => { setComposerState({isOpen: false}) }} />
+                    <CloseBtn onclick={composerState.close} />
                 </div>
+                <Show when={!!composerState.replyTo}>
+                    <QuoteBox originalPost={composerState.replyTo!} />
+                </Show>
                 <textarea
                     oninput={e => setInput(e.target.value)}
                     maxLength={180}
@@ -54,7 +57,7 @@ export function PostComposer() {
                 </div>
                 <div class={styles.preview} innerHTML={preview()} />
                 <Show when={!!composerState.quotedPost}>
-                    <QuoteBox quotedPost={composerState.quotedPost!} />
+                    <QuoteBox originalPost={composerState.quotedPost!} />
                 </Show>
             </div>
             <Portal>

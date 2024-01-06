@@ -1,8 +1,6 @@
-import { useParams } from "@solidjs/router";
-import { useQueryClient } from "@tanstack/solid-query";
 import { Match, Switch } from "solid-js";
 import NotFound from "~/components/404";
-import { PostBox } from "~/components/PostBox";
+import { PostBox } from "~/components/PostBox/PostBox";
 import Loader from "~/components/shared/Loader/Loader";
 import Page from "~/components/shared/Page";
 import { usePost } from "~/data/post";

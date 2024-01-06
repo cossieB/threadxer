@@ -1,8 +1,8 @@
-import { QueryClient, createMutation, createQuery, useQueryClient } from "@tanstack/solid-query";
+import { createMutation, createQuery, useQueryClient } from "@tanstack/solid-query";
 import { customFetch } from "~/utils/customFetcher";
 import { handleApiError } from "./handleApiError";
-import { Params, useMatch, useNavigate, useParams } from "@solidjs/router";
-import { setComposerState } from "~/globalState/composer";
+import { useMatch, useNavigate, useParams } from "@solidjs/router";
+import { composerState } from "~/globalState/composer";
 
 export function usePost() {
     const params = useParams()
@@ -31,7 +31,7 @@ export function usePost() {
                 queryKey: ['posts']
             })
             navigate(`/posts/${data}`)
-            setComposerState('isOpen', false)
+            composerState.close()
         },
     }))
     const allPostsQuery = createQuery(() => ({

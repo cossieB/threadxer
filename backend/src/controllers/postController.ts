@@ -136,7 +136,7 @@ export async function getPost(req: Request, res: Response, next: NextFunction) {
 }
 
 export async function getAllPosts(req: Request, res: Response, next: NextFunction) {
-    const currentUser = res.locals.token?.user
+    const currentUser = res.locals.token?.user; console.log(currentUser)
     // if (currentUser) {
     //     const subquery = db.select({
     //         followeeId: FollowerFollowee.followeeId
@@ -214,7 +214,6 @@ export async function getAllPosts(req: Request, res: Response, next: NextFunctio
         query.leftJoin(Repost, and(eq(Post.postId, Repost.postId), eq(Repost.userId, currentUser?.userId)))
     }
     const posts = await query
-    type T = typeof posts[number]['quotedPost']
     res.json(
         posts.map(p => {
             const { replyingTo, quotedPost, ...x } = p
