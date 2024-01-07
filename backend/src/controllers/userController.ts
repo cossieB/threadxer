@@ -1,9 +1,10 @@
 import AppError from "../utils/AppError";
 import { db } from "../db/drizzle";
 import type { Request, Response, NextFunction } from "express";
-import { User } from "../db/schema";
-import { eq } from "drizzle-orm";
+import { Post, User } from "../db/schema";
+import { and, eq, isNull } from "drizzle-orm";
 import { validateUrl } from "../lib/validateUrl";
+import { getPosts } from "../models/getPosts";
 
 export async function getUser(req: Request, res: Response, next: NextFunction) {
     const username = req.params.username.toLowerCase();
@@ -26,15 +27,40 @@ export async function updateUser(req: Request, res: Response, next: NextFunction
         if (req.body.website && !validateUrl(req.body.website))
             throw new AppError("Please don't bypass client validation", 400)
         const { displayName, bio, website, location, avatar, banner } = req.body;
-        
+
         await db
             .update(User)
             .set({ displayName, bio, website, location, avatar, banner })
             .where(eq(User.userId, user.userId))
- 
+
         return res.sendStatus(200)
-    } 
+    }
     catch (error) {
         next(error)
     }
+}
+
+export async function getUserPosts(req: Request, res: Response, next: NextFunction) {
+    const username = req.params.username.toLowerCase()
+
+    const query = getPosts(res)
+    query
+        .where(
+            and(
+                eq(User.usernameLower, username),
+                isNull(Post.replyTo)
+            )
+        )
+    const posts = await query
+
+    res.json(
+        posts.map(p => {
+            const { replyingTo, quotedPost, ...x } = p
+            return {
+                ...x,
+                ...replyingTo?.postId && { replyingTo },
+                ...quotedPost?.postId && { quotedPost },
+            }
+        })
+    )
 }

@@ -1,18 +1,19 @@
 import { useParams, useSearchParams } from "@solidjs/router";
-import { Match, Show, Switch } from "solid-js";
+import { For, Match, Show, Switch } from "solid-js";
 import NotFound from "~/components/404";
 import { BioIcons } from "~/components/BioIcons";
+import { PostBox } from "~/components/PostBox/PostBox";
 import { Tabs } from "~/components/Tabs";
 import Loader from "~/components/shared/Loader/Loader";
 import Page from "~/components/shared/Page";
-import { useUser } from "~/data/user";
+import { useUser, useUserPosts } from "~/data/user";
 import styles from "~/styles/routes/[username].module.scss"
 import { LinkSvg, LocationSvg } from "~/svgs";
 
 export default function UserPage() {
     const params = useParams();
     const {query} = useUser(params.username);
-
+    const postsQuery = useUserPosts(params.username)
     return (
         <Page title={params.username}>
             <Switch>
@@ -54,6 +55,19 @@ export default function UserPage() {
                         </Show>
                     </div>
                     <Tabs arr={[{ label: "posts", path: "/" }, "replies", "media"]} url={`users/${params.username}`} />
+                </Match>
+            </Switch>
+            <Switch>
+                <Match when={postsQuery.isError}>
+                    <p>Couldn't load posts. Please try again</p>
+                </Match>
+                <Match when={postsQuery.isLoading}>
+                    <Loader />
+                </Match>
+                <Match when={postsQuery.isSuccess}>
+                    <For each={postsQuery.data}>
+                        {post => <PostBox post={post ?? []} />}
+                    </For>
                 </Match>
             </Switch>
         </Page>

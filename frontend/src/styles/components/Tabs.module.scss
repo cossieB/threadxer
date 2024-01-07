@@ -4,7 +4,8 @@
     display: flex;
     position: relative;
     --i: 0;
-    --width: calc(100% / 3);
+    --count: 1;
+    --width: calc(100% / var(--count));
     height: 3rem;
     margin-top: 1rem;
     &::after {

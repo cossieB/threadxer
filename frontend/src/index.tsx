@@ -42,7 +42,9 @@ render(() =>
             <Route path="/users/:username" >
                 <Route path={["/", "replies", "media"]} component={UserPage}  />
             </Route>
-            <Route path="/posts/:postId" component={PostPage} />
+            <Route path="/posts/:postId" >
+                <Route path={["/", "replies", "quotes", "likes"]} component={PostPage} />
+            </Route>
         </Router>
     </QueryClientProvider>
     , root!)

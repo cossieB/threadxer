@@ -15,7 +15,7 @@ type Props = {
 export function Tabs(props: Props) {
     const [i, setI] = createSignal(0)
     return (
-        <div class={styles.tabs} style={{'--i': i()}}>
+        <nav class={styles.tabs} style={{'--i': i(), '--count': props.arr.length}}>
             <For each={props.arr}>
                 {(tab, i) =>
                     <Tab
@@ -26,7 +26,7 @@ export function Tabs(props: Props) {
                     />
                 }
             </For>
-        </div>
+        </nav>
     );
 }
 

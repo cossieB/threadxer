@@ -42,6 +42,12 @@ export function useUser(username: string) {
     }))
     return { mutation, imageMutation, query }
 }
+export function useUserPosts(username: string) {
+    return createQuery(() => ({
+        queryKey: ['postsByUser', username.toLowerCase()],
+        queryFn: key => fetchUserPosts(key.queryKey[1])
+    }))
+}
 
 // fetchers
 async function mutateUserImage(obj: { field: 'avatar' | 'banner', url: string }) {
@@ -91,4 +97,12 @@ async function mutateUser(e: SubmitEvent) {
     });
     if (!res.ok)
         throw await handleApiError(res);
+}
+
+async function fetchUserPosts(username: string) {
+    const res = await customFetch(`/api/users/${username}/posts`.toLowerCase());
+    if (res.ok) {
+        return res.json() 
+    }
+    return await handleApiError(res)
 }
