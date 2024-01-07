@@ -88,28 +88,29 @@ type CreatePost = {
 }
 
 export type PostResponse = {
+    liked?: boolean | undefined;
+    reposted?: boolean | undefined;
+    likes: number,
+    reposts: number,
     post: {
-        text: string;
         userId: string;
         postId: string;
+        text: string;
         dateCreated: Date;
         views: number;
         replyTo: string | null;
         didReply: boolean;
         quotedPost: string | null;
         didQuote: boolean;
-        likes: number,
-        reposts: number
     };
     user: {
         userId: string;
         username: string;
-        email: string;
         avatar: string;
         banner: string;
-        displayName: string
+        displayName: string;
     }
-    replyingTo?: {
+    originalPost?: {
         userId: string;
         postId: string;
         text: string;
@@ -119,12 +120,20 @@ export type PostResponse = {
         didReply: boolean;
         quotedPost: string | null;
         didQuote: boolean;
-        username: string
-        avatar: string
-        banner: string
-        displayName: string
     }
-    quotedPost?: {
+    originalPostAuthor?: {
+        username: string;
+        avatar: string;
+        banner: string;
+        displayName: string;
+    }
+    quoteAuthor?: {
+        username: string;
+        avatar: string;
+        banner: string;
+        displayName: string;
+    }
+    quotePost?: {
         userId: string;
         postId: string;
         text: string;
@@ -134,11 +143,5 @@ export type PostResponse = {
         didReply: boolean;
         quotedPost: string | null;
         didQuote: boolean;
-        username: string
-        avatar: string
-        banner: string
-        displayName: string
     }
-    liked?: boolean,
-    reposted?: boolean
 }

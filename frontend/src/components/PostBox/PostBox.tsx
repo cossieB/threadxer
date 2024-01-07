@@ -9,8 +9,12 @@ export function PostBox(props: { post: PostResponse }) {
 
     return (
         <>
-            <Show when={!!props.post.replyingTo}>
-                <QuoteBox originalPost={props.post.replyingTo!} isReply />
+            <Show when={!!props.post.originalPost}>
+                <QuoteBox
+                    originalPost={props.post.originalPost!}
+                    originalPostAuthor={props.post.originalPostAuthor!}
+                    isReply
+                />
             </Show>
             <div class={styles.box} onclick={() => navigate(`/posts/${props.post.post.postId}`)}>
 
@@ -26,8 +30,11 @@ export function PostBox(props: { post: PostResponse }) {
                     <PostBoxContent text={props.post.post.text} />
                     <PostBoxButtons {...props} />
                 </div>
-                <Show when={!!props.post.quotedPost}>
-                    <QuoteBox originalPost={props.post.quotedPost!} />
+                <Show when={!!props.post.quotePost}>
+                    <QuoteBox
+                        originalPost={props.post.quotePost!}
+                        originalPostAuthor={props.post.quoteAuthor!}
+                    />
                 </Show>
             </div>
         </>
@@ -35,29 +42,30 @@ export function PostBox(props: { post: PostResponse }) {
 }
 
 type P = {
-    originalPost: NonNullable<PostResponse['quotedPost']>;
+    originalPost: NonNullable<PostResponse['quotePost']>;
+    originalPostAuthor: NonNullable<PostResponse['quoteAuthor']>
     isReply?: boolean
 };
 
 export function QuoteBox(props: P) {
     const navigate = useNavigate()
     return (
-        <div 
+        <div
             class={styles.box}
-            classList={{[styles.reply]: !!props.isReply}}
+            classList={{ [styles.reply]: !!props.isReply }}
             onclick={(e) => {
                 navigate(`/posts/${props.originalPost.postId}`)
                 e.stopPropagation()
             }}
         >
             <div class={styles.avatar}>
-                <img src={props.originalPost.avatar} />
+                <img src={props.originalPostAuthor.avatar} />
             </div>
             <div class={styles.div} >
                 <PostBoxHeader
                     dateCreated={props.originalPost.dateCreated}
-                    displayName={props.originalPost.displayName}
-                    username={props.originalPost.username}
+                    displayName={props.originalPostAuthor.displayName}
+                    username={props.originalPostAuthor.username}
                 />
                 <PostBoxContent text={props.originalPost.text} />
             </div>

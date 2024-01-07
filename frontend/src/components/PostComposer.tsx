@@ -23,7 +23,7 @@ export function PostComposer() {
         str = str.replace(rgx, `<span class="${styles.special}">$1</span>`)
         return str
     }
-    const {mutation} = usePost()
+    const { mutation } = usePost()
 
     return (
         <div class={styles.composer} >
@@ -31,8 +31,11 @@ export function PostComposer() {
                 <div class={styles.top}>
                     <CloseBtn onclick={composerState.close} />
                 </div>
-                <Show when={!!composerState.replyTo}>
-                    <QuoteBox originalPost={composerState.replyTo!} />
+                <Show when={!!composerState.replying}>
+                    <QuoteBox
+                        originalPost={composerState.replying!.post!}
+                        originalPostAuthor={composerState.replying!.author!}
+                    />
                 </Show>
                 <textarea
                     oninput={e => setInput(e.target.value)}
@@ -50,14 +53,17 @@ export function PostComposer() {
                         loading={mutation.isPending}
                         onclick={() => mutation.mutate({
                             text: input(),
-                            quotedPost: composerState.quotedPost?.postId,
-                            replyTo: composerState.replyTo?.postId
+                            quotedPost: composerState.quoting?.post?.postId,
+                            replyTo: composerState.replying?.post?.postId
                         })}
                     />
                 </div>
                 <div class={styles.preview} innerHTML={preview()} />
-                <Show when={!!composerState.quotedPost}>
-                    <QuoteBox originalPost={composerState.quotedPost!} />
+                <Show when={!!composerState.quoting}>
+                    <QuoteBox
+                        originalPost={composerState.quoting!.post!}
+                        originalPostAuthor={composerState.quoting!.author!}
+                    />
                 </Show>
             </div>
             <Portal>

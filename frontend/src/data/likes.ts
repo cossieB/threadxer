@@ -20,13 +20,13 @@ export function useLikes() {
                     }
                     const newPost: PostResponse = JSON.parse(JSON.stringify(post))
                     newPost.liked = data === 1
-                    newPost.post.likes += data
+                    newPost.likes += data
                     return old.map(x => x.post.postId === variables ? newPost : x)
                 }
                 else if (old && old.post.postId === variables)  {
                     const newPost: PostResponse = JSON.parse(JSON.stringify(old))
                     newPost.liked = data === 1
-                    newPost.post.likes += data
+                    newPost.likes += data
                     return newPost
                 }
             })

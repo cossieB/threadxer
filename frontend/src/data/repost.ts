@@ -21,13 +21,13 @@ export function useRepost() {
                     }
                     const newPost: PostResponse = JSON.parse(JSON.stringify(post))
                     newPost.reposted = data === 1
-                    newPost.post.reposts += data
+                    newPost.reposts += data
                     return old.map(x => x.post.postId === variables ? newPost : x)
                 }
                 else if (old && old.post.postId === variables)  {
                     const newPost: PostResponse = JSON.parse(JSON.stringify(old))
                     newPost.reposted = data === 1
-                    newPost.post.reposts += data
+                    newPost.reposts += data
                     return newPost
                 }
             })

@@ -1,10 +1,10 @@
-import type { Request, Response } from "express";
+import { response, type Request, type Response } from "express";
 import { db } from "../db/drizzle";
 import { Likes, Post, Repost, User } from "../db/schema";
 import { SQL, and, count, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-export function getPosts(res: Response<any, Record<string, any>>) {
+export function getPosts(res: Response) {
     const currentUser = res.locals.token?.user;
     // if (currentUser) {
     //     const subquery = db.select({
@@ -34,12 +34,9 @@ export function getPosts(res: Response<any, Record<string, any>>) {
     const quoteAuthor = alias(User, 'qa');
     const originalPost = alias(Post, 'op');
     const originalPostAuthor = alias(User, 'opa');
+
     const query = db.with(likeQ, repostQ).select({
-        post: {
-            ...Post,
-            likes: sql<number> `COALESCE (${likeQ.c}::INT, 0)`,
-            reposts: sql<number> `COALESCE (${repostQ.c}::INT, 0)`,
-        },
+        post: Post,
         user: {
             userId: User.userId,
             username: User.username,
@@ -47,20 +44,22 @@ export function getPosts(res: Response<any, Record<string, any>>) {
             banner: User.avatar,
             displayName: User.displayName
         },
-        quotedPost: {
+        quoteAuthor: {
             username: quoteAuthor.username,
             avatar: quoteAuthor.avatar,
             banner: quoteAuthor.avatar,
             displayName: quoteAuthor.displayName,
-            ...quote,
         },
-        replyingTo: {
+        quotePost: quote,
+        originalPostAuthor: {
             username: originalPostAuthor.username,
             avatar: originalPostAuthor.avatar,
             banner: originalPostAuthor.avatar,
             displayName: originalPostAuthor.displayName,
-            ...originalPost,
         },
+        originalPost,
+        likes: sql<number> `COALESCE (${likeQ.c}::INT, 0)`,
+        reposts: sql<number> `COALESCE (${repostQ.c}::INT, 0)`,
         ...currentUser && ({
             liked: isNotNull(Likes.userId) as SQL<boolean>,
             reposted: isNotNull(Repost.userId) as SQL<boolean>
@@ -80,4 +79,7 @@ export function getPosts(res: Response<any, Record<string, any>>) {
         query.leftJoin(Repost, and(eq(Post.postId, Repost.postId), eq(Repost.userId, currentUser?.userId)));
     }
     return query;
+}
+export function funfun(res: Response) {
+    
 }

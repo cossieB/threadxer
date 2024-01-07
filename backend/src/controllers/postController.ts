@@ -59,12 +59,14 @@ export async function getPost(req: Request, res: Response, next: NextFunction) {
     const post = posts.at(0);
     if (!post)
         return next(new AppError("That post doesn't exist", 404))
-    if (!post.quotedPost?.postId)
+    if (!post.quotePost?.postId){
         //@ts-expect-error
-        delete post.quotedPost
-    if (!post.replyingTo?.postId)
+        delete post.quotedPost; delete post.quoteAuthor
+    }
+    if (!post.originalPost?.postId){
         //@ts-expect-error
-        delete post.replyingTo
+        delete post.originalPost; delete post.originalPostAuthor
+    }
     return res.json(post)
 }
 
@@ -80,11 +82,12 @@ export async function getAllPosts(req: Request, res: Response, next: NextFunctio
     const posts = await query
     res.json(
         posts.map(p => {
-            const { replyingTo, quotedPost, ...x } = p
+            
+            const { originalPost, originalPostAuthor, quoteAuthor, quotePost, ...x } = p
             return {
                 ...x,
-                ...replyingTo?.postId && { replyingTo },
-                ...quotedPost?.postId && { quotedPost },
+                ...originalPost?.postId && { originalPost, originalPostAuthor },
+                ...quotePost?.postId && { quotePost, quoteAuthor },
             }
         })
     )

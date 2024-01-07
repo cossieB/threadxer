@@ -1,8 +1,8 @@
 import AppError from "../utils/AppError";
 import { db } from "../db/drizzle";
 import type { Request, Response, NextFunction } from "express";
-import { Post, User } from "../db/schema";
-import { and, eq, isNull } from "drizzle-orm";
+import { Post, Repost, User } from "../db/schema";
+import { and, eq, isNull, inArray } from "drizzle-orm";
 import { validateUrl } from "../lib/validateUrl";
 import { getPosts } from "../models/getPosts";
 
@@ -51,15 +51,16 @@ export async function getUserPosts(req: Request, res: Response, next: NextFuncti
                 isNull(Post.replyTo)
             )
         )
+
     const posts = await query
 
     res.json(
         posts.map(p => {
-            const { replyingTo, quotedPost, ...x } = p
+            const { originalPost, originalPostAuthor, quoteAuthor, quotePost, ...x } = p
             return {
                 ...x,
-                ...replyingTo?.postId && { replyingTo },
-                ...quotedPost?.postId && { quotedPost },
+                ...originalPost?.postId && { originalPost, originalPostAuthor },
+                ...quotePost?.postId && { quotePost, quoteAuthor },
             }
         })
     )

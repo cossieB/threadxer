@@ -56,19 +56,22 @@ export function PostBoxButtons(props: Props) {
                 color="rgb(29, 155, 240)"
                 onClick={() => setComposerState({
                     isOpen: true,
-                    replyTo: { ...props.post.post, ...props.post.user, }
+                    replying: {
+                        post: props.post.post,
+                        author: props.post.user
+                    }
                 })}
             />
             <StatIcon
                 icon={<LikeSvg />}
-                number={props.post.post.likes}
+                number={props.post.likes}
                 color="rgb(249, 24, 128)"
                 onClick={() => likeMutation.mutate(props.post.post.postId)}
                 highlight={props.post.liked}
             />
             <StatIcon
                 icon={<RepostSvg />}
-                number={props.post.post.reposts}
+                number={props.post.reposts}
                 color="rgb(0,186,124)"
                 onClick={() => repostMutation.mutate(props.post.post.postId)}
                 highlight={props.post.reposted}
@@ -80,7 +83,10 @@ export function PostBoxButtons(props: Props) {
                 onClick={() => {
                     setComposerState({
                         isOpen: true,
-                        quotedPost: { ...props.post.post, ...props.post.user, }
+                        quoting: {
+                            post: props.post.post,
+                            author: props.post.user
+                        }
                     })
                 }}
             />

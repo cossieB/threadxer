@@ -3,11 +3,17 @@ import { PostResponse } from "~/data/post";
 
 export const [composerState, setComposerState] = createStore({
     isOpen: false,
-    quotedPost: undefined as PostResponse['quotedPost'],
-    replyTo: undefined as PostResponse['replyingTo'],
+    quoting: undefined as {
+        post: PostResponse['quotePost']
+        author: PostResponse['quoteAuthor']
+    } | undefined,
+    replying: undefined as {
+        post: PostResponse['originalPost']
+        author: PostResponse['originalPostAuthor']
+    } | undefined,
     close: () => setComposerState({
         isOpen: false, 
-        quotedPost: undefined,
-        replyTo: undefined
+        quoting: undefined,
+        replying: undefined
     })
 })
