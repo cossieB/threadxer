@@ -4,7 +4,7 @@ import { Likes, Post, Repost, User } from "../db/schema";
 import { SQL, and, count, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-export function getPosts(res: Response) {
+export function getPosts(res: Response, withReposts = false) {
     const currentUser = res.locals.token?.user;
     // if (currentUser) {
     //     const subquery = db.select({
@@ -60,7 +60,10 @@ export function getPosts(res: Response) {
         originalPost,
         likes: sql<number> `COALESCE (${likeQ.c}::INT, 0)`,
         reposts: sql<number> `COALESCE (${repostQ.c}::INT, 0)`,
-        ...currentUser && ({
+        ...(withReposts && {
+            isRepost: isNotNull(Repost.dateCreated)
+        }),
+        ...(currentUser && {
             liked: isNotNull(Likes.userId) as SQL<boolean>,
             reposted: isNotNull(Repost.userId) as SQL<boolean>
         })
@@ -78,8 +81,10 @@ export function getPosts(res: Response) {
         query.leftJoin(Likes, and(eq(Post.postId, Likes.postId), eq(Likes.userId, currentUser?.userId)));
         query.leftJoin(Repost, and(eq(Post.postId, Repost.postId), eq(Repost.userId, currentUser?.userId)));
     }
+    
     return query;
 }
 export function funfun(res: Response) {
     
 }
+

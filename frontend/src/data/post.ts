@@ -92,6 +92,7 @@ export type PostResponse = {
     reposted?: boolean | undefined;
     likes: number,
     reposts: number,
+    isRepost?: boolean
     post: {
         userId: string;
         postId: string;

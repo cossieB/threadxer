@@ -3,6 +3,7 @@ import { useNavigate } from "@solidjs/router";
 import { Show } from "solid-js";
 import { PostResponse } from "~/data/post";
 import { PostBoxButtons, PostBoxContent, PostBoxHeader } from "./PostBox.components";
+import { RepostSvg } from "~/svgs";
 
 export function PostBox(props: { post: PostResponse }) {
     const navigate = useNavigate()
@@ -22,6 +23,9 @@ export function PostBox(props: { post: PostResponse }) {
                     <img src={props.post.user?.avatar} />
                 </div>
                 <div class={styles.div} >
+                    <Show when={props.post.isRepost}>
+                        <RepostSvg />
+                    </Show>
                     <PostBoxHeader
                         username={props.post.user.username}
                         dateCreated={props.post.post.dateCreated}
