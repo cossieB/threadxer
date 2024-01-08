@@ -4,7 +4,7 @@ import type { Request, Response, NextFunction } from "express";
 import { Post, Repost, User } from "../db/schema";
 import { and, eq, isNull, inArray, or, desc, sql } from "drizzle-orm";
 import { validateUrl } from "../lib/validateUrl";
-import { getPosts } from "../models/getPosts";
+import { getPosts, getPostsAndReposts } from "../models/getPosts";
 
 export async function getUser(req: Request, res: Response, next: NextFunction) {
     const username = req.params.username.toLowerCase();
@@ -43,29 +43,10 @@ export async function updateUser(req: Request, res: Response, next: NextFunction
 export async function getUserPosts(req: Request, res: Response, next: NextFunction) {
     const currentUser = res.locals.token?.user
     const username = req.params.username.toLowerCase()
-    const subquery = db.select({ postId: Repost.postId })
-        .from(Repost)
-        .innerJoin(User, eq(User.userId, Repost.userId))
-        .where(eq(User.usernameLower, username))
-        .orderBy(desc(Repost.dateCreated))
-        .limit(100)
         
-    const query = getPosts(res, true)
-    if (!currentUser)
-        query.leftJoin(Repost, eq(Post.postId, Repost.postId))
-    query
-        .orderBy(desc(sql<Date>`COALESCE(${Repost.dateCreated}, ${Post.dateCreated})`))
-        .where(
-            or(
-                and(
-                    eq(User.usernameLower, username),
-                    isNull(Post.replyTo)
-                ),
-                inArray(Post.postId, subquery)
-            )
-        )
+    const query = getPostsAndReposts(currentUser, username)
 
-    const posts = await query
+    const posts = await query;
 
     res.json(
         posts.map(p => {
