@@ -9,7 +9,7 @@ export function PostBox(props: { post: PostResponse }) {
     const navigate = useNavigate()
 
     return (
-        <>
+        <div>
             <Show when={!!props.post.originalPost}>
                 <QuoteBox
                     originalPost={props.post.originalPost!}
@@ -41,7 +41,7 @@ export function PostBox(props: { post: PostResponse }) {
                     />
                 </Show>
             </div>
-        </>
+        </div>
     )
 }
 

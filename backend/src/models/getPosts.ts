@@ -164,7 +164,6 @@ export function getPostsAndReposts(currentUser: TokenUser | undefined, username:
         query.leftJoin(Likes, and(eq(Post.postId, Likes.postId), eq(Likes.userId, currentUser?.userId)));
         query.leftJoin(Repost, and(eq(Post.postId, Repost.postId), eq(Repost.userId, currentUser?.userId)));
     }
-
     return query;
 }
 

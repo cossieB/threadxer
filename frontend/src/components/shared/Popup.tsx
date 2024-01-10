@@ -6,7 +6,8 @@ type Props = {
     text: string,
     close: () => void,
     colorDeg?: string,
-    when: boolean
+    when: boolean,
+    y?: number
 }
 
 export function Popup(props: Props) {
@@ -35,7 +36,7 @@ function Alert(props: Props) {
     return (
         <div
             class={styles.popup}
-            style={{ '--time': time() }}
+            style={{ '--time': time(), top: props.y?.toString() }}
             onMouseOver={() => clearInterval(t)}
             onMouseLeave={() => {
                 t = setInterval(timer, 1000)

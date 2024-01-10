@@ -23,7 +23,7 @@ const queryClient = new QueryClient({
             refetchOnReconnect: false,
             refetchOnWindowFocus: false,
             retry(failureCount, error) {
-                return failureCount < 3 && !error.message.toLowerCase().includes("unauthorized")
+                return failureCount < 3 && !error.message.toLowerCase().includes("unauthorized") && !error.message.toLowerCase().includes("not found")
             },
         },
     }

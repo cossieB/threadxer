@@ -14,10 +14,10 @@ export function usePost() {
         get enabled() {
             return !!params.postId
         },
-        queryKey: ['posts', params.postId],
-        queryFn: key => getPost(key.queryKey[1]),
+        queryKey: ['posts', 'byId', params.postId],
+        queryFn: key => getPost(key.queryKey[2]),
         initialData: () => {
-            const posts = queryClient.getQueryData<PostResponse[]>(['posts'])
+            const posts = queryClient.getQueryData<PostResponse[]>(['posts', 'byId'])
             return posts?.find(p => p.post.postId == params.postId)
         },
         retry(failureCount, error) {

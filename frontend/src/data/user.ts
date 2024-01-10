@@ -44,8 +44,8 @@ export function useUser(username: string) {
 }
 export function useUserPosts(username: string) {
     return createQuery(() => ({
-        queryKey: ['postsByUser', username.toLowerCase()],
-        queryFn: key => fetchUserPosts(key.queryKey[1])
+        queryKey: ['posts', 'byUsername', username.toLowerCase()],
+        queryFn: key => fetchUserPosts(key.queryKey[2])
     }))
 }
 
