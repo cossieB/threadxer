@@ -3,11 +3,11 @@
 }
 
 .slide-enter {
-    transform: translateX(100px);
+    transform: translateY(-100px);
 }
 
 .slide-enter-to {
-    transform: translateX(0px);
+    transform: translateY(0px);
 }
 
 .slide-exit-active {
@@ -15,11 +15,11 @@
 }
 
 .slide-exit {
-    transform: translateX(0px);
+    transform: translateY(0px);
 }
 
 .slide-exit-to {
-    transform: translateX(100px);
+    transform: translateY(-100px);
 }
 
 .fade-enter-active {

@@ -3,6 +3,7 @@ import { JSXElement, Show, createEffect } from 'solid-js';
 import auth from './globalState/auth';
 import { PostComposer } from './components/PostComposer';
 import { composerState } from './globalState/composer';
+import { Toast } from './components/ErrorPopups';
 
 function App(props: { children?: JSXElement }) {
 
@@ -22,6 +23,7 @@ function App(props: { children?: JSXElement }) {
             <Show when={composerState.isOpen}>
                 <PostComposer />
             </Show>
+            <Toast />
         </>
     );
 };

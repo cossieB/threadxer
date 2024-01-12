@@ -1,4 +1,4 @@
-export async function handleApiError(res: Response) {
+export async function handleApiError(res: Response) {console.log("HERE")
     if (res.headers.get('Content-Type')?.includes('application/json')) {
         const data = await res.json();
         return new Error(data.error);
