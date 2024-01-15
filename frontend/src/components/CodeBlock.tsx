@@ -1,4 +1,4 @@
-import { Accessor, Setter, onCleanup, onMount } from "solid-js";
+import { Accessor } from "solid-js";
 import { SetStoreFunction } from "solid-js/store";
 import styles from '~/styles/components/VerificationCode.module.scss';
 
@@ -17,30 +17,7 @@ export type P = {
 
 export function CodeBlock(props: P) {
     let ref!: HTMLDivElement;
-    function handleInput(e: KeyboardEvent) {
-        // if (e.key == "Backspace" || e.key == "Delete") {
-        //     props.setCode('splitUp', props.i, "");
-        //     return;
-        // }
-        // const next = ref.nextSibling as HTMLDivElement | null;
-        // const prev = ref.previousSibling as HTMLDivElement | null;
-        // if (e.key == "ArrowLeft")
-        //     return prev?.focus();
-        // if (e.key == "ArrowRight")
-        //     return next?.focus();
 
-        // else if (/\D/.test(e.key)) return;
-        // props.setCode('splitUp', props.i, e.key);
-        // if (next)
-        //     next.focus();
-        // else
-        //     document.querySelector('button')?.focus();
-
-    }
-    // onMount(() => {
-    //     ref.addEventListener('keyup', handleInput);
-    //     onCleanup(() => ref.removeEventListener('keyup', handleInput));
-    // });
     return (
         <div
             ref={ref}

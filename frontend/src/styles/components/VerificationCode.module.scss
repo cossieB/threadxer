@@ -23,6 +23,16 @@
 .row {
     display: flex;
 }
+.pasteBtn {
+    all: unset;
+    height: 2rem;
+    width: 2rem !important;
+    border-radius: 0;
+    margin: 0.5rem auto !important;
+    border: 1px solid var(--blue1);
+    color: var(--blue1);
+    @include mixins.flexCenter
+}
 .form {
     display: flex;
     flex-direction: column;

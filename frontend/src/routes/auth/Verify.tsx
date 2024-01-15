@@ -1,5 +1,5 @@
 import { useNavigate } from "@solidjs/router";
-import { Index, createEffect, createMemo, onCleanup, onMount } from "solid-js";
+import { Index, createEffect, createMemo } from "solid-js";
 import { createStore } from "solid-js/store";
 import { Popup } from "~/components/shared/Popup";
 import { SubmitButton } from "~/components/shared/SubmitButton";
@@ -7,6 +7,8 @@ import styles from '~/styles/components/VerificationCode.module.scss'
 import { CodeBlock } from "../../components/CodeBlock";
 import { handleSubmit, handleResend } from "./Verify.fetcher";
 import { Numberpad } from "./Numberpad";
+import auth from "~/globalState/auth";
+import { PasteSvg } from "~/svgs";
 
 const [state, setState] = createStore({
     submitting: false,
@@ -31,16 +33,16 @@ export default function VerifyEmail() {
         },
         clear() {
             setCode('splitUp', ["", "", "", "", "", ""])
-            setCode('pointer', 0)    
+            setCode('pointer', 0)
         }
     })
     const joined = createMemo(() => code.splitUp.join(""))
     const isDisabled = () => code.splitUp.some(letter => !letter)
 
     createEffect(() => {
-        // const encoded = encodeURIComponent("/auth/verify")
-        // if (!auth.user.username) navigate(`/auth/login?redirect=${encoded}`, { state: { message: "Please login to verify your account" } })
-        // if (auth.user.isUnverified === false) navigate("/")
+        const encoded = encodeURIComponent("/auth/verify")
+        if (!auth.user.username) navigate(`/auth/login?redirect=${encoded}`, { state: { message: "Please login to verify your account" } })
+        if (auth.user.isUnverified === false) navigate("/")
     })
     return (
         <main class={styles.main}>
@@ -59,6 +61,26 @@ export default function VerifyEmail() {
                         }
                     </Index>
                 </div>
+                <button
+                    class={styles.pasteBtn}
+                    onclick={async e => {
+                        const text = await navigator.clipboard.readText();
+                        const newArr: string[] = []
+                        for (let i = 0; i < text.length && i < 6; i++) {
+                            const char = text[i]
+                            if (/\d/.test(char))
+                                newArr.push(char)
+                        }
+        
+                        if (newArr.length == 6){
+                            setCode('splitUp', newArr)
+                            setCode('pointer', 5)
+                        }
+                    }}
+                    aria-label="paste"
+                >
+                    <PasteSvg />
+                </button>
                 <Numberpad
                     enterNumber={num => code.enterNumber(num)}
                     deleteNumber={code.deleteNumber}

@@ -1,12 +1,10 @@
 @use '~/styles/mixins';
 
 .numberpad {
-    margin-top: 5rem;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     margin: 0 auto;
     gap: 0.5rem;
-    padding-top: 1.5rem;
     div {
         width: 2.5rem;
         height: 2.5rem;
