@@ -9,6 +9,7 @@ import { sendAuthRequest } from '~/utils/sendAuthRequest';
 import { Show } from 'solid-js';
 import auth from '~/globalState/auth';
 import Page from '~/components/shared/Page';
+import { useQueryClient } from '@tanstack/solid-query';
 
 const [userState, setUserState] = createStore({
     email: "",
@@ -29,10 +30,11 @@ export function Login() {
         return validator.errors.email
     }
     const navigate = useNavigate()
+    const queryClient = useQueryClient()
 
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault();
-        await sendAuthRequest('/api/auth/login', setState, userState, navigate)
+        await sendAuthRequest('/api/auth/login', setState, userState, navigate, queryClient)
     }
     return (
         <Show when={!auth.user.username} fallback={<Navigate href="/" />}>

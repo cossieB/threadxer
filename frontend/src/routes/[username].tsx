@@ -12,8 +12,8 @@ import { LinkSvg, LocationSvg } from "~/svgs";
 
 export default function UserPage() {
     const params = useParams();
-    const {query} = useUser(params.username);
-    const postsQuery = useUserPosts(params.username)
+    const { query } = useUser(params.username);
+    const postsQuery = useUserPosts(params.username);
     return (
         <Page title={params.username}>
             <Switch>
@@ -54,7 +54,7 @@ export default function UserPage() {
                             />
                         </Show>
                     </div>
-                    <Tabs arr={[{ label: "posts", path: "/" }, "replies", "media"]} url={`users/${params.username}`} />
+                    <Tabs arr={[{ label: "posts", path: "/" }, "replies", "media", "likes"]} url={`users/${params.username}`} />
                 </Match>
             </Switch>
             <Switch>

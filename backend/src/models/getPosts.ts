@@ -86,7 +86,7 @@ export function getPosts(res: Response, withReposts = false) {
     return query;
 }
 export function getPostsAndReposts(currentUser: TokenUser | undefined, username: string) {
-    
+
     const likeQ = db.$with('l').as(
         db.select({
             postId: Likes.postId,
@@ -155,10 +155,14 @@ export function getPostsAndReposts(currentUser: TokenUser | undefined, username:
         .leftJoin(originalPostAuthor, eq(originalPost.userId, originalPostAuthor.userId))
         .leftJoin(reposts, eq(reposts.reposts.postId, Post.postId))
         .orderBy(desc(sql<Date>`COALESCE(${reposts.reposts.dateCreated}, ${Post.dateCreated})`))
-        .where(or(
-            eq(User.usernameLower, username),
-            eq(reposts.users.usernameLower, username)
-        ))
+        .where(
+            and(
+                or(
+                    eq(User.usernameLower, username),
+                    eq(reposts.users.usernameLower, username)
+                ),
+                isNull(Post.replyTo)
+            ))
 
     if (currentUser) {
         query.leftJoin(Likes, and(eq(Post.postId, Likes.postId), eq(Likes.userId, currentUser?.userId)));

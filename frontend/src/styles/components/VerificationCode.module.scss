@@ -15,9 +15,10 @@
     align-items: center;
     color: black;
     cursor: pointer;
-    &:focus {
+    &.focus {
         background-color: var(--blue1);
     }
+
 }
 .row {
     display: flex;

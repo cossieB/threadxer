@@ -1,13 +1,41 @@
 # TODO
 
-- [ ] profiles page
-- [ ] create post
-    - [ ] post details with comments page
-    - [ ] upload images and clips
-- [ ] search
-    - [ ] hashtags
-- [ ] user preferences page
-    - [ ] light / dark modes
-- [ ] forgot password flow
-- [ ] allow pasting in verification code
-- [ ] animations
+## User Page
+- [x] User posts and reposts
+- [ ] User replies
+- [ ] User likes
+- [ ] User media
+
+## Create Post
+- [x] create post
+- [x] create post with quote
+- [x] reply to post
+- [ ] upload images and clips
+
+## Post Page
+- [ ] Replies
+- [ ] Quotes
+- [ ] Likes
+
+## Search
+- [ ] keyword search
+- [ ] hashtag search
+
+## User preferences
+- [ ] light/dark mode
+
+## Miscellaneous
+- [ ] View count
+
+## Auth
+- [x] Register
+- [x] Send verification email
+- [x] Login
+- [ ] Forgot password flow
+- [ ] Social providers
+
+## Home Feed
+- [x] All posts
+- [ ] Posts by followees
+
+## Issues

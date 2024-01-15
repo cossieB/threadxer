@@ -1,4 +1,5 @@
 import { type Navigator } from '@solidjs/router';
+import { QueryClient, useQueryClient } from '@tanstack/solid-query';
 import { SetStoreFunction } from 'solid-js/store';
 import auth from '~/globalState/auth';
 
@@ -6,7 +7,8 @@ export async function sendAuthRequest(
     url: string,
     setState: SetStoreFunction<{ loading: boolean; success: boolean; error: string | null; }>,
     userState: {},
-    navigate: Navigator
+    navigate: Navigator,
+    queryClient?: QueryClient
 ) {
     try {
         setState('loading', true);
@@ -18,6 +20,7 @@ export async function sendAuthRequest(
             body: JSON.stringify(userState)
         });
         if (res.ok) {
+            queryClient?.clear()
             setState('success', true);
             const data = await res.json(); 
             const redirect =  (data.redirect as string) ?? -1

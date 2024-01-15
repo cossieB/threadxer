@@ -1,0 +1,28 @@
+@use '~/styles/mixins';
+
+.numberpad {
+    margin-top: 5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    margin: 0 auto;
+    gap: 0.5rem;
+    padding-top: 1.5rem;
+    div {
+        width: 2.5rem;
+        height: 2.5rem;
+        cursor: pointer;
+        @include mixins.flexCenter;
+        color: var(--blue1);
+        border: 1px solid var(--blue1);
+        &:active:not(.disabled, .maxed), &.active {
+            background-color: var(--blue1);
+            color: white;
+        }
+        &.maxed {
+            border-color: var(--gray1);
+        }
+    }
+    div:first-child {
+        grid-area: 4 / 2 / 5 / 3;
+    }
+}
