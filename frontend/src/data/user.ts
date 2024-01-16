@@ -3,7 +3,7 @@ import { handleApiError } from "./handleApiError";
 import { createQuery, createMutation, useQueryClient } from "@tanstack/solid-query";
 import auth from "~/globalState/auth";
 import { PostResponse } from "./post";
-import { useMatch } from "@solidjs/router";
+import { useMatch, useParams } from "@solidjs/router";
 
 export function useUser(username: string) {
     const queryClient = useQueryClient()
@@ -44,13 +44,14 @@ export function useUser(username: string) {
     }))
     return { mutation, imageMutation, query }
 }
-export function useUserPosts(username: string) {
+export function useUserPosts() {
+    const params = useParams()
     const matches = useMatch(() => "users/:username/")
     return createQuery(() => ({
-        get enabled() {
-            return !!matches()
-        },
-        queryKey: ['posts', 'byUsername', username.toLowerCase()],
+        // get enabled() {
+        //     return !!matches()
+        // },
+        queryKey: ['posts', 'byUsername', params.username.toLowerCase()],
         queryFn: key => fetchUserPosts(key.queryKey[2])
     }))
 }

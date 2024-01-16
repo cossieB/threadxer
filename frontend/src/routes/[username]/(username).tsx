@@ -1,35 +1,21 @@
 import { useMatch, useParams, useSearchParams } from "@solidjs/router";
-import { For, Match, Show, Switch, createEffect } from "solid-js";
+import { CreateQueryResult } from "@tanstack/solid-query";
+import { For, JSX, Match, Show, Switch, createEffect } from "solid-js";
 import NotFound from "~/components/404";
 import { BioIcons } from "~/components/BioIcons";
 import { PostBox } from "~/components/PostBox/PostBox";
 import { Tabs } from "~/components/Tabs";
 import Loader from "~/components/shared/Loader/Loader";
 import Page from "~/components/shared/Page";
+import { PostResponse } from "~/data/post";
 import { useReplies } from "~/data/replies";
 import { useUser, useUserPosts } from "~/data/user";
 import styles from "~/styles/routes/[username].module.scss"
 import { LinkSvg, LocationSvg } from "~/svgs";
 
-export default function UserPage() {
+export default function UserPage(props: {children?: JSX.Element}) {
     const params = useParams();
     const { query } = useUser(params.username);
-    const postsQuery = useUserPosts(params.username);
-    const repliesQuery = useReplies()
-    const matches = useMatch(() => "users/:username/:tab")
-    
-    const map = {
-        "replies": repliesQuery
-    }
-
-    const pq = () => {
-        const match = matches()
-        const tab = match?.params.tab.toLowerCase()
-        if (!match || !tab) return postsQuery
-        if (tab == "replies") return repliesQuery
-
-        return postsQuery
-    }
 
     return (
         <Page title={params.username}>
@@ -74,19 +60,8 @@ export default function UserPage() {
                     <Tabs arr={[{ label: "posts", path: "/" }, "replies", "media", "likes"]} url={`users/${params.username}`} />
                 </Match>
             </Switch>
-            <Switch>
-                <Match when={pq().isError}>
-                    <p>Couldn't load posts. Please try again</p>
-                </Match>
-                <Match when={pq().isLoading}>
-                    <Loader />
-                </Match>
-                <Match when={pq().isSuccess}>
-                    <For each={pq().data}>
-                        {post => <PostBox post={post ?? []} />}
-                    </For>
-                </Match>
-            </Switch>
+            {props.children}
         </Page>
     )
 }
+

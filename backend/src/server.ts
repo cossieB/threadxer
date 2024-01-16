@@ -7,6 +7,7 @@ import * as Routes from "./routes";
 import { authenticate } from "./middleware/authenticate";
 import { cookieParser } from "./middleware/cookieParser";
 import { startFire } from "./config/firebase";
+import { sleep } from "./lib/sleep";
 
 dotenv.config()
 const app = express()
@@ -19,6 +20,10 @@ app.use(express.json())
 app.use(cookieParser)
 app.use(express.static(path.resolve(__dirname, '../public')))
 app.use(authenticate)
+app.use(async (req, res, next) => {
+    await sleep(500)
+    next()
+})
 
 app.use('/api/auth', Routes.authRouter)
 app.use('/api/auth/verify', Routes.verificationRouter)

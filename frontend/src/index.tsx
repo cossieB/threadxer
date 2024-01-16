@@ -11,9 +11,10 @@ import Home from './routes/Home';
 import ProfilePage from './routes/ProfilePage';
 import { Login } from './routes/auth/Login';
 import { SignUp } from './routes/auth/SignUp';
-import UserPage from './routes/[username]';
 import { PostPage } from './routes/[postId]';
 import VerifyEmail from './routes/auth/Verify';
+import UserPage from './routes/[username]/(username)';
+import { Replies, UserPosts } from './routes/[username]/Replies';
 
 const root = document.getElementById('root');
 const queryClient = new QueryClient({
@@ -40,8 +41,11 @@ render(() =>
             <Route path="/create" component={PostComposer} />
             <Route path="*" component={NotFound} />
             <Route path="/profile" component={ProfilePage} />
-            <Route path="/users/:username" >
-                <Route path={["/", "replies", "media", "likes"]} component={UserPage}  />
+            <Route path="/users/:username" component={UserPage} >
+                <Route path={["/", "/posts"]} component={UserPosts} />
+                <Route path={"/replies"} component={Replies} />
+                <Route path={"/likes"} component={() => <p>LIKES</p>} />
+                <Route path={"media"} component={() => <p>MEDIA</p>}  />
             </Route>
             <Route path="/posts/:postId" >
                 <Route path={["/", "replies", "quotes", "likes"]} component={PostPage} />

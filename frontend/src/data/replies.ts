@@ -13,9 +13,9 @@ export function useReplies() {
         refetchOnReconnect: false,
         refetchOnWindowFocus: false,
         
-        get enabled() {
-            return !!matches()
-        },
+        // get enabled() {
+        //     return !!matches()
+        // },
         queryKey: ['posts', 'replies', params.username],
         queryFn: key => getReplies(key.queryKey[2])
     }))
