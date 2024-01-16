@@ -75,7 +75,7 @@ export async function getAllPosts(req: Request, res: Response, next: NextFunctio
     const postsPerPage = 100
     const query = getPosts(res);
     query
-        .where(and(isNull(Post.replyTo)))
+        .where(isNull(Post.replyTo))
         .limit(postsPerPage)
         .offset(page * postsPerPage)
         .orderBy(desc(Post.dateCreated));

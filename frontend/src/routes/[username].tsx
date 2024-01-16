@@ -1,11 +1,12 @@
-import { useParams, useSearchParams } from "@solidjs/router";
-import { For, Match, Show, Switch } from "solid-js";
+import { useMatch, useParams, useSearchParams } from "@solidjs/router";
+import { For, Match, Show, Switch, createEffect } from "solid-js";
 import NotFound from "~/components/404";
 import { BioIcons } from "~/components/BioIcons";
 import { PostBox } from "~/components/PostBox/PostBox";
 import { Tabs } from "~/components/Tabs";
 import Loader from "~/components/shared/Loader/Loader";
 import Page from "~/components/shared/Page";
+import { useReplies } from "~/data/replies";
 import { useUser, useUserPosts } from "~/data/user";
 import styles from "~/styles/routes/[username].module.scss"
 import { LinkSvg, LocationSvg } from "~/svgs";
@@ -14,6 +15,22 @@ export default function UserPage() {
     const params = useParams();
     const { query } = useUser(params.username);
     const postsQuery = useUserPosts(params.username);
+    const repliesQuery = useReplies()
+    const matches = useMatch(() => "users/:username/:tab")
+    
+    const map = {
+        "replies": repliesQuery
+    }
+
+    const pq = () => {
+        const match = matches()
+        const tab = match?.params.tab.toLowerCase()
+        if (!match || !tab) return postsQuery
+        if (tab == "replies") return repliesQuery
+
+        return postsQuery
+    }
+
     return (
         <Page title={params.username}>
             <Switch>
@@ -58,14 +75,14 @@ export default function UserPage() {
                 </Match>
             </Switch>
             <Switch>
-                <Match when={postsQuery.isError}>
+                <Match when={pq().isError}>
                     <p>Couldn't load posts. Please try again</p>
                 </Match>
-                <Match when={postsQuery.isLoading}>
+                <Match when={pq().isLoading}>
                     <Loader />
                 </Match>
-                <Match when={postsQuery.isSuccess}>
-                    <For each={postsQuery.data}>
+                <Match when={pq().isSuccess}>
+                    <For each={pq().data}>
                         {post => <PostBox post={post ?? []} />}
                     </For>
                 </Match>

@@ -9,11 +9,6 @@ type O = {
     regex?: RegExp,
     required?: boolean
 }
-/**
- * 
- * @param arr An array of required properties in request body.
- * @returns 
- */
 
 const defaults: Omit<Required<O>, 'property' | 'regex'> = {
     type: 'string',
@@ -22,6 +17,11 @@ const defaults: Omit<Required<O>, 'property' | 'regex'> = {
     required: true
 }
 
+/**
+ * 
+ * @param arr An array of allowed properties in request body.
+ * @returns 
+ */
 export function validation(arr: (string | O)[]) {
     return function (req: Request, res: Response, next: NextFunction) {
         for (const element of arr) {

@@ -2,7 +2,7 @@ import AppError from "../utils/AppError";
 import { db } from "../db/drizzle";
 import type { Request, Response, NextFunction } from "express";
 import { Post, Repost, User } from "../db/schema";
-import { and, eq, isNull, inArray, or, desc, sql } from "drizzle-orm";
+import { and, eq, isNull, inArray, or, desc, sql, isNotNull } from "drizzle-orm";
 import { validateUrl } from "../lib/validateUrl";
 import { getPosts, getPostsAndReposts } from "../models/getPosts";
 
@@ -43,13 +43,42 @@ export async function updateUser(req: Request, res: Response, next: NextFunction
 export async function getUserPosts(req: Request, res: Response, next: NextFunction) {
     const currentUser = res.locals.token?.user
     const username = req.params.username.toLowerCase()
-        
+
     const query = getPostsAndReposts(currentUser, username)
 
     const posts = await query;
 
     res.json(
         posts.map(p => {
+            const { originalPost, originalPostAuthor, quoteAuthor, quotePost, ...x } = p
+            return {
+                ...x,
+                ...originalPost?.postId && { originalPost, originalPostAuthor },
+                ...quotePost?.postId && { quotePost, quoteAuthor },
+            }
+        })
+    )
+}
+
+export async function getUserReplies(req: Request, res: Response, next: NextFunction) {
+    const page = Number(req.body.page) || 0
+    const postsPerPage = 100
+    const query = getPosts(res);
+    query
+        .where(
+            and(
+                isNotNull(Post.replyTo),
+                eq(User.usernameLower, req.params.username.toLowerCase())
+            )
+        ).limit(postsPerPage)
+        .offset(page * postsPerPage)
+        .orderBy(desc(Post.dateCreated));
+
+    const posts = await query
+
+    res.json(
+        posts.map(p => {
+
             const { originalPost, originalPostAuthor, quoteAuthor, quotePost, ...x } = p
             return {
                 ...x,

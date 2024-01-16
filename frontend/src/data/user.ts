@@ -2,6 +2,8 @@ import { customFetch } from "~/utils/customFetcher";
 import { handleApiError } from "./handleApiError";
 import { createQuery, createMutation, useQueryClient } from "@tanstack/solid-query";
 import auth from "~/globalState/auth";
+import { PostResponse } from "./post";
+import { useMatch } from "@solidjs/router";
 
 export function useUser(username: string) {
     const queryClient = useQueryClient()
@@ -43,7 +45,11 @@ export function useUser(username: string) {
     return { mutation, imageMutation, query }
 }
 export function useUserPosts(username: string) {
+    const matches = useMatch(() => "users/:username/")
     return createQuery(() => ({
+        get enabled() {
+            return !!matches()
+        },
         queryKey: ['posts', 'byUsername', username.toLowerCase()],
         queryFn: key => fetchUserPosts(key.queryKey[2])
     }))
@@ -102,7 +108,7 @@ async function mutateUser(e: SubmitEvent) {
 async function fetchUserPosts(username: string) {
     const res = await customFetch(`/api/users/${username}/posts`.toLowerCase());
     if (res.ok) {
-        return res.json() 
+        return await res.json() as PostResponse[]
     }
-    return await handleApiError(res)
+    throw await handleApiError(res)
 }
