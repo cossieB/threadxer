@@ -1,7 +1,7 @@
 import { CreateQueryResult } from "@tanstack/solid-query"
 import { PostResponse } from "~/data/post"
 import { useReplies } from "~/data/replies"
-import { useUserPosts } from "~/data/user"
+import { useUserLikes, useUserPosts } from "~/data/user"
 import { PostLists } from "../../components/PostLists"
 
 export type P = {
@@ -10,13 +10,15 @@ export type P = {
 
 export function Replies() {
     const query = useReplies()
-    return (
-        <PostLists query={query} />
-    )
+    return <PostLists query={query} />
 }
-export function UserPosts () {
+
+export function UserPosts() {
     const query = useUserPosts()
-    return (
-        <PostLists query={query} />
-    )
+    return <PostLists query={query} />
+}
+
+export function Likes() {
+    const query = useUserLikes()
+    return <PostLists query={query} />
 }

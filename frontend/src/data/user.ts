@@ -46,16 +46,19 @@ export function useUser(username: string) {
 }
 export function useUserPosts() {
     const params = useParams()
-    const matches = useMatch(() => "users/:username/")
+
     return createQuery(() => ({
-        // get enabled() {
-        //     return !!matches()
-        // },
         queryKey: ['posts', 'byUsername', params.username.toLowerCase()],
         queryFn: key => fetchUserPosts(key.queryKey[2])
     }))
 }
-
+export function useUserLikes() {
+    const params = useParams()
+    return createQuery(() => ({
+        queryKey: ['posts', 'likes', params.username.toLowerCase()],
+        queryFn: key => fetchUserLikes(key.queryKey[2])
+    }))
+}
 // fetchers
 async function mutateUserImage(obj: { field: 'avatar' | 'banner', url: string }) {
     const { field, url } = obj
@@ -108,6 +111,14 @@ async function mutateUser(e: SubmitEvent) {
 
 async function fetchUserPosts(username: string) {
     const res = await customFetch(`/api/users/${username}/posts`.toLowerCase());
+    if (res.ok) {
+        return await res.json() as PostResponse[]
+    }
+    throw await handleApiError(res)
+}
+
+async function fetchUserLikes(username: string) {
+    const res = await customFetch(`/api/users/${username}/likes`.toLowerCase());
     if (res.ok) {
         return await res.json() as PostResponse[]
     }

@@ -92,8 +92,9 @@ export async function getUserReplies(req: Request, res: Response, next: NextFunc
 }
 
 export async function getUserLikes(req: Request, res: Response, next: NextFunction) {
-    const {username} = req.params
-    const posts = await getLikes(username);
+    const {username} = req.params;
+    const currentUser = res.locals.token?.user
+    const posts = await getLikes(username, currentUser);
     res.json(
         posts.map(p => {
 

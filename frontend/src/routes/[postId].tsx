@@ -12,22 +12,22 @@ export function PostPage() {
     const { postQuery } = usePost()
 
     return (
-        <Switch>
-            <Match when={postQuery.isLoading}>
-                <Loader />
-            </Match>
-            <Match when={postQuery.isError && postQuery.error.message.includes("post doesn't exist")}>
-                <NotFound />
-            </Match>
-            <Match when={postQuery.isError}>
-                {postQuery.error?.message}
-            </Match>
-            <Match when={postQuery.isSuccess}>
-                <Page title={postQuery.data?.post.postId!}>
+        <Page title={postQuery.data?.post.postId!}>
+            <Switch>
+                <Match when={postQuery.isLoading}>
+                    <Loader />
+                </Match>
+                <Match when={postQuery.isError && postQuery.error.message.includes("post doesn't exist")}>
+                    <NotFound />
+                </Match>
+                <Match when={postQuery.isError}>
+                    {postQuery.error?.message}
+                </Match>
+                <Match when={postQuery.isSuccess}>
                     <PostBox post={postQuery.data!} />
                     <Tabs arr={["replies", "quotes", "likes"]} url={`posts/${params.postId}`} />
-                </Page>
-            </Match>
-        </Switch>
+                </Match>
+            </Switch>
+        </Page>
     )
 }

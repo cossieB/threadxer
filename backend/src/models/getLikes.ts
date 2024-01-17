@@ -6,15 +6,7 @@ import { alias } from "drizzle-orm/pg-core";
 import { TokenUser } from "../types";
 
 export async function getLikes(username: string, currentUser?: TokenUser) {
-    
-    // if (currentUser) {
-    //     const subquery = db.select({
-    //         followeeId: FollowerFollowee.followeeId
-    //     })
-    //     .from(FollowerFollowee)
-    //     .where(eq(FollowerFollowee.followerId, currentUser.userId))
-    //     .as('sub')
-    // }
+
     const likeQ = db.$with('l').as(
         db.select({
             postId: Likes.postId,
@@ -37,6 +29,7 @@ export async function getLikes(username: string, currentUser?: TokenUser) {
     const originalPost = alias(Post, 'op');
     const originalPostAuthor = alias(User, 'opa');
     const pageUser = alias(User, 'pu')
+    const allLikes = alias(Likes, 'al')
 
     const query = db.with(likeQ, repostQ).select({
         post: Post,
@@ -68,14 +61,13 @@ export async function getLikes(username: string, currentUser?: TokenUser) {
             reposted: isNotNull(Repost.userId) as SQL<boolean>
         })
     })
-        .from(Likes)
-        .innerJoin(Post, eq(Likes.postId, Post.postId))
+        .from(allLikes)
+        .innerJoin(Post, eq(allLikes.postId, Post.postId))
         .innerJoin(User, eq(User.userId, Post.userId))
-        .innerJoin(pageUser, 
-            and(
-                eq(pageUser.userId, Likes.userId), 
-                eq(pageUser.usernameLower, username.toLowerCase())
-            ))
+        .innerJoin(pageUser, and(
+            eq(pageUser.userId, allLikes.userId),
+            eq(pageUser.usernameLower, username.toLowerCase())
+        ))
         .leftJoin(likeQ, eq(Post.postId, likeQ.postId))
         .leftJoin(repostQ, eq(Post.postId, repostQ.postId))
         .leftJoin(quote, eq(quote.postId, Post.quotedPost))

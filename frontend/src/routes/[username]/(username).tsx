@@ -1,22 +1,18 @@
-import { useMatch, useParams, useSearchParams } from "@solidjs/router";
-import { CreateQueryResult } from "@tanstack/solid-query";
-import { For, JSX, Match, Show, Switch, createEffect } from "solid-js";
+import { useParams } from "@solidjs/router";
+import { JSX, Match, Show, Switch } from "solid-js";
 import NotFound from "~/components/404";
 import { BioIcons } from "~/components/BioIcons";
-import { PostBox } from "~/components/PostBox/PostBox";
 import { Tabs } from "~/components/Tabs";
 import Loader from "~/components/shared/Loader/Loader";
 import Page from "~/components/shared/Page";
-import { PostResponse } from "~/data/post";
-import { useReplies } from "~/data/replies";
-import { useUser, useUserPosts } from "~/data/user";
+import { useUser } from "~/data/user";
 import styles from "~/styles/routes/[username].module.scss"
 import { LinkSvg, LocationSvg } from "~/svgs";
 
 export default function UserPage(props: {children?: JSX.Element}) {
     const params = useParams();
     const { query } = useUser(params.username);
-
+    
     return (
         <Page title={params.username}>
             <Switch>
