@@ -1,5 +1,5 @@
 import { useMatch, useParams, useSearchParams } from "@solidjs/router";
-import { For, Match, Show, Switch, createEffect } from "solid-js";
+import { For, Match, Show, Switch, createEffect, createMemo } from "solid-js";
 import NotFound from "~/components/404";
 import { BioIcons } from "~/components/BioIcons";
 import { PostBox } from "~/components/PostBox/PostBox";
@@ -17,19 +17,15 @@ export default function UserPage() {
     const postsQuery = useUserPosts(params.username);
     const repliesQuery = useReplies()
     const matches = useMatch(() => "users/:username/:tab")
-    
-    const map = {
-        "replies": repliesQuery
-    }
 
-    const pq = () => {
+    const pq = createMemo(() => {
         const match = matches()
         const tab = match?.params.tab.toLowerCase()
         if (!match || !tab) return postsQuery
         if (tab == "replies") return repliesQuery
 
         return postsQuery
-    }
+    })
 
     return (
         <Page title={params.username}>

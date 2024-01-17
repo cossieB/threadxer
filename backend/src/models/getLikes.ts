@@ -3,9 +3,10 @@ import { db } from "../db/drizzle";
 import { Likes, Post, Repost, User } from "../db/schema";
 import { SQL, and, count, eq, isNotNull, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
+import { TokenUser } from "../types";
 
-export function getPosts(res: Response, withReposts = false) {
-    const currentUser = res.locals.token?.user;
+export async function getLikes(username: string, currentUser?: TokenUser) {
+    
     // if (currentUser) {
     //     const subquery = db.select({
     //         followeeId: FollowerFollowee.followeeId
@@ -30,10 +31,12 @@ export function getPosts(res: Response, withReposts = false) {
             .from(Repost)
             .groupBy(Repost.postId)
     );
+
     const quote = alias(Post, 'q');
     const quoteAuthor = alias(User, 'qa');
     const originalPost = alias(Post, 'op');
     const originalPostAuthor = alias(User, 'opa');
+    const pageUser = alias(User, 'pu')
 
     const query = db.with(likeQ, repostQ).select({
         post: Post,
@@ -60,16 +63,19 @@ export function getPosts(res: Response, withReposts = false) {
         originalPost,
         likes: sql<number> `COALESCE (${likeQ.c}::INT, 0)`,
         reposts: sql<number> `COALESCE (${repostQ.c}::INT, 0)`,
-        ...(withReposts && {
-            isRepost: isNotNull(Repost.dateCreated)
-        }),
         ...(currentUser && {
             liked: isNotNull(Likes.userId) as SQL<boolean>,
             reposted: isNotNull(Repost.userId) as SQL<boolean>
         })
     })
-        .from(Post)
+        .from(Likes)
+        .innerJoin(Post, eq(Likes.postId, Post.postId))
         .innerJoin(User, eq(User.userId, Post.userId))
+        .innerJoin(pageUser, 
+            and(
+                eq(pageUser.userId, Likes.userId), 
+                eq(pageUser.usernameLower, username.toLowerCase())
+            ))
         .leftJoin(likeQ, eq(Post.postId, likeQ.postId))
         .leftJoin(repostQ, eq(Post.postId, repostQ.postId))
         .leftJoin(quote, eq(quote.postId, Post.quotedPost))

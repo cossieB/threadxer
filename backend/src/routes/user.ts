@@ -21,3 +21,4 @@ const updateUserValidation = validation([{
 userRouter.post('/', authorize, updateUserValidation, userController.updateUser)
 userRouter.get("/:username/posts", userController.getUserPosts)
 userRouter.get("/:username/replies", userController.getUserReplies)
+userRouter.get("/:username/likes", userController.getUserLikes)

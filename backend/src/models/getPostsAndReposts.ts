@@ -1,19 +1,11 @@
-import { response, type Request, type Response } from "express";
 import { db } from "../db/drizzle";
 import { Likes, Post, Repost, User } from "../db/schema";
-import { SQL, and, count, eq, isNotNull, sql } from "drizzle-orm";
+import { SQL, and, count, desc, eq, isNotNull, isNull, or, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
+import { TokenUser } from "../types";
 
-export function getPosts(res: Response, withReposts = false) {
-    const currentUser = res.locals.token?.user;
-    // if (currentUser) {
-    //     const subquery = db.select({
-    //         followeeId: FollowerFollowee.followeeId
-    //     })
-    //     .from(FollowerFollowee)
-    //     .where(eq(FollowerFollowee.followerId, currentUser.userId))
-    //     .as('sub')
-    // }
+export function getPostsAndReposts(currentUser: TokenUser | undefined, username: string) {
+
     const likeQ = db.$with('l').as(
         db.select({
             postId: Likes.postId,
@@ -30,12 +22,18 @@ export function getPosts(res: Response, withReposts = false) {
             .from(Repost)
             .groupBy(Repost.postId)
     );
+    const reposts = db.$with('rp').as(
+        db.select()
+            .from(Repost)
+            .innerJoin(User, eq(User.userId, Repost.userId))
+            .where(eq(User.usernameLower, username))
+    );
     const quote = alias(Post, 'q');
     const quoteAuthor = alias(User, 'qa');
     const originalPost = alias(Post, 'op');
     const originalPostAuthor = alias(User, 'opa');
 
-    const query = db.with(likeQ, repostQ).select({
+    const query = db.with(likeQ, repostQ, reposts).select({
         post: Post,
         user: {
             userId: User.userId,
@@ -60,9 +58,7 @@ export function getPosts(res: Response, withReposts = false) {
         originalPost,
         likes: sql<number> `COALESCE (${likeQ.c}::INT, 0)`,
         reposts: sql<number> `COALESCE (${repostQ.c}::INT, 0)`,
-        ...(withReposts && {
-            isRepost: isNotNull(Repost.dateCreated)
-        }),
+        isRepost: isNotNull(reposts.reposts.repostId),
         ...(currentUser && {
             liked: isNotNull(Likes.userId) as SQL<boolean>,
             reposted: isNotNull(Repost.userId) as SQL<boolean>
@@ -76,11 +72,20 @@ export function getPosts(res: Response, withReposts = false) {
         .leftJoin(quoteAuthor, eq(quote.userId, quoteAuthor.userId))
         .leftJoin(originalPost, eq(originalPost.postId, Post.replyTo))
         .leftJoin(originalPostAuthor, eq(originalPost.userId, originalPostAuthor.userId))
+        .leftJoin(reposts, eq(reposts.reposts.postId, Post.postId))
+        .orderBy(desc(sql<Date> `COALESCE(${reposts.reposts.dateCreated}, ${Post.dateCreated})`))
+        .where(
+            and(
+                or(
+                    eq(User.usernameLower, username),
+                    eq(reposts.users.usernameLower, username)
+                ),
+                isNull(Post.replyTo)
+            ));
 
     if (currentUser) {
         query.leftJoin(Likes, and(eq(Post.postId, Likes.postId), eq(Likes.userId, currentUser?.userId)));
         query.leftJoin(Repost, and(eq(Post.postId, Repost.postId), eq(Repost.userId, currentUser?.userId)));
     }
-
     return query;
 }
