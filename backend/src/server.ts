@@ -20,10 +20,6 @@ app.use(express.json())
 app.use(cookieParser)
 app.use(express.static(path.resolve(__dirname, '../public')))
 app.use(authenticate)
-app.use(async (req, res, next) => {
-    await sleep(500)
-    next()
-})
 
 app.use('/api/auth', Routes.authRouter)
 app.use('/api/auth/verify', Routes.verificationRouter)

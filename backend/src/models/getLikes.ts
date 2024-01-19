@@ -7,7 +7,7 @@ import { TokenUser } from "../types";
 
 export async function getLikes(username: string, currentUser?: TokenUser) {
 
-    const likeQ = db.$with('l').as(
+    const likeCount = db.$with('l').as(
         db.select({
             postId: Likes.postId,
             c: count().as('like_count'),
@@ -15,7 +15,7 @@ export async function getLikes(username: string, currentUser?: TokenUser) {
             .from(Likes)
             .groupBy(Likes.postId)
     );
-    const repostQ = db.$with('r').as(
+    const repostCount = db.$with('r').as(
         db.select({
             postId: Repost.postId,
             c: count().as('repost_count')
@@ -23,6 +23,22 @@ export async function getLikes(username: string, currentUser?: TokenUser) {
             .from(Repost)
             .groupBy(Repost.postId)
     );
+    const quotesCount = db.$with('qc').as(
+        db.select({
+            quotedPost: Post.quotedPost,
+            c: count().as('quote_count')
+        })
+            .from(Post)
+            .groupBy(Post.quotedPost)
+    )
+    const replyCount = db.$with('rc').as(
+        db.select({
+            replyTo: Post.replyTo,
+            c: count().as('reply_count')
+        })
+            .from(Post)
+            .groupBy(Post.replyTo)
+    )
 
     const quote = alias(Post, 'q');
     const quoteAuthor = alias(User, 'qa');
@@ -31,7 +47,7 @@ export async function getLikes(username: string, currentUser?: TokenUser) {
     const pageUser = alias(User, 'pu')
     const allLikes = alias(Likes, 'al')
 
-    const query = db.with(likeQ, repostQ).select({
+    const query = db.with(likeCount, repostCount, quotesCount, replyCount).select({
         post: Post,
         user: {
             userId: User.userId,
@@ -54,8 +70,10 @@ export async function getLikes(username: string, currentUser?: TokenUser) {
             displayName: originalPostAuthor.displayName,
         },
         originalPost,
-        likes: sql<number> `COALESCE (${likeQ.c}::INT, 0)`,
-        reposts: sql<number> `COALESCE (${repostQ.c}::INT, 0)`,
+        likes: sql<number> `COALESCE (${likeCount.c}::INT, 0)`,
+        reposts: sql<number> `COALESCE (${repostCount.c}::INT, 0)`,
+        quotes: sql<number> `COALESCE (${quotesCount.c}::INT, 0)`,
+        replies: sql<number> `COALESCE (${replyCount.c}::INT, 0)`,
         ...(currentUser && {
             liked: isNotNull(Likes.userId) as SQL<boolean>,
             reposted: isNotNull(Repost.userId) as SQL<boolean>
@@ -68,8 +86,10 @@ export async function getLikes(username: string, currentUser?: TokenUser) {
             eq(pageUser.userId, allLikes.userId),
             eq(pageUser.usernameLower, username.toLowerCase())
         ))
-        .leftJoin(likeQ, eq(Post.postId, likeQ.postId))
-        .leftJoin(repostQ, eq(Post.postId, repostQ.postId))
+        .leftJoin(likeCount, eq(Post.postId, likeCount.postId))
+        .leftJoin(repostCount, eq(Post.postId, repostCount.postId))
+        .leftJoin(replyCount, eq(Post.postId, replyCount.replyTo))
+        .leftJoin(quotesCount, eq(Post.postId, quotesCount.quotedPost))
         .leftJoin(quote, eq(quote.postId, Post.quotedPost))
         .leftJoin(quoteAuthor, eq(quote.userId, quoteAuthor.userId))
         .leftJoin(originalPost, eq(originalPost.postId, Post.replyTo))

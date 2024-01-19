@@ -45,14 +45,14 @@ export function PostBoxContent(props: P2) {
 }
 
 export function PostBoxButtons(props: Props) {
-        const likeMutation = useLikes()
+    const likeMutation = useLikes()
     const repostMutation = useRepost()
 
     return (
         <div class={styles.btns} >
             <StatIcon
                 icon={<CommentSvg />}
-                number={0}
+                number={props.post.replies}
                 color="rgb(29, 155, 240)"
                 onClick={() => setComposerState({
                     isOpen: true,
@@ -78,7 +78,7 @@ export function PostBoxButtons(props: Props) {
             />
             <StatIcon
                 icon={<QuoteSvg />}
-                number={0}
+                number={props.post.quotes}
                 color="rgb(29, 155, 240)"
                 onClick={() => {
                     setComposerState({
@@ -102,7 +102,7 @@ function PostFormatter(props: { str: string }) {
     return (
         <Switch fallback={props.str + " "}>
             <Match when={/(?:\s|^)(#\w+)(\s|$)/.test(props.str)}>
-                <A href={`/search?hashtag=${props.str}`} class={styles.special}>{props.str}</A>{" "}
+                <A href={`/search?hashtag=${props.str.slice(1)}`} class={styles.special}>{props.str}</A>{" "}
             </Match>
             <Match when={/(?:\s|^)(@\w+)(\s|$)/.test(props.str)}>
                 <A href={`/users/${props.str.slice(1)}`} class={styles.special}>{props.str}</A>{" "}

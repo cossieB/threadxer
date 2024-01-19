@@ -1,6 +1,6 @@
-# Threadxer (W.I.P)
+# [Threadxer (W.I.P)](https://threadxer.cossie.dev)
 
-My clone of _Threads_ app which is a clone of _The App Formerly Known As Twitter_.
+My clone of _Threads_ app which is a clone of _The App Formerly Known As Twitter_. 
 
 ## Stack
 

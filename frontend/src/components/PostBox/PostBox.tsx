@@ -19,7 +19,14 @@ export function PostBox(props: { post: PostResponse }) {
             </Show>
             <div class={styles.box} onclick={() => navigate(`/posts/${props.post.post.postId}`)}>
 
-                <div class={styles.avatar}>
+                <div
+                    class={styles.avatar}
+                    onclick={(e) => {
+                        console.log(e.target)
+                        navigate(`/users/${props.post.user.username}`)
+                        e.stopPropagation()
+                    }}
+                >
                     <img src={props.post.user?.avatar} />
                 </div>
                 <div class={styles.div} >
@@ -62,7 +69,13 @@ export function QuoteBox(props: P) {
                 e.stopPropagation()
             }}
         >
-            <div class={styles.avatar}>
+            <div
+                class={styles.avatar}
+                onclick={(e) => {
+                    navigate(`/users/${props.originalPostAuthor.username}`)
+                    e.stopPropagation()
+                }}
+            >
                 <img src={props.originalPostAuthor.avatar} />
             </div>
             <div class={styles.div} >
