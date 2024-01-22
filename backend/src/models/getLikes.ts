@@ -1,4 +1,3 @@
-import { response, type Request, type Response } from "express";
 import { db } from "../db/drizzle";
 import { Likes, Post, Repost, User } from "../db/schema";
 import { SQL, and, count, eq, isNotNull, sql } from "drizzle-orm";

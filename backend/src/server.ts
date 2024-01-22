@@ -39,7 +39,7 @@ app.get("*", (req, res) => {
 app.use("*", (req, res) => {
     res.sendStatus(404)
 })
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {console.log("HERE")
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     if (err instanceof AppError)
         return res.status(err.status).json({ error: err.message })
     console.error(err.stack);

@@ -5,7 +5,7 @@ import AppError from "../utils/AppError";
 import { eq, desc, isNull } from "drizzle-orm";
 import { getHashtags } from "../utils/getHashtags";
 import { getPosts } from "../models/getPosts";
-import { formatPosts } from "../middleware/formatPosts";
+import { formatPosts } from "../utils/formatPosts";
 import { PostgresError } from "postgres";
 
 export async function createPost(req: Request, res: Response, next: NextFunction) {

@@ -1,10 +1,10 @@
-import { response, type Request, type Response } from "express";
+import { type Response } from "express";
 import { db } from "../db/drizzle";
 import { Likes, Post, Repost, User } from "../db/schema";
 import { SQL, and, count, eq, isNotNull, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-export function getPosts(res: Response, withReposts = false) {
+export function getPosts(res: Response) {
     const currentUser = res.locals.token?.user;
 
     const likeCount = db.$with('l').as(

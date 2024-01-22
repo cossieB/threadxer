@@ -1,12 +1,13 @@
 import AppError from "../utils/AppError";
 import { db } from "../db/drizzle";
 import type { Request, Response, NextFunction } from "express";
-import { Likes, Post, Repost, User } from "../db/schema";
-import { and, eq, isNull, inArray, or, desc, sql, isNotNull } from "drizzle-orm";
+import { Post, User } from "../db/schema";
+import { and, eq, desc, isNotNull } from "drizzle-orm";
 import { validateUrl } from "../lib/validateUrl";
 import { getPosts } from "../models/getPosts";
 import { getPostsAndReposts } from "../models/getPostsAndReposts";
 import { getLikes } from "../models/getLikes";
+import { formatPosts } from "../utils/formatPosts";
 
 export async function getUser(req: Request, res: Response, next: NextFunction) {
     const username = req.params.username.toLowerCase();
@@ -49,17 +50,7 @@ export async function getUserPosts(req: Request, res: Response, next: NextFuncti
     const query = getPostsAndReposts(currentUser, username)
 
     const posts = await query;
-
-    res.json(
-        posts.map(p => {
-            const { originalPost, originalPostAuthor, quoteAuthor, quotePost, ...x } = p
-            return {
-                ...x,
-                ...originalPost?.postId && { originalPost, originalPostAuthor },
-                ...quotePost?.postId && { quotePost, quoteAuthor },
-            }
-        })
-    )
+    res.json(posts.map(formatPosts))
 }
 
 export async function getUserReplies(req: Request, res: Response, next: NextFunction) {
@@ -77,33 +68,12 @@ export async function getUserReplies(req: Request, res: Response, next: NextFunc
         .orderBy(desc(Post.dateCreated));
 
     const posts = await query
-
-    res.json(
-        posts.map(p => {
-
-            const { originalPost, originalPostAuthor, quoteAuthor, quotePost, ...x } = p
-            return {
-                ...x,
-                ...originalPost?.postId && { originalPost, originalPostAuthor },
-                ...quotePost?.postId && { quotePost, quoteAuthor },
-            }
-        })
-    )
+    res.json(posts.map(formatPosts))
 }
 
 export async function getUserLikes(req: Request, res: Response, next: NextFunction) {
-    const {username} = req.params;
+    const { username } = req.params;
     const currentUser = res.locals.token?.user
     const posts = await getLikes(username, currentUser);
-    res.json(
-        posts.map(p => {
-
-            const { originalPost, originalPostAuthor, quoteAuthor, quotePost, ...x } = p
-            return {
-                ...x,
-                ...originalPost?.postId && { originalPost, originalPostAuthor },
-                ...quotePost?.postId && { quotePost, quoteAuthor },
-            }
-        })
-    )
+    res.json(posts.map(formatPosts))
 }
