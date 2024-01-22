@@ -1,5 +1,5 @@
 import { useParams } from "@solidjs/router";
-import { Match, Switch } from "solid-js";
+import { JSX, Match, Switch } from "solid-js";
 import NotFound from "~/components/404";
 import { PostBox } from "~/components/PostBox/PostBox";
 import { Tabs } from "~/components/Tabs";
@@ -7,7 +7,7 @@ import Loader from "~/components/shared/Loader/Loader";
 import Page from "~/components/shared/Page";
 import { usePost } from "~/data/post";
 
-export function PostPage() {
+export function PostPage(props: {children?: JSX.Element}) {
     const params = useParams()
     const { postQuery } = usePost()
 
@@ -28,6 +28,7 @@ export function PostPage() {
                     <Tabs arr={["replies", "quotes", "likes"]} url={`posts/${params.postId}`} />
                 </Match>
             </Switch>
+            {props.children}
         </Page>
     )
 }

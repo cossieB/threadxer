@@ -11,10 +11,11 @@ import Home from './routes/Home';
 import ProfilePage from './routes/ProfilePage';
 import { Login } from './routes/auth/Login';
 import { SignUp } from './routes/auth/SignUp';
-import { PostPage } from './routes/[postId]';
+import { PostPage } from './routes/[postId]/(postId)';
 import VerifyEmail from './routes/auth/Verify';
 import UserPage from './routes/[username]/(username)';
 import { Likes, Replies, UserPosts } from './routes/[username]/Replies';
+import { PostQuotes, PostReplies } from './routes/[postId]/Engagement';
 
 const root = document.getElementById('root');
 const queryClient = new QueryClient({
@@ -45,10 +46,12 @@ render(() =>
                 <Route path={["/", "/posts"]} component={UserPosts} />
                 <Route path={"/replies"} component={Replies} />
                 <Route path={"/likes"} component={Likes} />
-                <Route path={"media"} component={() => <p>MEDIA</p>}  />
+                <Route path={"media"} component={() => <p>TODO: User media</p>}  />
             </Route>
-            <Route path="/posts/:postId" >
-                <Route path={["/", "replies", "quotes", "likes"]} component={PostPage} />
+            <Route path="/posts/:postId" component={PostPage} >
+                <Route path={["/", "/replies"]} component={PostReplies} />
+                <Route path={"/quotes"} component={PostQuotes} />
+                <Route path={"/likes"} component={() => <p>TODO: Post likes</p>} />
             </Route>
         </Router>
     </QueryClientProvider>

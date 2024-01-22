@@ -7,6 +7,7 @@ import { getHashtags } from "../utils/getHashtags";
 import { getPosts } from "../models/getPosts";
 import { formatPosts } from "../utils/formatPosts";
 import { PostgresError } from "postgres";
+import { postRepliesQuery } from "../models/postRepliesQuery";
 
 export async function createPost(req: Request, res: Response, next: NextFunction) {
     const user = res.locals.token!.user
@@ -94,9 +95,26 @@ export async function getAllPosts(req: Request, res: Response, next: NextFunctio
 
 export async function getPostReplies(req: Request, res: Response, next: NextFunction) {
     try {
-        const query = getPosts(res)
+        const query = postRepliesQuery(res)
         query
             .where(eq(Post.replyTo, req.params.postId))
+            .orderBy(desc(Post.dateCreated))
+
+        const posts = await query;
+        res.json(posts.map(formatPosts))
+    }
+    catch (error) {
+        if (error instanceof PostgresError && error.message.includes("invalid input syntax for type uuid"))
+            return next(new AppError("That post doesn't exist", 404))
+        return next(error)
+    }
+}
+
+export async function getPostQuotes(req: Request, res: Response, next: NextFunction) {
+    try {
+        const query = postRepliesQuery(res)
+        query
+            .where(eq(Post.quotedPost, req.params.postId))
             .orderBy(desc(Post.dateCreated))
 
         const posts = await query;
