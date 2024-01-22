@@ -7,7 +7,6 @@ import * as Routes from "./routes";
 import { authenticate } from "./middleware/authenticate";
 import { cookieParser } from "./middleware/cookieParser";
 import { startFire } from "./config/firebase";
-import { sleep } from "./lib/sleep";
 
 dotenv.config()
 const app = express()
@@ -40,7 +39,7 @@ app.get("*", (req, res) => {
 app.use("*", (req, res) => {
     res.sendStatus(404)
 })
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {console.log("HERE")
     if (err instanceof AppError)
         return res.status(err.status).json({ error: err.message })
     console.error(err.stack);
@@ -48,8 +47,10 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 })
 
 const PORT = process.env.PORT ?? 8080
+
 startFire()
+
 app.listen(PORT, () => {
-    console.log(`Listening at http://127.0.0.1:${PORT}`)
+    console.log(`Listening at port ${PORT}`)
 })
 

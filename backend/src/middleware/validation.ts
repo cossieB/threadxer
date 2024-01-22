@@ -3,18 +3,18 @@ import AppError from "../utils/AppError"
 
 type O = {
     property: string,
-    type?: 'string' | 'boolean' | 'number' | 'null',
+    type?: 'string' | 'boolean' | 'number' | 'null' | 'array',
     min?: number,
     max?: number,
     regex?: RegExp,
-    required?: boolean
+    isRequired?: boolean
 }
 
 const defaults: Omit<Required<O>, 'property' | 'regex'> = {
     type: 'string',
     min: Number.NEGATIVE_INFINITY,
     max: Number.POSITIVE_INFINITY,
-    required: true
+    isRequired: true
 }
 
 /**
@@ -30,11 +30,14 @@ export function validation(arr: (string | O)[]) {
             const { property } = options
             const bodyValue = req.body[property];
 
-            if (options.required && !bodyValue) {
+            if (options.isRequired && !bodyValue) {
                 return next(new AppError(`${bodyValue} is required`, 400))
             }
             if (bodyValue === undefined) continue
             
+            if (options.type == 'array' && !Array.isArray(bodyValue))
+                return next(new AppError(`Wrong type for ${property}`, 400))
+
             if (typeof bodyValue != options.type)
                 return next(new AppError(`Wrong type for ${property}`, 400))
 

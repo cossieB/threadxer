@@ -7,10 +7,16 @@ export const postRouter = express.Router()
 
 postRouter.get('/', postController.getAllPosts )
 
-postRouter.get('/:postId', postController.getPost)
-
 postRouter.post('/', authorize, validation([{
     property: 'text',
     min: 1,
     max: 180
+}, {
+    property: 'media',
+    isRequired: false,
+    type: 'array'
 }]), postController.createPost)
+
+postRouter.get('/:postId', postController.getPost)
+
+postRouter.get('/:postId/replies', postController.getPostReplies)

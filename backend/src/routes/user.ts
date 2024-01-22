@@ -9,12 +9,12 @@ userRouter.get('/:username', userController.getUser)
 
 const updateUserValidation = validation([{
     property: 'displayName',
-    required: false,
+    isRequired: false,
     min: 1,
     max: 25
 }, {
     property: 'bio',
-    required: false,
+    isRequired: false,
     max: 180
 },]);
 
