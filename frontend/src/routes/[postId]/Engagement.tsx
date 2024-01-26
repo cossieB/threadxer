@@ -1,7 +1,7 @@
 import { CreateQueryResult } from "@tanstack/solid-query"
 import { PostLists } from "~/components/PostLists"
 import { useEngagement } from "~/data/engagement"
-import { PostResponse } from "~/data/post"
+import { PostResponse } from "~/api/postFetchers"
 
 type P = {
     query: CreateQueryResult<PostResponse[], Error>

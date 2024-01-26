@@ -1,9 +1,6 @@
-import { customFetch } from "~/utils/customFetcher";
-import { handleApiError } from "./handleApiError";
 import { QueryClient, createMutation, useQueryClient } from "@tanstack/solid-query";
-import { PostResponse } from "./post";
-import auth from "~/globalState/auth";
-import { errors } from "~/globalState/popups";
+import { PostResponse } from "~/api/postFetchers";
+import { likeOrUnlikePost } from "~/api/likesFetchers";
 
 export function useLikes() {
     const queryClient = useQueryClient()
@@ -34,23 +31,4 @@ export function useLikes() {
         },
     }))
     return mutation
-}
-
-async function likeOrUnlikePost(postId: string) {
-    if (!auth.user.username) {
-        errors.addError("Please login to like")
-        throw new Error("Please login to like")
-    }
-    const res = await customFetch(`/api/likes/${postId}`, {
-        method: "POST",
-    })
-    if (res.status === 201) {
-        return 1
-    }
-    if (res.status === 200) {
-        return -1
-    }
-    const err = await handleApiError(res); console.log(err)
-    errors.addError(err.message)
-    throw err
 }

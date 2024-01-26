@@ -1,6 +1,6 @@
 import { A } from "@solidjs/router"
 import { For, Switch, Match } from "solid-js"
-import { PostResponse } from "~/data/post"
+import { PostResponse } from "~/api/postFetchers"
 import { setComposerState } from "~/globalState/composer"
 import { formatDate } from "~/lib/formatDate"
 import styles from "~/styles/components/PostBox.module.scss"

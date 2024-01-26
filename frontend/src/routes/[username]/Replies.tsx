@@ -1,5 +1,5 @@
 import { CreateQueryResult } from "@tanstack/solid-query"
-import { PostResponse } from "~/data/post"
+import { PostResponse } from "~/api/postFetchers"
 import { useReplies } from "~/data/replies"
 import { useUserLikes, useUserPosts } from "~/data/user"
 import { PostLists } from "../../components/PostLists"

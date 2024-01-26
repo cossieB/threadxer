@@ -1,9 +1,8 @@
-import { customFetch } from "~/utils/customFetcher";
-import { handleApiError } from "./handleApiError";
 import { createQuery, createMutation, useQueryClient } from "@tanstack/solid-query";
 import auth from "~/globalState/auth";
-import { PostResponse } from "./post";
-import { useMatch, useParams } from "@solidjs/router";
+import { useParams } from "@solidjs/router";
+import { fetchUser, mutateUser, ApiUserResponse, fetchUserPosts, fetchUserLikes } from "../api/userFetchers";
+import { mutateUserImage } from "../api/userFetchers";
 
 export function useUser(username: string) {
     const queryClient = useQueryClient()
@@ -59,68 +58,4 @@ export function useUserLikes() {
         queryFn: key => fetchUserLikes(key.queryKey[2])
     }))
 }
-// fetchers
-async function mutateUserImage(obj: { field: 'avatar' | 'banner', url: string }) {
-    const { field, url } = obj
-    const res = await customFetch('/api/users', {
-        method: "POST",
-        headers: {
-            'Content-Type': "application/json"
-        },
-        body: JSON.stringify({ [field]: url })
-    })
-    if (res.ok) {
-        auth.modifyUser({[field]: url})
-        return
-    }
-    throw await handleApiError(res);
-}
-type ApiUserResponse = {
-    username: string;
-    dateJoined: Date;
-    bio: string;
-    avatar: string;
-    banner: string;
-    displayName: string;
-    dob?: Date;
-    location: string;
-    website: string
-};
-async function fetchUser(username: string) {
-    const res = await fetch(`/api/users/${username.toLowerCase()}`);
-    if (res.ok) {
-        return await res.json() as ApiUserResponse;
-    }
-    throw await handleApiError(res);
-}
 
-async function mutateUser(e: SubmitEvent) {
-    e.preventDefault();
-
-    const fd = new FormData(e.target as HTMLFormElement);
-    const res = await customFetch('/api/users', {
-        method: "POST",
-        headers: {
-            'Content-Type': "application/json"
-        },
-        body: JSON.stringify(Object.fromEntries(fd))
-    });
-    if (!res.ok)
-        throw await handleApiError(res);
-}
-
-async function fetchUserPosts(username: string) {
-    const res = await customFetch(`/api/users/${username}/posts`.toLowerCase());
-    if (res.ok) {
-        return await res.json() as PostResponse[]
-    }
-    throw await handleApiError(res)
-}
-
-async function fetchUserLikes(username: string) {
-    const res = await customFetch(`/api/users/${username}/likes`.toLowerCase());
-    if (res.ok) {
-        return await res.json() as PostResponse[]
-    }
-    throw await handleApiError(res)
-}

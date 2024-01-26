@@ -1,7 +1,7 @@
 import styles from "~/styles/components/PostBox.module.scss"
 import { useNavigate } from "@solidjs/router";
 import { Show } from "solid-js";
-import { PostResponse } from "~/data/post";
+import { PostResponse } from "~/api/postFetchers";
 import { PostBoxButtons, PostBoxContent, PostBoxHeader } from "./PostBox.components";
 import { RepostSvg } from "~/svgs";
 
