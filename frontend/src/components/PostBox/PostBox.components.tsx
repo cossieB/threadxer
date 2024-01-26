@@ -1,4 +1,4 @@
-import { A } from "@solidjs/router"
+import { A, useNavigate } from "@solidjs/router"
 import { For, Switch, Match } from "solid-js"
 import { PostResponse } from "~/api/postFetchers"
 import { setComposerState } from "~/globalState/composer"
@@ -11,6 +11,26 @@ import { useLikes } from "~/data/likes"
 import { useRepost } from "~/data/repost"
 
 type Props = { post: PostResponse }
+
+type P = {
+    username: string
+    avatar: string
+}
+export function PostBoxAvatar(props: P) {
+    const navigate = useNavigate()
+    return (
+        <div
+            class={styles.avatar}
+            onclick={(e) => {
+                console.log(e.target)
+                navigate(`/users/${props.username}`)
+                e.stopPropagation()
+            }}
+        >
+            <img src={props.avatar} />
+        </div>
+    )
+}
 
 type P1 = {
     username: string,

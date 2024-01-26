@@ -15,7 +15,7 @@ import { PostPage } from './routes/[postId]/(postId)';
 import VerifyEmail from './routes/auth/Verify';
 import UserPage from './routes/[username]/(username)';
 import { Likes, Replies, UserPosts } from './routes/[username]/Replies';
-import { PostQuotes, PostReplies } from './routes/[postId]/Engagement';
+import { PostLikes, PostQuotes, PostReplies } from './routes/[postId]/Engagement';
 
 const root = document.getElementById('root');
 const queryClient = new QueryClient({
@@ -51,7 +51,7 @@ render(() =>
             <Route path="/posts/:postId" component={PostPage} >
                 <Route path={["/", "/replies"]} component={PostReplies} />
                 <Route path={"/quotes"} component={PostQuotes} />
-                <Route path={"/likes"} component={() => <p>TODO: Post likes</p>} />
+                <Route path={"/likes"} component={PostLikes} />
             </Route>
         </Router>
     </QueryClientProvider>

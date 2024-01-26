@@ -1,4 +1,4 @@
-import { QueryClient, createMutation, useQueryClient } from "@tanstack/solid-query";
+import { createMutation, useQueryClient } from "@tanstack/solid-query";
 import { PostResponse } from "~/api/postFetchers";
 import { likeOrUnlikePost } from "~/api/likesFetchers";
 

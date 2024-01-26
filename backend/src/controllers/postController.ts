@@ -135,11 +135,12 @@ export async function getPostLikes(req: Request, res: Response, next: NextFuncti
             username: User.username,
             avatar: User.avatar,
             banner: User.avatar,
-            displayName: User.displayName
+            displayName: User.displayName,
+            bio: User.bio
         })
         .from(Likes)
         .innerJoin(User, eq(Likes.userId, User.userId))
-        .where(eq(Post.postId, postId))
+        .where(eq(Likes.postId, postId))
         return res.json(users)
     } 
     catch (error) {
