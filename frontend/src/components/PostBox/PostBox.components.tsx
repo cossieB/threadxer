@@ -7,8 +7,8 @@ import styles from "~/styles/components/PostBox.module.scss"
 import { CommentSvg, LikeSvg, RepostSvg, QuoteSvg, ViewsSvg } from "~/svgs"
 import { formatPostTime } from "~/utils/formatPostTime"
 import StatIcon from "../ActionIcon"
-import { useLikes } from "~/data/likes"
-import { useRepost } from "~/data/likes"
+import { useLikes } from "~/data/engagement"
+import { useRepost } from "~/data/engagement"
 
 type Props = { post: PostResponse }
 

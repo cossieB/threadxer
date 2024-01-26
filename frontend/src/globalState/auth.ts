@@ -1,7 +1,7 @@
 import { JwtPayload, jwtDecode } from "jwt-decode";
 import { createStore } from "solid-js/store";
 import { firebaseAuth } from "../../firebase";
-import { signInWithCustomToken } from "firebase/auth";
+import { signInWithCustomToken, signOut } from "firebase/auth";
 
 export type User = {
     username: string,
@@ -57,7 +57,8 @@ class Auth {
         this.setUser(newUser)
         localStorage.setItem('user', JSON.stringify(newUser))
     }
-    deleteUser = () => {
+    deleteUser = async () => {
+        signOut(firebaseAuth)
         const blankUser = {
             avatar: "",
             banner: "",
