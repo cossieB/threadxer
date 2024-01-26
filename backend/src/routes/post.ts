@@ -21,3 +21,4 @@ postRouter.get('/:postId', postController.getPost)
 
 postRouter.get('/:postId/replies', postController.getPostReplies)
 postRouter.get('/:postId/quotes', postController.getPostQuotes)
+postRouter.get('/:postId/likes', postController.getPostLikes)

@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { db } from "../db/drizzle";
-import { Hashtags, Media, Post } from "../db/schema";
+import { Hashtags, Likes, Media, Post, User } from "../db/schema";
 import AppError from "../utils/AppError";
 import { eq, desc, isNull } from "drizzle-orm";
 import { getHashtags } from "../utils/getHashtags";
@@ -120,6 +120,28 @@ export async function getPostQuotes(req: Request, res: Response, next: NextFunct
         const posts = await query;
         res.json(posts.map(formatPosts))
     }
+    catch (error) {
+        if (error instanceof PostgresError && error.message.includes("invalid input syntax for type uuid"))
+            return next(new AppError("That post doesn't exist", 404))
+        return next(error)
+    }
+}
+
+export async function getPostLikes(req: Request, res: Response, next: NextFunction) {
+    const postId = req.params.postId
+    try {
+        const users = await db.select({
+            userId: User.userId,
+            username: User.username,
+            avatar: User.avatar,
+            banner: User.avatar,
+            displayName: User.displayName
+        })
+        .from(Likes)
+        .innerJoin(User, eq(Likes.userId, User.userId))
+        .where(eq(Post.postId, postId))
+        return res.json(users)
+    } 
     catch (error) {
         if (error instanceof PostgresError && error.message.includes("invalid input syntax for type uuid"))
             return next(new AppError("That post doesn't exist", 404))
