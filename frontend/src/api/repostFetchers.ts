@@ -18,5 +18,7 @@ export async function repostOrUnrepost(postId: string) {
     if (res.status === 200) {
         return -1;
     }
-    throw await handleApiError(res);
+    const err = await handleApiError(res); 
+    errors.addError(err.message);
+    throw err;
 }

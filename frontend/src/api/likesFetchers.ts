@@ -18,7 +18,7 @@ export async function likeOrUnlikePost(postId: string) {
     if (res.status === 200) {
         return -1;
     }
-    const err = await handleApiError(res); console.log(err);
+    const err = await handleApiError(res); 
     errors.addError(err.message);
     throw err;
 }

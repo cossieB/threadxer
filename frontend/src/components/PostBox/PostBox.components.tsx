@@ -8,7 +8,7 @@ import { CommentSvg, LikeSvg, RepostSvg, QuoteSvg, ViewsSvg } from "~/svgs"
 import { formatPostTime } from "~/utils/formatPostTime"
 import StatIcon from "../ActionIcon"
 import { useLikes } from "~/data/likes"
-import { useRepost } from "~/data/repost"
+import { useRepost } from "~/data/likes"
 
 type Props = { post: PostResponse }
 
