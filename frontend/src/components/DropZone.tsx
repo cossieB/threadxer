@@ -1,6 +1,10 @@
 import { For, JSXElement, createSignal, onCleanup } from "solid-js"
 import styles from '~/styles/components/DropZone.module.scss'
 import { UploadSvg } from "~/svgs"
+import { MediaPreview } from "./MediaPreview"
+import { errors } from "~/globalState/popups"
+
+const MAX_FILE_SIZE = 8
 
 export default function DropZone() {
     const [hovered, setHovered] = createSignal(false)
@@ -9,9 +13,11 @@ export default function DropZone() {
     const cleanUpUrls = () => objUrls().forEach(url => URL.revokeObjectURL(url))
 
     function selectFiles(files: File[]) {
-        cleanUpUrls()
-        const o = files.map(file => URL.createObjectURL(file)).slice(0, 4);
-        setObjUrls(o)
+        if (files.some(file => file.size >= MAX_FILE_SIZE * 1024 * 1024))
+            errors.addError("Warning some of your files are too big and have been ignored")
+        const remainder = 4 - objUrls().length
+        const urls = files.filter(file => file.type.match(/(image|video)/) && file.size < MAX_FILE_SIZE * 1024 * 1024).map(file => URL.createObjectURL(file)).slice(0, remainder);
+        setObjUrls(prev => [...prev, ...urls])
         setHovered(false)
     }
 
@@ -25,6 +31,7 @@ export default function DropZone() {
                 class={styles.z}
                 classList={{ [styles.dragover]: hovered() }}
                 onclick={() => input.click()}
+                
                 onDragOver={(e) => {
                     e.preventDefault()
                     setHovered(true)
@@ -40,14 +47,11 @@ export default function DropZone() {
                     selectFiles(Array.from(e.dataTransfer.files))
                 }}
             >
-                <UploadSvg />
+                <UploadSvg /> &nbsp;
+                <small>{`max: ${MAX_FILE_SIZE}MB`}</small>
             </div>
             <div class={styles.imgs}>
-                <For each={objUrls()}>
-                    {url =>
-                        <img src={url} />
-                    }
-                </For>
+                <MediaPreview setImages={setObjUrls} images={objUrls()} />
                 <input
                     type="file"
                     accept="image/*, video/*"
