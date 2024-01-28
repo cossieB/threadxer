@@ -1,9 +1,14 @@
+import { errors } from "~/globalState/popups";
+
 export async function handleApiError(res: Response) {
+    let error = ""
     if (res.headers.get('Content-Type')?.includes('application/json')) {
         const data = await res.json();
-        return new Error(data.error);
+        error = data.error
     }
     else {
-        return new Error("Something went wrong. Please try again later.");
+        error = "Something went wrong. Please try again later."
     }
+    errors.addError(error);
+    throw new Error(error)
 }

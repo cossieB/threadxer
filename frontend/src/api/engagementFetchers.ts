@@ -22,7 +22,7 @@ type UserResponse = {
 };
 
 export async function getPostLikes(postId: string) {
-    const res = await fetch(`/api/posts/${postId}/likes`)
+    const res = await customFetch(`/api/posts/${postId}/likes`)
     if (res.ok) {
         return await res.json() as UserResponse[]
     }
@@ -43,9 +43,7 @@ export async function repostOrUnrepost(postId: string) {
     if (res.status === 200) {
         return -1;
     }
-    const err = await handleApiError(res);
-    errors.addError(err.message);
-    throw err;
+    await handleApiError(res);
 }
 
 export async function likeOrUnlikePost(postId: string) {
@@ -62,8 +60,6 @@ export async function likeOrUnlikePost(postId: string) {
     if (res.status === 200) {
         return -1;
     }
-    const err = await handleApiError(res);
-    errors.addError(err.message);
-    throw err;
+    await handleApiError(res);
 }
 

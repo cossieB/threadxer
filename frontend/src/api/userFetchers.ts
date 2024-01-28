@@ -15,7 +15,7 @@ export type ApiUserResponse = {
     website: string;
 };
 export async function fetchUser(username: string) {
-    const res = await fetch(`/api/users/${username.toLowerCase()}`);
+    const res = await customFetch(`/api/users/${username.toLowerCase()}`);
     if (res.ok) {
         return await res.json() as ApiUserResponse;
     }

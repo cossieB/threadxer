@@ -20,6 +20,7 @@ app.use(cookieParser)
 app.use(express.static(path.resolve(__dirname, '../public')))
 app.use(authenticate)
 
+// Routes
 app.use('/api/auth', Routes.authRouter)
 app.use('/api/auth/verify', Routes.verificationRouter)
 app.use('/api/auth/refresh', Routes.refreshRoutes)
@@ -39,6 +40,8 @@ app.get("*", (req, res) => {
 app.use("*", (req, res) => {
     res.sendStatus(404)
 })
+
+// Error handler
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     if (err instanceof AppError)
         return res.status(err.status).json({ error: err.message })
@@ -48,7 +51,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 
 const PORT = process.env.PORT ?? 8080
 
-startFire()
+startFire() //initialize firebase admin
 
 app.listen(PORT, () => {
     console.log(`Listening at port ${PORT}`)

@@ -9,6 +9,7 @@ import { Popup } from "./shared/Popup";
 import { composerState } from "~/globalState/composer";
 import { QuoteBox } from "./PostBox/PostBox";
 import { usePost } from "~/data/post";
+import DropZone from "./DropZone";
 false && clickOutside
 
 export function PostComposer() {
@@ -59,6 +60,7 @@ export function PostComposer() {
                     />
                 </div>
                 <div class={styles.preview} innerHTML={preview()} />
+                <DropZone />
                 <Show when={!!composerState.quoting}>
                     <QuoteBox
                         originalPost={composerState.quoting!.post!}
