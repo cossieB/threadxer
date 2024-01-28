@@ -2,8 +2,8 @@
 
 ## User Page
 - [x] User posts and reposts
-- [ ] User replies
-- [ ] User likes
+- [x] User replies
+- [x] User likes
 - [ ] User media
 
 ## Create Post
@@ -13,9 +13,9 @@
 - [ ] upload images and clips
 
 ## Post Page
-- [ ] Replies
-- [ ] Quotes
-- [ ] Likes
+- [x] Replies
+- [x] Quotes
+- [x] Likes
 
 ## Search
 - [ ] keyword search
