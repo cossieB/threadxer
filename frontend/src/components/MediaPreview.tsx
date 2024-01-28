@@ -1,10 +1,16 @@
-import { For, createSignal } from "solid-js"
+import { For, Match, Switch, createSignal } from "solid-js"
 import styles from '~/styles/components/DropZone.module.scss'
 import { DeleteSvg } from "~/svgs"
 
 type P = {
-    images: string[]
-    setImages: (arr: string[]) => void
+    images: {
+        url: string;
+        file: File;
+    }[]
+    setImages: (arr: {
+        url: string;
+        file: File;
+    }[]) => void
 }
 export function MediaPreview(props: P) {
     const [lastDragOverIndex, setLastDragOverIndex] = createSignal(-1);
@@ -12,36 +18,37 @@ export function MediaPreview(props: P) {
     return (
         <div class={styles.previews}>
             <For each={props.images}>
-                {(image, i) =>
+                {(data, i) =>
                     <div
                         class={styles.imgContainer}
                         draggable
                         onDragEnd={() => {
                             // i is the index of the image being dragged before being dragged
-                            // lastDragoverIndex index the image is being moved to.
+                            // lastDragoverIndex is the index the image is being moved to.
 
                             {/**
-                                Illustration of what is happening. Example: image at index 1 is being moved to index 3
-                                [0,1,2,3,4]
-                                [0,2,3,1,4]
+                                Illustration of what is happening. 
+                                Example: image at index 1 is being moved to index 3
+                                [0,1,2,3,4] <---- props.images
+                                [0,2,3,1,4] <---- newArr
                             */}
 
                             if (lastDragOverIndex() == i()) return;
-                            const newArr: string[] = []
+                            const newArr: typeof props.images = []
                             let indexOnNewArray = 0
 
                             // looping through the images
                             for (let j = 0; j < props.images.length; j++) {
                                 if (j === i()) continue; // skip the image that's being moved. Note indexOnNewArray doesn't get incremented
                                 if (indexOnNewArray == lastDragOverIndex()) {
-                                    newArr.push(image);
+                                    newArr.push(data);
                                 }
                                 newArr.push(props.images[j])
                                 indexOnNewArray++
                             }
                             // for when image is being moved to the end.
                             if (newArr.length < props.images.length)
-                                newArr.push(image);
+                                newArr.push(data);
                             props.setImages(newArr)
                             setLastDragOverIndex(-1)
                         }}
@@ -51,7 +58,14 @@ export function MediaPreview(props: P) {
                         }}
                     >
                         <DeleteSvg onclick={() => props.setImages(props.images.filter((_, j) => i() != j))} />
-                        <img data-i={i()} src={image} class="screenshotImg" />
+                        <Switch fallback={"Unsupported content"} >
+                            <Match when={data.file.type.includes('image')}>
+                                <img data-i={i()} src={data.url} />
+                            </Match>
+                            <Match when={data.file.type.includes('video')}>
+                                <video data-i={i()} src={data.url} autoplay />
+                            </Match>
+                        </Switch>
                     </div>
                 }
             </For>
