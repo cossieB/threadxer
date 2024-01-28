@@ -1,13 +1,22 @@
 import { customFetch } from "~/utils/customFetcher";
 import { handleApiError } from "./handleApiError";
+import { validateAndUpload } from "~/utils/uploadToFirebase";
 
-export async function createPost(post: CreatePost) {
+export async function createPost({ media, ...post }: CreatePost) {
+    let urls: string[] | null = null
+    if (media)
+        urls = await Promise.all(validateAndUpload(media, 'media', 8))
+
+    console.log(urls)
     const res = await customFetch("/api/posts", {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(post)
+        body: JSON.stringify({
+            ...post,
+            ...(urls && { media: urls })
+        })
     });
     if (res.ok) {
         const data = await res.json();
@@ -36,7 +45,7 @@ type CreatePost = {
     text: string;
     replyTo?: string;
     quotedPost?: string;
-    media?: string[];
+    media?: File[];
 };
 
 export type PostResponse = {

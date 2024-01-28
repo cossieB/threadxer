@@ -63,7 +63,7 @@ export function MediaPreview(props: P) {
                                 <img data-i={i()} src={data.url} />
                             </Match>
                             <Match when={data.file.type.includes('video')}>
-                                <video data-i={i()} src={data.url} autoplay />
+                                <video data-i={i()} src={data.url} />
                             </Match>
                         </Switch>
                     </div>

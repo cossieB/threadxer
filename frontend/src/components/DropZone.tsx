@@ -1,31 +1,39 @@
-import { For, JSXElement, createSignal, onCleanup } from "solid-js"
+import { For, JSXElement, Setter, createSignal, onCleanup } from "solid-js"
 import styles from '~/styles/components/DropZone.module.scss'
 import { UploadSvg } from "~/svgs"
 import { MediaPreview } from "./MediaPreview"
 import { errors } from "~/globalState/popups"
 
+type P = {
+    images: {
+        url: string;
+        file: File;
+    }[]
+    setImages: Setter<{
+        url: string;
+        file: File;
+    }[]>
+}
+
 const MAX_FILE_SIZE = 8
 
-export default function DropZone() {
+export default function DropZone(props: P) {
     const [hovered, setHovered] = createSignal(false)
-    const [files, setFiles] = createSignal<{url: string, file: File}[]>([])
+
     let input!: HTMLInputElement
-    const cleanUpUrls = () => files().forEach(file => URL.revokeObjectURL(file.url))
 
     function selectFiles(fileList: File[]) {
         if (fileList.some(file => file.size >= MAX_FILE_SIZE * 1024 * 1024))
             errors.addError("Warning some of your files are too big and have been ignored")
-        const remainder = 4 - files().length
+        const remainder = 4 - props.images.length
         const urls = fileList
             .filter(file => file.type.match(/(image|video)/) && file.size < MAX_FILE_SIZE * 1024 * 1024)
-            .map(file => ({url: URL.createObjectURL(file), file})).slice(0, remainder);
-        setFiles(prev => [...prev, ...urls])
+            .map(file => ({ url: URL.createObjectURL(file), file })).slice(0, remainder);
+        props.setImages(prev => [...prev, ...urls])
         setHovered(false)
     }
 
-    onCleanup(() => {
-        cleanUpUrls()
-    })
+
     return (
         <>
             <div
@@ -33,7 +41,7 @@ export default function DropZone() {
                 class={styles.z}
                 classList={{ [styles.dragover]: hovered() }}
                 onclick={() => input.click()}
-                
+
                 onDragOver={(e) => {
                     e.preventDefault()
                     setHovered(true)
@@ -53,7 +61,7 @@ export default function DropZone() {
                 <small>{`max: ${MAX_FILE_SIZE}MB`}</small>
             </div>
             <div class={styles.imgs}>
-                <MediaPreview setImages={setFiles} images={files()} />
+                <MediaPreview setImages={props.setImages} images={props.images} />
                 <input
                     type="file"
                     accept="image/*, video/*"

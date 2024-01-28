@@ -1,4 +1,4 @@
-import { Show, createSignal, onMount } from "solid-js";
+import { Show, createSignal, onCleanup, onMount } from "solid-js";
 import styles from "~/styles/components/Composer.module.scss"
 import { CloseBtn } from "./shared/CloseBtn";
 import { SubmitButton } from "./shared/SubmitButton";
@@ -14,10 +14,19 @@ false && clickOutside
 
 export function PostComposer() {
     let textarea!: HTMLTextAreaElement
+
     onMount(() => {
         textarea.focus()
     })
-    const [input, setInput] = createSignal("")
+    onCleanup(() => {
+        cleanUpUrls()
+    })
+
+    const [input, setInput] = createSignal("");
+    const [files, setFiles] = createSignal<{ url: string, file: File }[]>([])
+
+    const cleanUpUrls = () => files().forEach(file => URL.revokeObjectURL(file.url))
+    
     const preview = () => {
         const rgx = /(?<=\s|^)([#@]\w+)(?=\s|$)/g
         let str = input();
@@ -55,12 +64,13 @@ export function PostComposer() {
                         onclick={() => mutation.mutate({
                             text: input(),
                             quotedPost: composerState.quoting?.post?.postId,
-                            replyTo: composerState.replying?.post?.postId
+                            replyTo: composerState.replying?.post?.postId,
+                            media: files().map(data => data.file)
                         })}
                     />
                 </div>
                 <div class={styles.preview} innerHTML={preview()} />
-                <DropZone />
+                <DropZone setImages={setFiles} images={files()} />
                 <Show when={!!composerState.quoting}>
                     <QuoteBox
                         originalPost={composerState.quoting!.post!}

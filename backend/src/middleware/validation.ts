@@ -38,7 +38,7 @@ export function validation(arr: (string | O)[]) {
             if (options.type == 'array' && !Array.isArray(bodyValue))
                 return next(new AppError(`Wrong type for ${property}`, 400))
 
-            if (typeof bodyValue != options.type)
+            if (options.type !== 'array' && typeof bodyValue != options.type)
                 return next(new AppError(`Wrong type for ${property}`, 400))
 
             if ((typeof bodyValue === 'string') && (bodyValue.length > options.max || bodyValue.length < options.min))
