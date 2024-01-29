@@ -12,5 +12,6 @@ export function validateAndUpload(files: File[], path: string, maxSize = 1) {
 async function uploadFile(file: File, path: string) {
     const imageRef = ref(storage, `${auth.user.userId}/${path}/${file.name}`)
     const res = await uploadBytes(imageRef, file)
-    return getDownloadURL(res.ref)
+    const url = await getDownloadURL(res.ref)
+    return { url, file, ref: `${auth.user.userId}/${path}/${file.name}` }
 }

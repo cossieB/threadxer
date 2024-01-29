@@ -23,10 +23,10 @@ export async function sendAuthRequest(
             queryClient?.clear()
             setState('success', true);
             const data = await res.json(); 
-            const redirect =  (data.redirect as string) ?? -1
+            const redirect =  (data.redirect as string) ?? -1; 
             navigate(redirect)
-            auth.createUser(data.jwt);
             data.fb && await auth.firebaseSignin(data.fb)
+            auth.createUser(data.jwt);
         }
         else if (res.headers.get('Content-Type')?.includes('application/json')) {
             const data = await res.json();

@@ -1,8 +1,6 @@
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { createSignal, mergeProps } from "solid-js";
 import { ChangeEvent } from "~/lib/solidTypes";
 import { UploadSvg } from "~/svgs";
-import { storage } from "../../../firebase";
 import auth from "~/globalState/auth";
 import type { CreateMutationResult, QueryKey } from "@tanstack/solid-query";
 import { Popup } from "../shared/Popup";
@@ -28,7 +26,7 @@ export function UploadBtn(props: Props) {
         const files = Array.from(e.target.files ?? []).slice(0, merged.limit)
         try {
             const urls = await Promise.all(validateAndUpload(files, `${merged.path}s`))
-            urls.length && props.mutation.mutate({ field: props.path, url: urls[0] },)
+            urls.length && props.mutation.mutate({ field: props.path, url: urls[0].url },)
         } catch (error: any) {
             setError(error.message ?? "Something went wrong please try again later")
         }

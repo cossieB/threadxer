@@ -69,7 +69,6 @@ export function SignUp() {
         await sendAuthRequest('/api/auth/signup', setState, userState, navigate);
     }
     return (
-        <Show when={!auth.user.username} fallback={<Navigate href="/" />}>
             <Page title='Sign Up'>
 
                 <UserForm onsubmit={handleSubmit}>
@@ -151,6 +150,5 @@ export function SignUp() {
                     colorDeg='270'
                 />
             </Page>
-        </Show>
     );
 }

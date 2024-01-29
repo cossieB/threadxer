@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, uuid, varchar, text, timestamp, jsonb, integer, unique, primaryKey, boolean, foreignKey, date } from "drizzle-orm/pg-core";
+import { pgTable, uuid, varchar, text, timestamp, integer, unique, primaryKey, boolean, foreignKey, date } from "drizzle-orm/pg-core";
 
 export const User = pgTable('users', {
     userId: uuid('user_id').primaryKey().defaultRandom(),
@@ -58,7 +58,9 @@ export const Repost = pgTable('reposts', {
 export const Media = pgTable('media', {
     mediaId: uuid('media_id').primaryKey().defaultRandom(),
     postId: uuid('post_id').notNull().references(() => Post.postId, { onDelete: 'cascade', onUpdate: 'cascade' }),
-    url: text('url').notNull()
+    isVideo: boolean('is_video').notNull().default(false),
+    url: text('url').notNull(),
+    firebaseRef: text('firebase_ref').notNull()
 })
 
 export const Likes = pgTable('likes', {
@@ -79,10 +81,10 @@ export const FollowerFollowee = pgTable('follower_followee', {
 }))
 
 export const Hashtags = pgTable('hashtags', {
-    hashtag: varchar('hashtag'),
+    hashtag: varchar('hashtag').primaryKey(),
     postId: uuid('post_id').notNull().references(() => Post.postId, { onDelete: 'cascade', onUpdate: 'cascade' }),
 }, t => ({
-    unique: primaryKey({columns: [t.hashtag, t.postId]})
+    unique: unique().on(t.hashtag, t.postId)
 }))
 
 export const RefreshTokens = pgTable('refresh_tokens', {

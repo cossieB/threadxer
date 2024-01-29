@@ -3,11 +3,12 @@ import { handleApiError } from "./handleApiError";
 import { validateAndUpload } from "~/utils/uploadToFirebase";
 
 export async function createPost({ media, ...post }: CreatePost) {
-    let urls: string[] | null = null
-    if (media)
-        urls = await Promise.all(validateAndUpload(media, 'media', 8))
-
-    console.log(urls)
+    const urls = await Promise.all(validateAndUpload(media ?? [], 'media', 8))
+    const data = urls.map(x => ({
+        url: x.url,
+        isVideo: x.file.type.includes('video'),
+        ref: x.ref
+    }))
     const res = await customFetch("/api/posts", {
         method: "POST",
         headers: {
@@ -15,7 +16,9 @@ export async function createPost({ media, ...post }: CreatePost) {
         },
         body: JSON.stringify({
             ...post,
-            ...(urls && { media: urls })
+            ...(data.length > 0 && {
+                media: data
+            })
         })
     });
     if (res.ok) {

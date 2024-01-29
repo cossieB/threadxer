@@ -10,9 +10,20 @@ import { PostgresError } from "postgres";
 import { postRepliesQuery } from "../models/postRepliesQuery";
 
 export async function createPost(req: Request, res: Response, next: NextFunction) {
+    type Body = {
+        text: string;
+        replyTo?: string | undefined;
+        quotedPost?: string | undefined;
+        media: {
+            url: string;
+            isVideo: boolean;
+            ref: string;
+        }[]
+    }
     const user = res.locals.token!.user
-    const { text } = req.body as { text: string, media?: string[] }
-    const media: string[] = req.body.media ?? []
+    const { text } = req.body as Body
+    const media = (req.body as Body).media ?? []
+    
     if (text.length + media.length === 0)
         return next(new AppError("Empty posts are not allowed", 400))
 
@@ -32,9 +43,11 @@ export async function createPost(req: Request, res: Response, next: NextFunction
                     postId: Post.postId
                 })
             if (media.length > 0)
-                await tx.insert(Media).values(media.map(url => ({
+                await tx.insert(Media).values(media.map(m => ({
                     postId: row[0].postId,
-                    url
+                    url: m.url,
+                    firebaseRef: m.ref,
+                    isVideo: m.isVideo,
                 })))
             if (uniques.length > 0)
                 await tx.insert(Hashtags).values(uniques.map(tag => ({
@@ -138,11 +151,11 @@ export async function getPostLikes(req: Request, res: Response, next: NextFuncti
             displayName: User.displayName,
             bio: User.bio
         })
-        .from(Likes)
-        .innerJoin(User, eq(Likes.userId, User.userId))
-        .where(eq(Likes.postId, postId))
+            .from(Likes)
+            .innerJoin(User, eq(Likes.userId, User.userId))
+            .where(eq(Likes.postId, postId))
         return res.json(users)
-    } 
+    }
     catch (error) {
         if (error instanceof PostgresError && error.message.includes("invalid input syntax for type uuid"))
             return next(new AppError("That post doesn't exist", 404))

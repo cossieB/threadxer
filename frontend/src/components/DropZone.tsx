@@ -33,7 +33,6 @@ export default function DropZone(props: P) {
         setHovered(false)
     }
 
-
     return (
         <>
             <div
