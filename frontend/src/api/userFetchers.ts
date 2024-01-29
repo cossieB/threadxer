@@ -33,6 +33,11 @@ export async function mutateUser(e: SubmitEvent) {
         },
         body: JSON.stringify(Object.fromEntries(fd))
     });
+    if (res.ok) {
+        const data = await res.json();
+        auth.createUser(data.jwt);
+        return;
+    }
     if (!res.ok)
         throw await handleApiError(res);
 }
@@ -63,7 +68,8 @@ export async function mutateUserImage(obj: { field: 'avatar' | 'banner'; url: st
         body: JSON.stringify({ [field]: url })
     });
     if (res.ok) {
-        auth.modifyUser({ [field]: url });
+        const data = await res.json();
+        auth.createUser(data.jwt);
         return;
     }
     throw await handleApiError(res);

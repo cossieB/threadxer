@@ -5,7 +5,6 @@ import { RefreshTokens } from "../db/schema";
 import { handleTokens } from "../utils/generateCookies";
 import { eq } from "drizzle-orm";
 import jwt, { type JwtPayload } from "jsonwebtoken";
-import { getAuth } from "firebase-admin/auth";
 
 export async function getAccessToken(req: Request, res: Response, next: NextFunction) {
     const refresh = req.cookies.rf;
