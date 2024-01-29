@@ -4,6 +4,7 @@ import { Show } from "solid-js";
 import { PostResponse } from "~/api/postFetchers";
 import { PostBoxButtons, PostBoxContent, PostBoxHeader } from "./PostBox.components";
 import { RepostSvg } from "~/svgs";
+import { Media } from "../Media";
 
 export function PostBox(props: { post: PostResponse }) {
     const navigate = useNavigate()
@@ -39,6 +40,9 @@ export function PostBox(props: { post: PostResponse }) {
                         displayName={props.post.user.displayName}
                     />
                     <PostBoxContent text={props.post.post.text} />
+                    <Show when={!!props.post.media}>
+                        <Media media={props.post.media!} />
+                    </Show>
                     <PostBoxButtons {...props} />
                 </div>
                 <Show when={!!props.post.quotePost}>

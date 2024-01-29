@@ -111,4 +111,8 @@ export type PostResponse = {
         quotedPost: string | null;
         didQuote: boolean;
     };
+    media: {
+        url: string,
+        isVideo: boolean
+    }[] | null
 };

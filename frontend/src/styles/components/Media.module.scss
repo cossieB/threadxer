@@ -1,0 +1,10 @@
+.container {
+    display: flex;
+    width: 100%;
+    img, video {
+        width: 50%;
+        flex: 1;
+        height: 10rem;
+        object-fit: contain;
+    }
+}
