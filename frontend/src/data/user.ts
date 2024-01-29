@@ -18,6 +18,18 @@ export function useUser(username: string) {
         retry(failureCount, error) {
             return !error.message.includes("No user with that username exists") && failureCount < 3
         },
+        ...(username.toLowerCase() === auth.user.username.toLowerCase() && {
+            placeholderData: {
+                username: auth.user.username,
+                dateJoined: new Date(0),
+                bio: "",
+                avatar: auth.user.avatar,
+                banner: auth.user.banner,
+                displayName: "",
+                location: "",
+                website: "",
+            }
+        })
     }))
 
     const mutation = createMutation(() => ({

@@ -3,53 +3,24 @@ import { Likes, Post, Repost, User } from "../db/schema";
 import { SQL, and, count, desc, eq, isNotNull, isNull, or, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { TokenUser } from "../types";
+import { likeCount, repostCount, quotesCount, replyCount, mediaAgg } from "./postSubQueries";
 
 export function getPostsAndReposts(currentUser: TokenUser | undefined, username: string) {
 
-    const likeCount = db.$with('l').as(
-        db.select({
-            postId: Likes.postId,
-            c: count().as('like_count'),
-        })
-            .from(Likes)
-            .groupBy(Likes.postId)
-    );
-    const repostCount = db.$with('r').as(
-        db.select({
-            postId: Repost.postId,
-            c: count().as('repost_count')
-        })
-            .from(Repost)
-            .groupBy(Repost.postId)
-    );
-    const quotesCount = db.$with('qc').as(
-        db.select({
-            quotedPost: Post.quotedPost,
-            c: count().as('quote_count')
-        })
-            .from(Post)
-            .groupBy(Post.quotedPost)
-    )
-    const replyCount = db.$with('rc').as(
-        db.select({
-            replyTo: Post.replyTo,
-            c: count().as('reply_count')
-        })
-            .from(Post)
-            .groupBy(Post.replyTo)
-    )
+
+    const quote = alias(Post, 'q');
+    const quoteAuthor = alias(User, 'qa');
+    const originalPost = alias(Post, 'op');
+    const originalPostAuthor = alias(User, 'opa');
+
     const reposts = db.$with('rp').as(
         db.select()
             .from(Repost)
             .innerJoin(User, eq(User.userId, Repost.userId))
             .where(eq(User.usernameLower, username))
     );
-    const quote = alias(Post, 'q');
-    const quoteAuthor = alias(User, 'qa');
-    const originalPost = alias(Post, 'op');
-    const originalPostAuthor = alias(User, 'opa');
 
-    const query = db.with(likeCount, repostCount, quotesCount, replyCount, reposts).select({
+    const query = db.with(likeCount, repostCount, quotesCount, replyCount, reposts, mediaAgg).select({
         post: Post,
         user: {
             userId: User.userId,
@@ -77,6 +48,7 @@ export function getPostsAndReposts(currentUser: TokenUser | undefined, username:
         quotes: sql<number> `COALESCE (${quotesCount.c}::INT, 0)`,
         replies: sql<number> `COALESCE (${replyCount.c}::INT, 0)`,
         isRepost: isNotNull(reposts.reposts.repostId),
+        media: mediaAgg.mediaArr,
         ...(currentUser && {
             liked: isNotNull(Likes.userId) as SQL<boolean>,
             reposted: isNotNull(Repost.userId) as SQL<boolean>
@@ -93,6 +65,7 @@ export function getPostsAndReposts(currentUser: TokenUser | undefined, username:
         .leftJoin(originalPost, eq(originalPost.postId, Post.replyTo))
         .leftJoin(originalPostAuthor, eq(originalPost.userId, originalPostAuthor.userId))
         .leftJoin(reposts, eq(reposts.reposts.postId, Post.postId))
+        .leftJoin(mediaAgg, eq(Post.postId, mediaAgg.postId))
         .orderBy(desc(sql<Date> `COALESCE(${reposts.reposts.dateCreated}, ${Post.dateCreated})`))
         .where(
             and(

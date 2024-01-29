@@ -1,52 +1,19 @@
+import { type Response } from "express";
 import { db } from "../db/drizzle";
 import { Likes, Post, Repost, User } from "../db/schema";
-import { SQL, and, count, eq, isNotNull, sql } from "drizzle-orm";
+import { SQL, and, eq, isNotNull, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
-import { TokenUser } from "../types";
+import { likeCount, repostCount, quotesCount, replyCount, mediaAgg } from "./postSubQueries";
 
-export async function getLikes(username: string, currentUser?: TokenUser) {
-
-    const likeCount = db.$with('l').as(
-        db.select({
-            postId: Likes.postId,
-            c: count().as('like_count'),
-        })
-            .from(Likes)
-            .groupBy(Likes.postId)
-    );
-    const repostCount = db.$with('r').as(
-        db.select({
-            postId: Repost.postId,
-            c: count().as('repost_count')
-        })
-            .from(Repost)
-            .groupBy(Repost.postId)
-    );
-    const quotesCount = db.$with('qc').as(
-        db.select({
-            quotedPost: Post.quotedPost,
-            c: count().as('quote_count')
-        })
-            .from(Post)
-            .groupBy(Post.quotedPost)
-    )
-    const replyCount = db.$with('rc').as(
-        db.select({
-            replyTo: Post.replyTo,
-            c: count().as('reply_count')
-        })
-            .from(Post)
-            .groupBy(Post.replyTo)
-    )
+export function getPosts(res: Response) {
+    const currentUser = res.locals.token?.user;
 
     const quote = alias(Post, 'q');
     const quoteAuthor = alias(User, 'qa');
     const originalPost = alias(Post, 'op');
     const originalPostAuthor = alias(User, 'opa');
-    const pageUser = alias(User, 'pu')
-    const allLikes = alias(Likes, 'al')
 
-    const query = db.with(likeCount, repostCount, quotesCount, replyCount).select({
+    const query = db.with(likeCount, repostCount, quotesCount, replyCount, mediaAgg).select({
         post: Post,
         user: {
             userId: User.userId,
@@ -68,6 +35,7 @@ export async function getLikes(username: string, currentUser?: TokenUser) {
             banner: originalPostAuthor.avatar,
             displayName: originalPostAuthor.displayName,
         },
+        media: mediaAgg.mediaArr,
         originalPost,
         likes: sql<number> `COALESCE (${likeCount.c}::INT, 0)`,
         reposts: sql<number> `COALESCE (${repostCount.c}::INT, 0)`,
@@ -78,13 +46,8 @@ export async function getLikes(username: string, currentUser?: TokenUser) {
             reposted: isNotNull(Repost.userId) as SQL<boolean>
         })
     })
-        .from(allLikes)
-        .innerJoin(Post, eq(allLikes.postId, Post.postId))
+        .from(Post)
         .innerJoin(User, eq(User.userId, Post.userId))
-        .innerJoin(pageUser, and(
-            eq(pageUser.userId, allLikes.userId),
-            eq(pageUser.usernameLower, username.toLowerCase())
-        ))
         .leftJoin(likeCount, eq(Post.postId, likeCount.postId))
         .leftJoin(repostCount, eq(Post.postId, repostCount.postId))
         .leftJoin(replyCount, eq(Post.postId, replyCount.replyTo))
@@ -93,6 +56,7 @@ export async function getLikes(username: string, currentUser?: TokenUser) {
         .leftJoin(quoteAuthor, eq(quote.userId, quoteAuthor.userId))
         .leftJoin(originalPost, eq(originalPost.postId, Post.replyTo))
         .leftJoin(originalPostAuthor, eq(originalPost.userId, originalPostAuthor.userId))
+        .leftJoin(mediaAgg, eq(Post.postId, mediaAgg.postId))
 
     if (currentUser) {
         query.leftJoin(Likes, and(eq(Post.postId, Likes.postId), eq(Likes.userId, currentUser?.userId)));

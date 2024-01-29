@@ -4,10 +4,10 @@ import { Hashtags, Likes, Media, Post, User } from "../db/schema";
 import AppError from "../utils/AppError";
 import { eq, desc, isNull } from "drizzle-orm";
 import { getHashtags } from "../utils/getHashtags";
-import { getPosts } from "../models/getPosts";
+import { getPosts } from "../queries/getPosts";
 import { formatPosts } from "../utils/formatPosts";
 import { PostgresError } from "postgres";
-import { postRepliesQuery } from "../models/postRepliesQuery";
+import { postRepliesQuery } from "../queries/postRepliesQuery";
 
 export async function createPost(req: Request, res: Response, next: NextFunction) {
     type Body = {
