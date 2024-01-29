@@ -1,4 +1,4 @@
-import { For, Match, Switch } from "solid-js";
+import { For, Match, Show, Switch } from "solid-js";
 import { PostResponse } from "~/api/postFetchers";
 import styles from "~/styles/components/Media.module.scss"
 
@@ -9,13 +9,15 @@ export function Media(props: P) {
         <div class={styles.container}>
             <For each={props.media}>
                 {m =>
-                    <Switch
+                    <Show
+                        when={m.is_video}
                         fallback={<img src={m.url} />}
                     >
-                        <Match when={m.isVideo}>
-                            <video src={m.url} />
-                        </Match>
-                    </Switch>
+                        <video
+                            src={m.url}
+                            controls
+                        />
+                    </Show>
                 }
             </For>
         </div>

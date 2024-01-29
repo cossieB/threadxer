@@ -113,6 +113,6 @@ export type PostResponse = {
     };
     media: {
         url: string,
-        isVideo: boolean
+        is_video: boolean
     }[] | null
 };

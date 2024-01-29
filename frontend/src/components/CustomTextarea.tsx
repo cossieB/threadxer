@@ -1,4 +1,4 @@
-import { JSX, Show, createSignal, mergeProps } from "solid-js";
+import { JSX, Show, createEffect, createSignal, mergeProps } from "solid-js";
 import titleCase from "~/lib/titleCase";
 import styles from "~/styles/components/form.module.scss";
 import { CharacterCounter } from "./CharacterCounter";
@@ -22,8 +22,11 @@ export function CustomTextarea(props: Props) {
 }
 
 export function TextareaWithCounter(props: Require<Props, 'maxLength'>) {
-    const [input, setInput] = createSignal(typeof props.value == 'string' ? props.value : "")
+    const [input, setInput] = createSignal(props.value as string ?? "")
     const merged = mergeProps({ label: props.name, required: true }, props)
+    createEffect(() => {
+        setInput(props.value as string ?? "")
+    })
     return (
         <>
             <div class={styles.formControl}  >

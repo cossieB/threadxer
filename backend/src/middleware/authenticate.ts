@@ -14,7 +14,7 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
     const at = authHeader.split(" ")[1]; 
     try {
         const token = jwt.verify(at, process.env.ACCESS_TOKEN_SECRET!) as {user: TokenUser, iat: number};
-        res.locals.token = token; 
+        res.locals.token = token;
     } 
     catch (error) {
         res.locals.authError = new AppError('Invalid Token', 403)

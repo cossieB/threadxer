@@ -35,9 +35,16 @@ export async function updateUser(req: Request, res: Response, next: NextFunction
         const user = res.locals.token!.user;
         if (req.body.website && !validateUrl(req.body.website))
             throw new AppError("Please don't bypass client validation", 400)
-        const { displayName, bio, website, location, avatar, banner } = req.body;
 
-        const { accessToken, cookie, fb } = await handleTokens({...token.user, displayName, bio, website, location, avatar, banner }, async refreshToken => {
+        const { body } = req
+        const validKeys = ['displayName', 'bio', 'website', 'location', 'avatar', 'banner']
+
+        Object.keys(body).forEach(key => {
+            if (!validKeys.includes(key))
+                delete body[key]
+        })
+
+        const { accessToken, cookie, fb } = await handleTokens({ ...token.user, ...req.body }, async refreshToken => {
             await db.transaction(async tx => {
                 await tx.delete(RefreshTokens).where(eq(RefreshTokens.token, refresh))
                 await tx.insert(RefreshTokens).values({
@@ -46,7 +53,7 @@ export async function updateUser(req: Request, res: Response, next: NextFunction
                 })
                 await tx
                     .update(User)
-                    .set({ displayName, bio, website, location, avatar, banner })
+                    .set({ ...req.body })
                     .where(eq(User.userId, user.userId))
             })
         })

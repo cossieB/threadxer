@@ -11,6 +11,7 @@
 - [x] create post with quote
 - [x] reply to post
 - [ ] upload images and clips
+- [ ] delete posts
 
 ## Post Page
 - [x] Replies
@@ -23,6 +24,8 @@
 
 ## User preferences
 - [ ] light/dark mode
+- [ ] delete banner image
+- [ ] fancy birthday input
 
 ## Miscellaneous
 - [ ] View count
