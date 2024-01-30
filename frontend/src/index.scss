@@ -26,6 +26,9 @@ body {
     &.modalOpen {
         overflow: hidden;
     }
+    &:has(.modal) {
+        overflow: hidden;
+    }
 }
 * {
     box-sizing:border-box

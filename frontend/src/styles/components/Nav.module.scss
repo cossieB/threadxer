@@ -13,13 +13,13 @@
     align-items: center;
     flex-shrink: 0;
     position: fixed;
-    z-index: 999;
     @media (max-width: 768px) {
         background-color: black;
         justify-content: space-around;
         width: 100vw;
         height: var(--nav-height);
         bottom: 0;
+        z-index: 999;
     }
     @media (min-width: 768px) {
         flex-direction: column;
