@@ -13,6 +13,7 @@
     align-items: center;
     flex-shrink: 0;
     position: fixed;
+    z-index: 999;
     @media (max-width: 768px) {
         background-color: black;
         justify-content: space-around;

@@ -4,7 +4,7 @@ import { Show } from "solid-js";
 import { PostResponse } from "~/api/postFetchers";
 import { PostBoxButtons, PostBoxContent, PostBoxHeader } from "./PostBox.components";
 import { RepostSvg } from "~/svgs";
-import { Media } from "../Media";
+import { MediaList } from "../Media";
 
 export function PostBox(props: { post: PostResponse }) {
     const navigate = useNavigate()
@@ -20,15 +20,12 @@ export function PostBox(props: { post: PostResponse }) {
             </Show>
             <div class={styles.box} onclick={() => navigate(`/posts/${props.post.post.postId}`)}>
 
-                <div
-                    class={styles.avatar}
-                    onclick={(e) => {
+                <div class={styles.avatar}>
+                    <img src={props.post.user?.avatar} onclick={(e) => {
                         console.log(e.target)
                         navigate(`/users/${props.post.user.username}`)
                         e.stopPropagation()
-                    }}
-                >
-                    <img src={props.post.user?.avatar} />
+                    }} />
                 </div>
                 <div class={styles.div} >
                     <Show when={props.post.isRepost}>
@@ -41,7 +38,7 @@ export function PostBox(props: { post: PostResponse }) {
                     />
                     <PostBoxContent text={props.post.post.text} />
                     <Show when={!!props.post.media}>
-                        <Media media={props.post.media!} />
+                        <MediaList media={props.post.media!} />
                     </Show>
                     <PostBoxButtons {...props} />
                 </div>
