@@ -4,6 +4,7 @@ import { PostResponse } from "~/api/postFetchers";
 import clickOutside from "~/lib/clickOutside";
 import styles from "~/styles/components/Media.module.scss"
 import { RoundBtn } from "./shared/buttons/RoundBtn";
+import { Transition, TransitionGroup } from "solid-transition-group";
 false && clickOutside
 
 type P = { media: NonNullable<PostResponse['media']> }
@@ -79,21 +80,43 @@ type P2 = {
 } & P
 
 function Slideshow(props: P2) {
+    let direction = 1
     return (
         <Portal ref={el => el.classList.add('modal')}>
             <div class={styles.slideshow} use:clickOutside={props.close}>
                 <Show when={props.i !== 0}>
                     <RoundBtn
-                        onclick={() => props.changeSlide(-1)}
+                        onclick={() => {
+                            direction = 1
+                            props.changeSlide(-1)
+                        }}
                         data-btn="prev"
                     >
                         ←
                     </RoundBtn>
                 </Show>
+                <TransitionGroup
+                    onEnter={(el, done) => {
+                        const a = el.animate([{transform: `translateX(${direction * 100}vw)`}, {transform: "translateX(0)"}], {
+                            duration: 250
+                        });
+                        a.finished.then(done)
+                    }}
+                    onExit={(el, done) => {
+                        const a = el.animate([{transform: "translateX(0)"}, {transform: `translateX(${-direction * 100}vw)`} ], {
+                            duration: 250
+                        });
+                        a.finished.then(done)
+                    }}
+                >
                 <Media m={props.media[props.i]} />
+                </TransitionGroup>
                 <Show when={props.i !== props.media.length - 1}>
                     <RoundBtn
-                        onclick={() => props.changeSlide(1)}
+                        onclick={() => {
+                            direction = -1
+                            props.changeSlide(1)
+                        }}
                         data-btn="next"
                     >
                         →
