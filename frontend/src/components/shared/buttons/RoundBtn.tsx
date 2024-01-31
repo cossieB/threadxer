@@ -8,7 +8,7 @@ type P = {
 export function RoundBtn(props: P) {
     const [p, others] = splitProps(props, ['children'])
     return (
-        <button class={styles.round} onclick={props.onclick} {...others}>
+        <button ref={props.ref} class={styles.round} onclick={props.onclick} {...others}>
             {p.children}
         </button>
     )

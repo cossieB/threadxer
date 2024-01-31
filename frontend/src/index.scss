@@ -5,7 +5,7 @@
     width: 100vw;
     height: 100vh;
 };
-@include mixins.hideScrollbar('body');
+
 :root {
     --sidepanelWidth: 25%;
     --nav-height: 5rem;
@@ -14,6 +14,7 @@
     --gray2: hsl(0, 0%, 50%);
     font-family: 'Roboto', sans-serif;
     font-size: 12px;
+    scrollbar-width: none;
     @media (min-width: 768px) {
         font-size: 16px;
     }
