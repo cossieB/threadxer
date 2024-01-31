@@ -1,5 +1,5 @@
 import { type JSX, Match, Switch } from "solid-js"
-import Loader from "../shared/Loader/Loader"
+import Loader from "../Loader/Loader"
 import styles from "~/styles/components/form.module.scss"
 
 type Props = {

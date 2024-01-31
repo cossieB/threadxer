@@ -14,24 +14,25 @@
 }
 
 .slideshow {
-    all: unset;
+    background-color: unset !important;
     @include mixins.flexCenter;
     height: 80%;
     width: 80%;
     position: relative;
     img, video {
         width: 100%;
-        height: 100%;
+        // height: 100%;
     }
     button {
         position: absolute;
-        height: 100%;
+        &:hover {
+            background-color: var(--gray1);
+        }
     }
-}
-
-.prevBtn {
-    left: 0;
-}
-.nextBtn {
-    right: 0;
+    [data-btn="prev"] {
+        left: 0;
+    }
+    [data-btn="next"] {
+        right: 0;
+    }
 }

@@ -1,6 +1,6 @@
 @use '~/styles/mixins';
 
-.btn {
+.round {
     @include mixins.flexCenter;
     background: none;
     border: none;

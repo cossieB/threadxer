@@ -5,7 +5,6 @@ import { CustomInput } from "~/components/CustomInput";
 import { TextareaWithCounter } from "~/components/CustomTextarea";
 import Loader from "~/components/shared/Loader/Loader";
 import Page from "~/components/shared/Page";
-import { SubmitButton } from "~/components/shared/SubmitButton";
 import UserForm from "~/components/shared/UserForm";
 import auth from "~/globalState/auth";
 import { validateUrl } from "~/lib/validateUrl";
@@ -14,6 +13,7 @@ import { DeleteSvg } from "~/svgs";
 import { UploadBtn } from "../components/ImageUploader/UploadBtn";
 import { Popup } from "~/components/shared/Popup";
 import { useUser } from "~/data/user";
+import { SubmitButton } from "~/components/shared/buttons/SubmitButton";
 
 const [fieldErrors, setFieldErrors] = createStore({
     username: [] as string[],

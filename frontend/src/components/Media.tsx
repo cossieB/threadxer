@@ -3,6 +3,7 @@ import { Portal } from "solid-js/web";
 import { PostResponse } from "~/api/postFetchers";
 import clickOutside from "~/lib/clickOutside";
 import styles from "~/styles/components/Media.module.scss"
+import { RoundBtn } from "./shared/buttons/RoundBtn";
 false && clickOutside
 
 type P = { media: NonNullable<PostResponse['media']> }
@@ -81,13 +82,23 @@ function Slideshow(props: P2) {
     return (
         <Portal ref={el => el.classList.add('modal')}>
             <div class={styles.slideshow} use:clickOutside={props.close}>
-                <button disabled={props.i == 0} class={styles.prevBtn} onclick={() => props.changeSlide(-1)}>
-                    PREV
-                </button>
+                <Show when={props.i !== 0}>
+                    <RoundBtn
+                        onclick={() => props.changeSlide(-1)}
+                        data-btn="prev"
+                    >
+                        ←
+                    </RoundBtn>
+                </Show>
                 <Media m={props.media[props.i]} />
-                <button disabled={props.i == props.media.length - 1} class={styles.nextBtn} onclick={() => props.changeSlide(1)}>
-                    NEXT
-                </button>
+                <Show when={props.i !== props.media.length - 1}>
+                    <RoundBtn
+                        onclick={() => props.changeSlide(1)}
+                        data-btn="next"
+                    >
+                        →
+                    </RoundBtn>
+                </Show>
             </div>
         </Portal>
     )

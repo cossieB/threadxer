@@ -5,7 +5,7 @@ import { Popup } from '../../components/shared/Popup';
 import { Show, createMemo } from 'solid-js';
 import titleCase from '~/lib/titleCase';
 import { Validator } from '../../utils/Validator';
-import { SubmitButton } from '../../components/shared/SubmitButton';
+import { SubmitButton } from '../../components/shared/buttons/SubmitButton';
 import { sendAuthRequest } from '~/utils/sendAuthRequest';
 import { Navigate, useNavigate } from '@solidjs/router';
 import auth from '~/globalState/auth';

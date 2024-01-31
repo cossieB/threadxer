@@ -1,7 +1,7 @@
 import { Show, createSignal, onCleanup, onMount } from "solid-js";
 import styles from "~/styles/components/Composer.module.scss"
-import { CloseBtn } from "./shared/CloseBtn";
-import { SubmitButton } from "./shared/SubmitButton";
+import { CloseBtn } from "./shared/buttons/Buttons";
+import { SubmitButton } from "./shared/buttons/SubmitButton";
 import clickOutside from "~/lib/clickOutside";
 import { CharacterCounter } from "./CharacterCounter";
 import { Portal } from "solid-js/web";

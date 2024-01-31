@@ -17,7 +17,6 @@ export function usePost() {
         queryFn: key => getPost(key.queryKey[2]),
         initialData: () => {
             const posts = queryClient.getQueryData<PostResponse[]>(['posts'])
-            console.log(posts)
             return posts?.find(p => p.post.postId == params.postId)
         },
         retry(failureCount, error) {
