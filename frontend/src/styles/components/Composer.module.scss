@@ -17,6 +17,8 @@
         opacity: 0.25;
     }
     >div:first-child {
+        overflow: scroll;
+        scrollbar-width: none;
         position: absolute;
         background-color: #181818;
         top: 5%;
@@ -25,6 +27,7 @@
         border-radius: 0.75rem;
         padding: 0.5rem;
         width: min(90%, 50rem);
+        max-height: 90vh;
     }
     textarea {
         width: 100%;

@@ -1,8 +1,8 @@
-import { Show, onMount } from "solid-js";
+import { For, Show, onMount } from "solid-js";
 import { Portal } from "solid-js/web";
 import styles from "~/styles/components/Media.module.scss";
 import { RoundBtn } from "./shared/buttons/RoundBtn";
-import { TransitionGroup } from "solid-transition-group";
+import { Transition, TransitionGroup } from "solid-transition-group";
 import { P, Media } from "./Media";
 import clickOutside from "~/lib/clickOutside";
 false && clickOutside
@@ -44,22 +44,28 @@ export function Slideshow(props: P2) {
                         ←
                     </RoundBtn>
                 </Show>
-                <TransitionGroup
+                <Transition
                     onEnter={(el, done) => {
-                        const a = el.animate([{ transform: `translateX(${direction * 100}vw)` }, { transform: "translateX(0)" }], {
+                        const a = el.animate([{ transform: `translateX(${-direction * 100}vw)` }, { transform: "translateX(0)" }], {
                             duration: 250
                         });
                         a.finished.then(done);
                     }}
                     onExit={(el, done) => {
-                        const a = el.animate([{ transform: "translateX(0)" }, { transform: `translateX(${-direction * 100}vw)` }], {
+                        const a = el.animate([{ transform: "translateX(0)" }, { transform: `translateX(${direction * 100}vw)` }], {
                             duration: 250
                         });
                         a.finished.then(done);
                     }}
                 >
-                    <Media m={props.media[props.i]} />
-                </TransitionGroup>
+                    <For each={props.media}>
+                        {(m, i) => 
+                            <Show when={props.i == i()}>
+                                <Media m={m} />
+                            </Show>
+                        }
+                    </For>
+                </Transition>
                 <Show when={props.i !== props.media.length - 1}>
                     <RoundBtn
                         onclick={() => {
