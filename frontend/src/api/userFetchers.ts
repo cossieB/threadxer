@@ -74,3 +74,10 @@ export async function mutateUserImage(obj: { field: 'avatar' | 'banner'; url: st
     }
     throw await handleApiError(res);
 }
+
+export async function fetchUserMedia(username: string) {
+    const res = await customFetch(`/api/users/${username.toLowerCase()}/media`)
+    if (res.ok) 
+        return await res.json() as {is_video: boolean, url: string, postId: string}[]
+    handleApiError(res)
+}

@@ -16,6 +16,7 @@ import VerifyEmail from './routes/auth/Verify';
 import UserPage from './routes/[username]/(username)';
 import { Likes, Replies, UserPosts } from './routes/[username]/Replies';
 import { PostLikes, PostQuotes, PostReplies } from './routes/[postId]/Engagement';
+import { UserMedia } from './routes/[username]/UserMedia';
 
 const root = document.getElementById('root');
 const queryClient = new QueryClient({
@@ -46,7 +47,7 @@ render(() =>
                 <Route path={["/", "/posts"]} component={UserPosts} />
                 <Route path={"/replies"} component={Replies} />
                 <Route path={"/likes"} component={Likes} />
-                <Route path={"media"} component={() => <p>TODO: User media</p>}  />
+                <Route path={"media"} component={UserMedia}  />
             </Route>
             <Route path="/posts/:postId" component={PostPage} >
                 <Route path={["/", "/replies"]} component={PostReplies} />

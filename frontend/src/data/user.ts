@@ -1,7 +1,7 @@
 import { createQuery, createMutation, useQueryClient } from "@tanstack/solid-query";
 import auth from "~/globalState/auth";
 import { useParams } from "@solidjs/router";
-import { fetchUser, mutateUser, ApiUserResponse, fetchUserPosts, fetchUserLikes } from "../api/userFetchers";
+import { fetchUser, mutateUser, ApiUserResponse, fetchUserPosts, fetchUserLikes, fetchUserMedia } from "../api/userFetchers";
 import { mutateUserImage } from "../api/userFetchers";
 
 export function useUser(username: string) {
@@ -71,3 +71,10 @@ export function useUserLikes() {
     }))
 }
 
+export function useUserMedia() {
+    const params = useParams()
+    return createQuery(() => ({
+        queryKey: ['media', params.username.toLowerCase()],
+        queryFn: key => fetchUserMedia(key.queryKey[1])
+    }))
+}

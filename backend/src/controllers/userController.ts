@@ -111,7 +111,8 @@ export async function getUserMedia(req: Request, res: Response, next: NextFuncti
             .from(Media)
             .innerJoin(Post, eq(Media.postId, Post.postId))
             .innerJoin(User, eq(Post.userId, User.userId))
-            .where(eq(User.usernameLower, username.toLowerCase()));
+            .where(eq(User.usernameLower, username.toLowerCase()))
+            .orderBy(desc(Post.dateCreated))
 
         return res.json(media)
     }
