@@ -1,7 +1,7 @@
 import AppError from "../utils/AppError";
 import { db } from "../db/drizzle";
 import type { Request, Response, NextFunction } from "express";
-import { Post, RefreshTokens, User } from "../db/schema";
+import { Media, Post, RefreshTokens, User } from "../db/schema";
 import { and, eq, desc, isNotNull } from "drizzle-orm";
 import { validateUrl } from "../lib/validateUrl";
 import { getPosts } from "../queries/getPosts";
@@ -98,4 +98,24 @@ export async function getUserLikes(req: Request, res: Response, next: NextFuncti
     const currentUser = res.locals.token?.user
     const posts = await getLikes(username, currentUser);
     res.json(posts.map(formatPosts))
+}
+
+export async function getUserMedia(req: Request, res: Response, next: NextFunction) {
+    const { username } = req.params;
+    try {
+        const media = await db.select({
+            url: Media.url,
+            is_video: Media.isVideo,
+            postId: Media.postId,
+        })
+            .from(Media)
+            .innerJoin(Post, eq(Media.postId, Post.postId))
+            .innerJoin(User, eq(Post.userId, User.userId))
+            .where(eq(User.usernameLower, username.toLowerCase()));
+
+        return res.json(media)
+    }
+    catch (error) {
+        next(error)
+    }
 }
