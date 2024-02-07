@@ -4,9 +4,10 @@ import auth from './globalState/auth';
 import { PostComposer } from './components/PostComposer';
 import { composerState } from './globalState/composer';
 import { Toast } from './components/ErrorPopups';
+import { client } from './trpc';
 
 function App(props: { children?: JSXElement }) {
-
+    client
     createEffect(() => {
         if (composerState.isOpen)
             document.body.classList.add("modalOpen")
