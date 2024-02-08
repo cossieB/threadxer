@@ -1,13 +1,11 @@
-import { type trpcServer } from '@hono/trpc-server'
+import { CreateFastifyContextOptions } from "@trpc/server/adapters/fastify"
 import { getUserFromHeader } from "./utils/getUserFromHeader";
 
-type A = Parameters<typeof trpcServer>[0]['createContext']
-type B = Parameters<NonNullable<A>>[0]
+export async function createContext({req, res}: CreateFastifyContextOptions) {
+    console.log(res)
+    const user = getUserFromHeader(req.headers)
 
-export async function createContext(opts: B) {
-    const user = await getUserFromHeader(opts.req.headers)
-
-    return {user}
+    return {user, req, res}
 }
 
 export type Context = Awaited<ReturnType<typeof createContext>>
