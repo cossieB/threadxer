@@ -116,12 +116,11 @@ export const authRouter = router({
         password: z.string()
     }))
         .mutation(async ({ input, ctx }) => {
-            rateLimiter({
+            await rateLimiter({
                 ctx,
                 limit: 5,
                 window: 30,
-                name: 'login',
-                req: ctx.req
+                name: 'login'
             })
             try {
                 const { email, password } = input;
