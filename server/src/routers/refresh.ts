@@ -4,7 +4,6 @@ import { TRPCError } from "@trpc/server";
 import { eq } from 'drizzle-orm';
 import { db } from '../db/drizzle';
 import { RefreshTokens } from '../db/schema';
-import AppError from '../utils/AppError';
 import { handleTokens } from '../utils/generateCookies';
 
 export const refreshRoutes = router({
