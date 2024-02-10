@@ -71,7 +71,7 @@ export async function verifyUser(req: Request, res: Response, next: NextFunction
         res.setHeader('Set-Cookie', cookie)
         return res.json({ jwt: newAccessToken, fb })
     } catch (error) {
-        next(error)
+        throw new TRPCError({code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong. Please try again later."})
     }
 }
 
@@ -101,6 +101,6 @@ export async function resendVerificationToken(req: Request, res: Response, next:
             if (error.message.includes("violates foreign key constraint"))
                 throw new TRPCError({code: 'BAD_REQUEST', message: "User Not Found"})
         }
-        next(error)
+        throw new TRPCError({code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong. Please try again later."})
     }
 }

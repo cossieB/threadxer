@@ -47,7 +47,7 @@ export async function sendMail(subject: string, to: string, message: string) {
         await transport.sendMail(options);
         transport.close()
     } catch (error) {
-        console.log(error)
+        console.error(error)
         throw error
     }
 }

@@ -61,7 +61,7 @@ export async function updateUser(req: Request, res: Response, next: NextFunction
         return res.json({ jwt: accessToken, fb })
     }
     catch (error) {
-        next(error)
+        throw new TRPCError({code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong. Please try again later."})
     }
 }
 
@@ -117,6 +117,6 @@ export async function getUserMedia(req: Request, res: Response, next: NextFuncti
         return res.json(media)
     }
     catch (error) {
-        next(error)
+        throw new TRPCError({code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong. Please try again later."})
     }
 }

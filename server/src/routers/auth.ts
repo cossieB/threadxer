@@ -48,7 +48,7 @@ export const authRouter = router({
                 throw new TRPCError({ code: "BAD_REQUEST" });
             }
             catch (error) {
-                console.log(error);
+                console.error(error);
                 throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Something Went wrong. Please try again later" })
             }
         }),
