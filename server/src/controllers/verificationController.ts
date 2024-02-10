@@ -12,7 +12,7 @@ import { redis } from "../utils/redis";
 export async function verifyUser(req: Request, res: Response, next: NextFunction) {
     const oldAccessToken = res.locals.token!;
     if (!oldAccessToken.user.isUnverified)
-        return next(new AppError("Already verified", 400))
+        throw new TRPCError({code: 'BAD_REQUEST', message: "Already verified"})
     let storedCode: string;
     const cachedCode = await redis.get(`verification:${oldAccessToken.user.userId}`)
     if (cachedCode)
@@ -38,7 +38,7 @@ export async function verifyUser(req: Request, res: Response, next: NextFunction
                 redis.setex(`verification:${oldAccessToken.user.userId}`, 259200, code)
             ])
             draftVerificationEmail(oldAccessToken.user.username, code, oldAccessToken.user.email)
-            return next(new AppError("Code expired. Check your email for a new code.", 400))
+            throw new TRPCError({code: 'BAD_REQUEST', message: "Code expired. Check your email for a new code."})
         }
         await redis.setex(`verification:${oldAccessToken.user.userId}`, 259200, row.code)
         storedCode = row.code
@@ -99,7 +99,7 @@ export async function resendVerificationToken(req: Request, res: Response, next:
     catch (error) {
         if (error instanceof PostgresError) {
             if (error.message.includes("violates foreign key constraint"))
-                return next(new AppError("User Not Found", 400))
+                throw new TRPCError({code: 'BAD_REQUEST', message: "User Not Found"})
         }
         next(error)
     }

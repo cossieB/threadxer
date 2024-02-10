@@ -5,8 +5,7 @@ import { SQL, and, count, eq, isNotNull, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { likeCount, repostCount, quotesCount, replyCount, mediaAgg } from "./postSubQueries";
 
-export function postRepliesQuery(res: Response) {
-    const currentUser = res.locals.token?.user;
+export function postRepliesQuery(loggedInUserId?: string) {
 
     const quote = alias(Post, 'q');
     const quoteAuthor = alias(User, 'qa');
@@ -34,7 +33,7 @@ export function postRepliesQuery(res: Response) {
         quotes: sql<number> `COALESCE (${quotesCount.c}::INT, 0)`,
         replies: sql<number> `COALESCE (${replyCount.c}::INT, 0)`,
         media: mediaAgg.mediaArr,
-        ...(currentUser && {
+        ...(loggedInUserId && {
             liked: isNotNull(Likes.userId) as SQL<boolean>,
             reposted: isNotNull(Repost.userId) as SQL<boolean>
         })
@@ -49,9 +48,9 @@ export function postRepliesQuery(res: Response) {
         .leftJoin(quoteAuthor, eq(quote.userId, quoteAuthor.userId))
         .leftJoin(mediaAgg, eq(Post.postId, mediaAgg.postId))
 
-    if (currentUser) {
-        query.leftJoin(Likes, and(eq(Post.postId, Likes.postId), eq(Likes.userId, currentUser?.userId)));
-        query.leftJoin(Repost, and(eq(Post.postId, Repost.postId), eq(Repost.userId, currentUser?.userId)));
+    if (loggedInUserId) {
+        query.leftJoin(Likes, and(eq(Post.postId, Likes.postId), eq(Likes.userId, loggedInUserId)));
+        query.leftJoin(Repost, and(eq(Post.postId, Repost.postId), eq(Repost.userId, loggedInUserId)));
     }
 
     return query;

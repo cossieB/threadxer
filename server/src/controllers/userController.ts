@@ -26,7 +26,7 @@ export async function getUser(req: Request, res: Response, next: NextFunction) {
 
 export async function updateUser(req: Request, res: Response, next: NextFunction) {
     if (Object.keys(req.body).length === 0)
-        return next(new AppError("Empty request body", 400))
+        throw new TRPCError({code: 'BAD_REQUEST', message: "Empty request body"})
 
     const refresh = req.cookies.rf;
     const token = jwt.verify(refresh, process.env.REFRESH_TOKEN_SECRET!) as JwtPayload;
