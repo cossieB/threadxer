@@ -63,6 +63,7 @@ export const postRouter = router({
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' })
             }
         }),
+
     getPost: publicProcedure.input(z.string())
         .query(async ({ ctx, input }) => {
             try {
@@ -81,6 +82,7 @@ export const postRouter = router({
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong. Please try again later" })
             }
         }),
+
     getAllPosts: publicProcedure
         .input(z.object({
             page: z.number().optional().default(0)
@@ -97,6 +99,7 @@ export const postRouter = router({
 
             return posts.map(formatPosts)
         }),
+
     getPostReplies: publicProcedure
         .input(z.object({
             postId: z.string().uuid(),
@@ -118,6 +121,7 @@ export const postRouter = router({
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong. Please try again later" })
             }
         }),
+
     getPostQuotes: publicProcedure
         .input(z.object({
             postId: z.string().uuid(),
@@ -139,6 +143,7 @@ export const postRouter = router({
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong. Please try again later" })
             }
         }),
+        
     getPostLikes: publicProcedure
         .input(z.object({
             postId: z.string().uuid(),

@@ -1,30 +1,44 @@
 import { useParams } from "@solidjs/router";
 import { createQuery, useQueryClient, createMutation } from "@tanstack/solid-query";
-import { getEngagement, getPostLikes } from "~/api/engagementFetchers";
-import { likeOrUnlikePost } from "~/api/engagementFetchers";
-import { repostOrUnrepost } from "~/api/engagementFetchers";
+import { trpcClient } from "~/trpc";
 import { modifyLikesAndRepostsInCache } from "~/utils/modifyLikesAndRepostsInCache";
 
-
-export function useEngagement(engagement: 'replies'  | 'quotes') {
+export function useQuotes(page?: number) {
     const params = useParams();
     return createQuery(() => ({
-        queryKey: ['posts', params.postId, engagement],
-        queryFn: key => getEngagement(key.queryKey[1], engagement)
+        queryKey: ['posts', params.postId, 'quotes'],
+        queryFn: key => trpcClient.posts.getPostQuotes.query({
+            postId: key.queryKey[1],
+            page
+        })
     }))
 }
 
-export function usePostLikes() {
+export function useReplies(page?: number) {
+    const params = useParams();
+    return createQuery(() => ({
+        queryKey: ['posts', params.postId, 'replies'],
+        queryFn: key => trpcClient.posts.getPostReplies.query({
+            postId: key.queryKey[1],
+            page
+        })
+    }))
+}
+export function usePostLikes(page?: number) {
     const params = useParams();
     return createQuery(() => ({
         queryKey: ['posts', params.postId, 'likes'],
-        queryFn: key => getPostLikes(key.queryKey[1])
+        queryFn: key => trpcClient.posts.getPostLikes.query({
+            postId: key.queryKey[1],
+            page
+        })
     }))
 }
+
 export function useLikes() {
     const queryClient = useQueryClient();
     const mutation = createMutation(() => ({
-        mutationFn: likeOrUnlikePost,
+        mutationFn: trpcClient.likes.likePost.mutate,
         onMutate: modifyLikesAndRepostsInCache('likes', queryClient),
         onError(error, variables, context) {
             queryClient.setQueriesData({
@@ -37,7 +51,7 @@ export function useLikes() {
 export function useRepost() {
     const queryClient = useQueryClient();
     const mutation = createMutation(() => ({
-        mutationFn: repostOrUnrepost,
+        mutationFn: trpcClient.reposts.repostPost.mutate,
         onMutate: modifyLikesAndRepostsInCache('reposts', queryClient),
         onError(error, variables, context) {
             queryClient.setQueriesData({

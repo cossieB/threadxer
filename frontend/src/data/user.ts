@@ -1,12 +1,10 @@
 import { createQuery, createMutation, useQueryClient } from "@tanstack/solid-query";
 import auth from "~/globalState/auth";
 import { useParams } from "@solidjs/router";
-import { fetchUser, mutateUser, ApiUserResponse, fetchUserPosts, fetchUserLikes, fetchUserMedia } from "../api/userFetchers";
-import { mutateUserImage } from "../api/userFetchers";
 import { trpcClient } from "~/trpc";
 
 export function useUser(username: string) {
-    const queryClient = useQueryClient()
+
     const query = createQuery(() => ({
         get enabled() {
             return !!username
@@ -32,18 +30,13 @@ export function useUser(username: string) {
         } : undefined
     }))
 
-    const mutation = createMutation(() => ({
-        mutationFn: mutateUser,
-        onSuccess() {
-            queryClient.invalidateQueries({
-                queryKey: ['users', auth.user.username.toLowerCase()]
-            })
-        },
-        onError(error) {
-            console.log(error)
-        },
-    }))
-    const imageMutation = createMutation(() => ({
+    return query 
+}
+
+export function useUserMutation() {
+    const queryClient = useQueryClient()
+    type ApiUserResponse = Awaited<ReturnType<typeof trpcClient.user.getUser.query>>
+    return createMutation(() => ({
         mutationFn: trpcClient.user.updateUser.mutate,
         onSuccess(data, variables, context) {
             queryClient.setQueryData(['users', auth.user.username.toLowerCase()], (old: ApiUserResponse) => ({
@@ -53,8 +46,8 @@ export function useUser(username: string) {
             auth.createUser(data.jwt)
         },
     }))
-    return { mutation, imageMutation, query }
 }
+
 export function useUserPosts(page?: number) {
     const params = useParams()
 
@@ -81,6 +74,8 @@ export function useUserMedia() {
     const params = useParams()
     return createQuery(() => ({
         queryKey: ['media', params.username.toLowerCase()],
-        queryFn: key => fetchUserMedia(key.queryKey[1])
+        queryFn: key => trpcClient.user.getUserMedia.query({
+            username: key.queryKey[1]
+        })
     }))
 }
