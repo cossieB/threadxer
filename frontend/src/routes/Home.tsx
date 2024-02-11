@@ -1,12 +1,12 @@
 import { PostLists } from "~/components/PostLists"
 import Page from "~/components/shared/Page"
-import { usePost } from "~/data/post"
+import { useAllPosts, usePost } from "~/data/post"
 
 export default function Home() {
-    const {allPostsQuery} = usePost()
+    const query = useAllPosts()
     return (
         <Page title="Home">
-            <PostLists query={allPostsQuery} />
+            <PostLists query={query} />
         </Page>
     )
 }

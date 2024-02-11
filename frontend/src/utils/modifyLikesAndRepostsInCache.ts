@@ -1,5 +1,5 @@
 import { QueryClient } from "@tanstack/solid-query";
-import { PostResponse } from "~/api/postFetchers";
+import { PostResponse } from "~/routes/[username]/Replies";;
 
 export function modifyLikesAndRepostsInCache(field: 'likes' | 'reposts', queryClient: QueryClient) {
     return async function (postId: string) {

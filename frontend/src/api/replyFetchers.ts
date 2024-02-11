@@ -1,5 +1,5 @@
 import { customFetch } from "~/utils/customFetcher";
-import { PostResponse } from "~/api/postFetchers";
+import { PostResponse } from "~/routes/[username]/Replies";;
 import { handleApiError } from "./handleApiError";
 
 //fetchers

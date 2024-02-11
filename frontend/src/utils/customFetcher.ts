@@ -1,4 +1,7 @@
+import { TRPCClientError } from "@trpc/client";
 import auth from "~/globalState/auth"
+import { trpcClient } from "~/trpc";
+import { AppRouter } from 'threadxer-server'
 
 type U = Parameters<typeof fetch>[0]
 type V = Parameters<typeof fetch>[1]
@@ -23,21 +26,26 @@ export async function customFetch(url: U, requestOpts?: V) {
 }
 
 async function refresh() {
-    const result = await fetch('/api/auth/refresh')
-    if (result.status == 401 || result.status == 403) {
-        return auth.deleteUser()
-    }
-    if (result.ok) {
-        const data = await result.json()
+    try {
+        const data = await trpcClient.refresh.getAccessToken.query(undefined);
         await auth.firebaseSignin(data.fb)
         return auth.createUser(data.jwt)
     }
-    return {
-        username: "",
-        email: "",
-        avatar: "",
-        banner: "",
-        isUnverified: false,
-        userId: ""
+    catch (e: unknown) {
+        if (e instanceof TRPCClientError) {
+            let error = e as TRPCClientError<AppRouter['refresh']>
+            console.log(error.data)
+            if (error.data!.httpStatus == 401 || error.data!.httpStatus == 403) {
+                return auth.deleteUser()
+            }
+            return {
+                username: "",
+                email: "",
+                avatar: "",
+                banner: "",
+                isUnverified: false,
+                userId: ""
+            }
+        }
     }
 }

@@ -1,6 +1,7 @@
 import { customFetch } from "~/utils/customFetcher";
 import { handleApiError } from "./handleApiError";
 import { validateAndUpload } from "~/utils/uploadToFirebase";
+import { trpcClient } from "~/trpc";
 
 export async function createPost({ media, ...post }: CreatePost) {
     const urls = await Promise.all(validateAndUpload(media ?? [], 'media', 8))
@@ -28,13 +29,7 @@ export async function createPost({ media, ...post }: CreatePost) {
     throw await handleApiError(res);
 }
 export async function getAllPosts() {
-    const res = await customFetch('/api/posts');
-
-    if (res.ok) {
-        const data = await res.json() as PostResponse[];
-        return data;
-    }
-    throw await handleApiError(res);
+    return await trpcClient.posts.getAllPosts.query({});
 }
 export async function getPost(postId: string) {
     const res = await customFetch(`/api/posts/${postId}`);

@@ -1,7 +1,10 @@
 import { initTRPC, TRPCError } from '@trpc/server'
 import { Context } from './context'
+import SuperJSON from 'superjson'
 
-const t = initTRPC.context<Context>().create()
+const t = initTRPC.context<Context>().create({
+    transformer: SuperJSON
+})
 
 export const publicProcedure = t.procedure
 export const protectedProcedure = t.procedure.use(async(opts) => {

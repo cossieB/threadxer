@@ -8,7 +8,7 @@
     img, video {
         width: 50%;
         flex: 1;
-        height: 15rem;
+        max-height: 15rem;
         object-fit: contain;
     }
 }

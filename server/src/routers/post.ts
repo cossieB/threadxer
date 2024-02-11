@@ -55,7 +55,8 @@ export const postRouter = router({
                         })))
                     return row[0].postId
                 })
-                return ctx.res.status(201).send({ postId })
+                ctx.res.status(201)
+                return postId
             }
             catch (error) {
                 console.error(error)
@@ -72,15 +73,7 @@ export const postRouter = router({
                 const post = posts.at(0);
                 if (!post)
                     throw new TRPCError({ code: 'NOT_FOUND', message: "That post doesn't exist" })
-                if (!post.quotePost?.postId) {
-                    //@ts-expect-error
-                    delete post.quotedPost; delete post.quoteAuthor
-                }
-                if (!post.originalPost?.postId) {
-                    //@ts-expect-error
-                    delete post.originalPost; delete post.originalPostAuthor
-                }
-                return post
+                return formatPosts(post)
             }
             catch (error) {
                 if (error instanceof PostgresError && error.message.includes("invalid input syntax for type uuid"))

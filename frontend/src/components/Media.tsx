@@ -1,9 +1,7 @@
 import { For, Show, createSignal, mergeProps } from "solid-js";
-import { PostResponse } from "~/api/postFetchers";
-import clickOutside from "~/lib/clickOutside";
 import styles from "~/styles/components/Media.module.scss"
-import { Transition } from "solid-transition-group";
 import { Slideshow } from "./Slideshow";
+import { PostResponse } from "~/routes/[username]/Replies";
 
 export type P = { media: NonNullable<PostResponse['media']> }
 
@@ -48,7 +46,7 @@ export function MediaList(props: P) {
 type P1 = {
     m: {
         url: string;
-        is_video: boolean;
+        isVideo: boolean;
     },
     i?: number
     openSlideshow?: (i: number) => void
@@ -58,7 +56,7 @@ export function Media(props: P1) {
     const merged = mergeProps(props, { i: 0 })
     return (
         <Show
-            when={props.m.is_video}
+            when={props.m.isVideo}
             fallback={
                 <img onclick={() => props.openSlideshow?.(merged.i)} src={props.m.url} />
             }>

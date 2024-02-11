@@ -11,7 +11,9 @@ const server = Fastify({
     logger: true,
     maxParamLength: 5000
 })
-server.register(cors)
+process.env.NODE_ENV == 'development' &&
+    server.register(cors)
+    
 server.register(serveStatic, {
     root: path.join(__dirname, "..", "public")
 })
@@ -24,18 +26,20 @@ server.register(fastifyTRPCPlugin, {
     trpcOptions: {
         router: appRouter,
         createContext,
-        
+
     } satisfies FastifyTRPCPluginOptions<AppRouter>['trpcOptions']
 })
 
 const PORT = Number(process.env.PORT) || 8080;
 
-(async function() {
+(async function () {
     try {
-        await server.listen({port: PORT})
+        await server.listen({ port: PORT })
         console.log(`Server is running on port ${PORT}`)
-    } 
+    }
     catch (err) {
         server.log.error(err)
     }
 })()
+
+export * from "./routers"

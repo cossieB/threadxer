@@ -2,7 +2,7 @@
   "name": "threader",
   "version": "1.0.0",
   "description": "My clone of _Threads_ app which is a clone of _The App Formerly Known As Twitter_.",
-  "main": "server/index.ts",
+  "main": "server/src/server.ts",
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

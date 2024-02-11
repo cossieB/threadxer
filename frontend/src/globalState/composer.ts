@@ -1,5 +1,5 @@
 import { createStore } from "solid-js/store";
-import { PostResponse } from "~/api/postFetchers";
+import { PostResponse } from "~/routes/[username]/Replies";;
 
 export const [composerState, setComposerState] = createStore({
     isOpen: false,

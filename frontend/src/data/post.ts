@@ -1,22 +1,22 @@
 import { createMutation, createQuery, useQueryClient } from "@tanstack/solid-query";
-import { useMatch, useNavigate, useParams } from "@solidjs/router";
+import { useNavigate, useParams } from "@solidjs/router";
 import { composerState } from "~/globalState/composer";
-import { getPost, PostResponse, createPost, getAllPosts } from "~/api/postFetchers";
+import { trpcClient } from "~/trpc";
 
 export function usePost() {
     const params = useParams()
     const queryClient = useQueryClient()
     const navigate = useNavigate()
-    const matches = useMatch(() => "/")
-    
+
     const postQuery = createQuery(() => ({
         get enabled() {
             return !!params.postId
         },
         queryKey: ['posts', 'byId', params.postId],
-        queryFn: key => getPost(key.queryKey[2]),
+        queryFn: key => trpcClient.posts.getPost.query(key.queryKey[2]),
         initialData: () => {
-            const posts = queryClient.getQueryData<PostResponse[]>(['posts'])
+            type X = Awaited<ReturnType<typeof trpcClient.posts.getPost.query>>
+            const posts = queryClient.getQueryData<X[]>(['posts'])
             return posts?.find(p => p.post.postId == params.postId)
         },
         retry(failureCount, error) {
@@ -24,7 +24,7 @@ export function usePost() {
         },
     }))
     const mutation = createMutation(() => ({
-        mutationFn: createPost,
+        mutationFn: trpcClient.posts.createPost.mutate,
         onSuccess(data, variables, context) {
             queryClient.invalidateQueries({
                 queryKey: ['posts']
@@ -33,13 +33,15 @@ export function usePost() {
             composerState.close()
         },
     }))
-    const allPostsQuery = createQuery(() => ({
-        get enabled() {
-            return !!matches()
-        },
+    return { mutation, postQuery }
+}
+
+export function useAllPosts(page?: number) {
+    return createQuery(() => ({
         queryKey: ['posts'],
-        queryFn: getAllPosts,
-        
+        queryFn: () => trpcClient.posts.getAllPosts.query({
+            page
+        }),
+
     }))
-    return {mutation, postQuery, allPostsQuery}
 }
