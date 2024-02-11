@@ -2,13 +2,12 @@ import { FormInput } from '../../components/shared/FormInput';
 import UserForm from '../../components/shared/UserForm';
 import { createStore } from 'solid-js/store';
 import { Popup } from '../../components/shared/Popup';
-import { Show, createMemo } from 'solid-js';
+import { createMemo } from 'solid-js';
 import titleCase from '~/lib/titleCase';
 import { Validator } from '../../utils/Validator';
 import { SubmitButton } from '../../components/shared/buttons/SubmitButton';
 import { sendAuthRequest } from '~/utils/sendAuthRequest';
-import { Navigate, useNavigate } from '@solidjs/router';
-import auth from '~/globalState/auth';
+import { useNavigate } from '@solidjs/router';
 import Page from '~/components/shared/Page';
 
 const initialState = {
