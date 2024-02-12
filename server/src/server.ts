@@ -6,6 +6,7 @@ import cors from '@fastify/cors';
 import serveStatic from "@fastify/static"
 import path from 'path';
 import fastifyCookie from '@fastify/cookie';
+import { startFire } from './config/firebase';
 
 const server = Fastify({
     logger: true,
@@ -26,7 +27,9 @@ server.register(fastifyTRPCPlugin, {
     trpcOptions: {
         router: appRouter,
         createContext,
-
+        onError({error, path}) {
+            
+        }
     } satisfies FastifyTRPCPluginOptions<AppRouter>['trpcOptions']
 })
 
@@ -34,6 +37,7 @@ const PORT = Number(process.env.PORT) || 8080;
 
 (async function () {
     try {
+        startFire()
         await server.listen({ port: PORT })
         console.log(`Server is running on port ${PORT}`)
     }
@@ -41,5 +45,4 @@ const PORT = Number(process.env.PORT) || 8080;
         server.log.error(err)
     }
 })()
-
 export * from "./routers"

@@ -14,44 +14,30 @@ import { compare, genSalt, hash } from "bcrypt";
 import { eq } from "drizzle-orm";
 
 export const authRouter = router({
+
     checkAvailability: publicProcedure.input(z.object({
-        email: z.string().optional(),
-        username: z.string().optional()
+        field: z.enum(["email", "username"]),
+        value: z.string()
     }))
         .query(async ({ input }) => {
-            const { username, email } = input
+            const field = input.field === 'email' ? 'email' : 'usernameLower'
             try {
-                if (!username && !email)
-                    throw new TRPCError({ code: "BAD_REQUEST" });
-                if (username) {
-                    const user = await db.query.User.findFirst({
-                        columns: {
-                            username: true
-                        },
-                        where(fields, operators) {
-                            return operators.eq(fields.usernameLower, username.toLowerCase());
-                        },
-                    });
-                    return { available: !user }
-                }
-                if (email) {
-                    const user = await db.query.User.findFirst({
-                        columns: {
-                            username: true
-                        },
-                        where(fields, { eq }) {
-                            return eq(fields.email, email.toLowerCase());
-                        },
-                    });
-                    return { available: !user }
-                }
-                throw new TRPCError({ code: "BAD_REQUEST" });
+                const user = await db.query.User.findFirst({
+                    columns: {
+                        username: true
+                    },
+                    where(fields, operators) {
+                        return operators.eq(fields[field], input.value.toLowerCase());
+                    },
+                });
+                return { available: !user }
             }
             catch (error) {
                 console.error(error);
                 throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Something Went wrong. Please try again later" })
             }
         }),
+
     signupUser: publicProcedure.input(
         z.object({
             username: z.string(),
@@ -96,21 +82,23 @@ export const authRouter = router({
                 })
                 redis.setex(`verification:${user.userId}`, 259200, code)
                     .catch(e => console.log(e))
-                const { accessToken, cookie } = await handleTokens({ ...user, isUnverified: true })
+                const { accessToken, cookie, fb } = await handleTokens({ ...user, isUnverified: true })
                 ctx.res.header('set-cookie', cookie)
                 draftVerificationEmail(username, code, email)
-                return ({ jwt: accessToken, redirect: '/auth/verify' })
+                return ({ jwt: accessToken, redirect: '/auth/verify', fb })
             }
             catch (error) {
                 if (error instanceof PostgresError) {
                     if (error.message.includes('users_username_unique'))
-                        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Username is not available' })
-                    if (error.message.includes("users_email_unique"))
-                        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Email is not available' })
-                }
+                    throw new TRPCError({ code: 'BAD_REQUEST', message: 'Username is not available' })
+                if (error.message.includes("users_email_unique"))
+                throw new TRPCError({ code: 'BAD_REQUEST', message: 'Email is not available' })
+        }
+        console.error(error)
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong." })
             }
         }),
+
     loginUser: publicProcedure.input(z.object({
         email: z.string(),
         password: z.string()
@@ -126,9 +114,9 @@ export const authRouter = router({
                 const { email, password } = input;
                 let redirect: string | undefined
                 try {
-                    // const url = new URL(req.get('Referrer') ?? "")
-                    // if (url.searchParams.get('redirect'))
-                    //     redirect = url.searchParams.get('redirect')!
+                    const url = new URL(ctx.req.headers['x-client-url'] as string ?? "")
+                    if (url.searchParams.get('redirect'))
+                        redirect = url.searchParams.get('redirect')!
                 } catch (_) { }
                 const row = await db.query.User.findFirst({
                     columns: {
@@ -174,7 +162,8 @@ export const authRouter = router({
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong. Please try again later" })
             }
         }),
-    logoutUser: publicProcedure.mutation(async ({ctx: {req, res}}) => {
+
+    logoutUser: publicProcedure.mutation(async ({ ctx: { req, res } }) => {
         const refresh = req.cookies.rf;
         if (refresh)
             await db.delete(RefreshTokens).where(eq(RefreshTokens.token, refresh))

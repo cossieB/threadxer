@@ -1,10 +1,10 @@
-import { useNavigate } from "@solidjs/router";
-import { Index, createEffect, createMemo } from "solid-js";
+import { Navigate, useNavigate } from "@solidjs/router";
+import { Index, Show, createEffect, createMemo, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
 import { Popup } from "~/components/shared/Popup";
 import styles from '~/styles/components/VerificationCode.module.scss'
 import { CodeBlock } from "../../components/CodeBlock";
-import { handleSubmit, handleResend } from "./Verify.fetcher";
+import { handleSubmit, handleResend } from "../../data/verify";
 import { Numberpad } from "./Numberpad";
 import auth from "~/globalState/auth";
 import { PasteSvg } from "~/svgs";
@@ -44,6 +44,9 @@ export default function VerifyEmail() {
         if (!auth.user.username) navigate(`/auth/login?redirect=${encoded}`, { state: { message: "Please login to verify your account" } })
         if (auth.user.isUnverified === false) navigate("/")
     })
+    onMount(() => {
+        
+    })
     return (
         <main class={styles.main}>
             <h1 >Verify your e-mail address</h1>
@@ -71,8 +74,8 @@ export default function VerifyEmail() {
                             if (/\d/.test(char))
                                 newArr.push(char)
                         }
-        
-                        if (newArr.length == 6){
+
+                        if (newArr.length == 6) {
                             setCode('splitUp', newArr)
                             setCode('pointer', 5)
                         }
@@ -92,7 +95,7 @@ export default function VerifyEmail() {
                     loading={state.submitting}
                     finished={state.finished}
                     disabled={isDisabled()}
-                    onclick={() => handleSubmit(joined(), setState, navigate)}
+                    onclick={() => handleSubmit(joined(), navigate)}
                 />
                 <SubmitButton
                     loading={state.isResending}

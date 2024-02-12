@@ -12,9 +12,7 @@ import { PostgresError } from 'postgres'
 
 export const verificationRouter = router({
     verifyUser: protectedProcedure
-        .input(z.object({
-            code: z.string(),
-        }))
+        .input(z.string())
         .mutation(async ({ ctx, input }) => {
             if (!ctx.user.isUnverified)
                 throw new TRPCError({ code: 'BAD_REQUEST', message: "Already verified" })
@@ -49,7 +47,7 @@ export const verificationRouter = router({
                 storedCode = row.code
             }
             try {
-                if (storedCode !== input.code)
+                if (storedCode !== input)
                     throw new TRPCError({ code: 'BAD_REQUEST', message: 'Invalid Code' })
                 const now = new Date;
                 await db.transaction(async tx => {

@@ -20,7 +20,8 @@ export async function customFetch(url: U, requestOpts?: V) {
         ...requestOpts,
         headers: {
             ...(requestOpts?.headers ?? {}),
-            ...auth.token.jwt && ({ Authorization: `Bearer ${auth.token.jwt}` })
+            ...auth.token.jwt && ({ Authorization: `Bearer ${auth.token.jwt}` }),
+            'X-Client-Url': location.href
         }
     })
 }
