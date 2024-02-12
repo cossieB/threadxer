@@ -153,7 +153,7 @@ export const authRouter = router({
                 })
                 if (!row.emailVerified)
                     redirect = '/auth/verify'
-                ctx.res.header('Set-Cookie', cookie)
+                ctx.res.header('set-cookie', cookie)
                 return { jwt: accessToken, redirect, fb }
             }
             catch (error) {

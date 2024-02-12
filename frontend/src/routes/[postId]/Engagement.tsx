@@ -1,12 +1,11 @@
 import { PostLists } from "~/components/PostLists"
-import { usePostLikes, useQuotes } from "~/data/engagement"
+import { usePostLikes, usePostReplies, useQuotes } from "~/data/engagement"
 import { For, Match, Switch } from "solid-js"
 import Loader from "~/components/shared/Loader/Loader"
 import { UserCard } from "~/components/UserCard"
-import { useReplies } from "~/data/replies"
 
 export function PostReplies() {
-    const query = useReplies()
+    const query = usePostReplies()
     return <PostLists query={query} />
 }
 

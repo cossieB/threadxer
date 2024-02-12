@@ -14,7 +14,7 @@ export function useQuotes(page?: number) {
     }))
 }
 
-export function useReplies(page?: number) {
+export function usePostReplies(page?: number) {
     const params = useParams();
     return createQuery(() => ({
         queryKey: ['posts', params.postId, 'replies'],

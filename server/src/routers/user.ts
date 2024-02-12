@@ -50,7 +50,7 @@ export const userRouter = router({
 
             const refresh = ctx.req.cookies.rf;
             if (!refresh)
-                throw new TRPCError({ code: "UNAUTHORIZED", message: "Not request token" })
+                throw new TRPCError({ code: "UNAUTHORIZED", message: "No request token" })
             const token = jwt.verify(refresh, process.env.REFRESH_TOKEN_SECRET!) as JwtPayload;
 
             try {

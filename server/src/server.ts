@@ -13,13 +13,15 @@ const server = Fastify({
     maxParamLength: 5000
 })
 process.env.NODE_ENV == 'development' &&
-    server.register(cors)
+    server.register(cors, {
+        origin: ["http://localhost:5173", "http://localhost:8080", "http://127.0.0.1:5173"]
+    })
     
 server.register(serveStatic, {
     root: path.join(__dirname, "..", "public")
 })
 server.register(fastifyCookie)
-server.get("/", (req, reply) => {
+server.setNotFoundHandler((req, reply) => {
     return reply.sendFile("index.html", path.resolve(__dirname, "..", "public"))
 })
 server.register(fastifyTRPCPlugin, {
