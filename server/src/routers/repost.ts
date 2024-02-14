@@ -22,15 +22,18 @@ export const repostRouter = router({
                     postId: input,
                     userId: ctx.user.userId
                 })
-                return ctx.res.code(201).send()
+                ctx.res.status(201)
+                return
             }
             catch (error: unknown) {
                 if (error instanceof PostgresError) {
-                    if (error.message.includes("repost_post_id_user_id_unique")) {
+                    if (error.message.includes("reposts_post_id_user_id_unique")) {
                         await db.delete(Repost).where(eq(Repost.postId, input))
-                        return ctx.res.send()
+                        ctx.res.status(200)
+                        return 
                     }
                 }
+                console.error(error)
                 throw new TRPCError({code: 'INTERNAL_SERVER_ERROR'})
             }
         })

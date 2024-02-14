@@ -22,13 +22,15 @@ export const likeRouter = router({
                     postId: input,
                     userId: ctx.user.userId
                 })
-                return new Response(undefined, {status: 201})
+                ctx.res.status(201)
+                return
             }
             catch (error: unknown) {
                 if (error instanceof PostgresError) {
                     if (error.message.includes("likes_post_id_user_id_unique")) {
                         await db.delete(Likes).where(eq(Likes.postId, input))
-                        return new Response(undefined, {status: 200})
+                        ctx.res.status(200)
+                        return 
                     }
                 }
                 throw new TRPCError({code: 'INTERNAL_SERVER_ERROR'})
