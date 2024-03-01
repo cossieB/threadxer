@@ -35,7 +35,7 @@ export const replyCount = db.$with('rc').as(
         .groupBy(Post.replyTo)
 );
 
-const md =  db.select({
+const md = db.select({
         postId: Media.postId,
         url: Media.url,
         isVideo: Media.isVideo
