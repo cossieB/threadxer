@@ -1,5 +1,6 @@
 import { useParams } from "@solidjs/router";
 import { createQuery, useQueryClient, createMutation } from "@tanstack/solid-query";
+import { PostResponse } from "~/routes/[username]/Replies";
 import { trpcClient } from "~/trpc";
 import { modifyLikesAndRepostsInCache } from "~/utils/modifyLikesAndRepostsInCache";
 
@@ -43,7 +44,25 @@ export function useLikes() {
         onError(error, variables, context) {
             queryClient.setQueriesData({
                 queryKey: ['posts']
-            }, context);
+            }, (old: PostResponse[] | PostResponse | undefined) => {
+                if (Array.isArray(old)) {
+                    const post = old.find(x => x.post.postId == variables)
+                    if (!post) {
+                        console.log(variables)
+                        return old
+                    }
+                    const newPost: PostResponse = JSON.parse(JSON.stringify(post))
+                    newPost.liked = context?.fieldIsActive
+                    newPost.likes = context?.count ?? 0
+                    return old.map(x => x.post.postId === variables ? newPost : x)
+                }
+                else if (old && old.post.postId === variables) {
+                    const newPost: PostResponse = JSON.parse(JSON.stringify(old))
+                    newPost.liked = context?.fieldIsActive
+                    newPost.likes = context?.count ?? 0
+                    return newPost
+                }
+            })
         },
     }));
     return mutation;
@@ -56,7 +75,25 @@ export function useRepost() {
         onError(error, variables, context) {
             queryClient.setQueriesData({
                 queryKey: ['posts']
-            }, context);
+            }, (old: PostResponse[] | PostResponse | undefined) => {
+                if (Array.isArray(old)) {
+                    const post = old.find(x => x.post.postId == variables)
+                    if (!post) {
+                        console.log(variables)
+                        return old
+                    }
+                    const newPost: PostResponse = JSON.parse(JSON.stringify(post))
+                    newPost.reposted = context?.fieldIsActive
+                    newPost.reposts = context?.count ?? 0
+                    return old.map(x => x.post.postId === variables ? newPost : x)
+                }
+                else if (old && old.post.postId === variables) {
+                    const newPost: PostResponse = JSON.parse(JSON.stringify(old))
+                    newPost.reposted = context?.fieldIsActive
+                    newPost.reposts = context?.count ?? 0
+                    return newPost
+                }
+            })
         },
     }));
     return mutation;

@@ -44,7 +44,7 @@ const md =  db.select({
     .as('mds')
     
 type M = {
-    url: string, isVideo: boolean
+    url: string, is_video: boolean
 }
 export const mediaAgg = db.$with('md').as(
     db.select({

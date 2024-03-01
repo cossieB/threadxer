@@ -46,7 +46,7 @@ export function MediaList(props: P) {
 type P1 = {
     m: {
         url: string;
-        isVideo: boolean;
+        is_video: boolean;
     },
     i?: number
     openSlideshow?: (i: number) => void
@@ -56,7 +56,7 @@ export function Media(props: P1) {
     const merged = mergeProps(props, { i: 0 })
     return (
         <Show
-            when={props.m.isVideo}
+            when={props.m.is_video}
             fallback={
                 <img onclick={() => props.openSlideshow?.(merged.i)} src={props.m.url} />
             }>
