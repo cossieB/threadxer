@@ -12,7 +12,7 @@ import styles from "~/styles/routes/ProfilePage.module.scss"
 import { DeleteSvg } from "~/svgs";
 import { UploadBtn } from "../components/ImageUploader/UploadBtn";
 import { Popup } from "~/components/shared/Popup";
-import { useUser } from "~/data/user";
+import { useUser, useUserMutation } from "~/data/user";
 import { SubmitButton } from "~/components/shared/buttons/SubmitButton";
 
 const [fieldErrors, setFieldErrors] = createStore({
@@ -22,7 +22,8 @@ const [fieldErrors, setFieldErrors] = createStore({
 
 export default function PreferencesPage() {
     const errored = () => Object.values(fieldErrors).flat().length > 0;
-    const {query, imageMutation, mutation} = useUser(auth.user.username)
+    const query = useUser(auth.user.username)
+    const mutation = useUserMutation()
 
     return (
         <Page title="Preferences">
@@ -39,15 +40,18 @@ export default function PreferencesPage() {
                 <Match when={query.isSuccess}>
                     <div class={styles.profile}>
                         <div class={styles.userImages} style={{ 'background-image': `url(${query.data?.banner})` }}>
-                            <UploadBtn path="banner" mutation={imageMutation} />
+                            <UploadBtn path="banner" mutation={mutation} />
                             <button type="button">
                                 <DeleteSvg />
                             </button>
                             <div class={styles.avatar} style={{ 'background-image': `url(${query.data?.avatar})` }}>
-                                <UploadBtn path="avatar" mutation={imageMutation} />
+                                <UploadBtn path="avatar" mutation={mutation} />
                             </div>
                         </div>
-                        <UserForm onsubmit={mutation.mutate}>
+                        <UserForm 
+                            onsubmit={() => mutation.mutate({
+                                
+                            })}>
                             <CustomInput
                                 name="username"
                                 disabled
@@ -84,16 +88,16 @@ export default function PreferencesPage() {
                                         return setFieldErrors('website', [])
                                     const url = validateUrl(value)
                                     if (!url)
-                                        setFieldErrors('website', ["Enter valid URL with starting with https"])
+                                        setFieldErrors('website', ["Enter valid URL starting with https"])
 
                                 }}
                                 validationErrors={fieldErrors.website}
-                                value={query.data?.website}
+                                value={query.data?.website ?? undefined}
                             />
                             <SubmitButton
                                 finished={mutation.isSuccess}
                                 loading={mutation.isPending}
-                                disabled={errored() || imageMutation.isPending || mutation.isPending}
+                                disabled={errored() || mutation.isPending || mutation.isPending}
                             />
                         </UserForm>
                     </div>
@@ -103,11 +107,6 @@ export default function PreferencesPage() {
                 close={mutation.reset}
                 text={mutation.error?.message ?? ""}
                 when={mutation.isError}
-            />
-            <Popup
-                close={imageMutation.reset}
-                text={imageMutation.error?.message ?? ""}
-                when={imageMutation.isError}
             />
         </Page>
     )

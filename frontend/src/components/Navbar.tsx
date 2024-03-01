@@ -3,21 +3,11 @@ import { JSX, Show, createSignal } from "solid-js"
 import styles from "~/styles/components/Nav.module.scss"
 import auth from "~/globalState/auth"
 import { CompostSvg, HomeSvg, LogoutSvg, RegisterSvg, SearchSvg, SettingsSvg, UnlockSvg } from "../svgs"
-import { customFetch } from "~/utils/customFetcher"
 import Modal from "./Modal";
 import clickOutside from "~/lib/clickOutside"
 import { setComposerState } from "~/globalState/composer"
 false && clickOutside
 
-async function logout() {
-    const res = await customFetch('/api/auth/logout', {
-        method: "DELETE"
-    })
-    if (res.ok) {
-        auth.deleteUser();
-        location.reload()
-    }
-}
 export default function Navbar() {
     const [alertLogout, setAlertLogout] = createSignal(false)
     return (
@@ -79,7 +69,7 @@ export default function Navbar() {
             <Modal when={alertLogout()} >
                 <div use:clickOutside={() => setAlertLogout(false)}>
                     <strong>Confirm logout? </strong>{""}
-                    <button class="danger" onclick={() => {logout()}}>Logout</button>
+                    <button class="danger" onclick={auth.logout}>Logout</button>
                 </div>
             </Modal>
         </nav>

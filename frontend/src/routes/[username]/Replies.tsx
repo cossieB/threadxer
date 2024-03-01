@@ -1,8 +1,10 @@
 import { CreateQueryResult } from "@tanstack/solid-query"
-import { PostResponse } from "~/api/postFetchers"
 import { useReplies } from "~/data/replies"
 import { useUserLikes, useUserPosts } from "~/data/user"
 import { PostLists } from "../../components/PostLists"
+import { type trpcClient } from "~/trpc"
+
+export type PostResponse = Awaited<ReturnType<typeof trpcClient['posts']['getPost']['query']>>
 
 export type P = {
     query: CreateQueryResult<PostResponse[], Error>

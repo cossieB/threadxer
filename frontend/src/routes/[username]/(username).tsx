@@ -11,7 +11,7 @@ import { LinkSvg, LocationSvg } from "~/svgs";
 
 export default function UserPage(props: {children?: JSX.Element}) {
     const params = useParams();
-    const { query } = useUser(params.username);
+    const query = useUser(params.username);
     
     return (
         <Page title={params.username}>

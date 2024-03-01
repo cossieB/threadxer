@@ -6,7 +6,6 @@ import { composerState } from './globalState/composer';
 import { Toast } from './components/ErrorPopups';
 
 function App(props: { children?: JSXElement }) {
-
     createEffect(() => {
         if (composerState.isOpen)
             document.body.classList.add("modalOpen")

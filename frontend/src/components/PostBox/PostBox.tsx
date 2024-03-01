@@ -1,10 +1,10 @@
 import styles from "~/styles/components/PostBox.module.scss"
 import { useNavigate } from "@solidjs/router";
 import { Show } from "solid-js";
-import { PostResponse } from "~/api/postFetchers";
 import { PostBoxButtons, PostBoxContent, PostBoxHeader } from "./PostBox.components";
 import { RepostSvg } from "~/svgs";
 import { MediaList } from "../Media";
+import { PostResponse } from "~/routes/[username]/Replies";
 
 export function PostBox(props: { post: PostResponse }) {
     const navigate = useNavigate()
@@ -28,7 +28,7 @@ export function PostBox(props: { post: PostResponse }) {
                     }} />
                 </div>
                 <div class={styles.div} >
-                    <Show when={props.post.isRepost}>
+                    <Show when={props.post.post.isRepost}>
                         <RepostSvg />
                     </Show>
                     <PostBoxHeader

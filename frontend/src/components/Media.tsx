@@ -1,9 +1,7 @@
 import { For, Show, createSignal, mergeProps } from "solid-js";
-import { PostResponse } from "~/api/postFetchers";
-import clickOutside from "~/lib/clickOutside";
 import styles from "~/styles/components/Media.module.scss"
-import { Transition } from "solid-transition-group";
 import { Slideshow } from "./Slideshow";
+import { PostResponse } from "~/routes/[username]/Replies";
 
 export type P = { media: NonNullable<PostResponse['media']> }
 

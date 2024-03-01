@@ -11,10 +11,13 @@
   "dependencies": {
     "@solidjs/router": "^0.10.3",
     "@tanstack/solid-query": "^5.13.4",
+    "@trpc/client": "^10.45.1",
     "firebase": "^10.7.1",
     "jwt-decode": "^4.0.0",
     "solid-js": "^1.7.8",
     "solid-transition-group": "^0.2.3",
+    "superjson": "^2.2.1",
+    "threadxer-server": "^1.0.0",
     "uploadthing": "^6.1.0"
   },
   "devDependencies": {

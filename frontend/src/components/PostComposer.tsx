@@ -10,6 +10,7 @@ import { composerState } from "~/globalState/composer";
 import { QuoteBox } from "./PostBox/PostBox";
 import { usePost } from "~/data/post";
 import DropZone from "./DropZone";
+import { validateAndUpload } from "~/utils/uploadToFirebase";
 false && clickOutside
 
 export function PostComposer() {
@@ -61,12 +62,19 @@ export function PostComposer() {
                         disabled={input().length === 0}
                         finished={mutation.isSuccess}
                         loading={mutation.isPending}
-                        onclick={() => mutation.mutate({
+                        onclick={async () => {
+                            const urls = await Promise.all(validateAndUpload(files().map(f => f.file) ?? [], 'media', 8))
+                            const data = urls.map(x => ({
+                                url: x.url,
+                                isVideo: x.file.type.includes('video'),
+                                ref: x.ref
+                            }))
+                            mutation.mutate({
                             text: input(),
                             quotedPost: composerState.quoting?.post?.postId,
                             replyTo: composerState.replying?.post?.postId,
-                            media: files().map(data => data.file)
-                        })}
+                            media: data
+                        })}}
                     />
                 </div>
                 <div class={styles.preview} innerHTML={preview()} />

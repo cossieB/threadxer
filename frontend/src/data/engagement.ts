@@ -1,35 +1,68 @@
 import { useParams } from "@solidjs/router";
 import { createQuery, useQueryClient, createMutation } from "@tanstack/solid-query";
-import { getEngagement, getPostLikes } from "~/api/engagementFetchers";
-import { likeOrUnlikePost } from "~/api/engagementFetchers";
-import { repostOrUnrepost } from "~/api/engagementFetchers";
+import { PostResponse } from "~/routes/[username]/Replies";
+import { trpcClient } from "~/trpc";
 import { modifyLikesAndRepostsInCache } from "~/utils/modifyLikesAndRepostsInCache";
 
-
-export function useEngagement(engagement: 'replies'  | 'quotes') {
+export function useQuotes(page?: number) {
     const params = useParams();
     return createQuery(() => ({
-        queryKey: ['posts', params.postId, engagement],
-        queryFn: key => getEngagement(key.queryKey[1], engagement)
+        queryKey: ['posts', params.postId, 'quotes'],
+        queryFn: key => trpcClient.posts.getPostQuotes.query({
+            postId: key.queryKey[1],
+            page
+        })
     }))
 }
 
-export function usePostLikes() {
+export function usePostReplies(page?: number) {
+    const params = useParams();
+    return createQuery(() => ({
+        queryKey: ['posts', params.postId, 'replies'],
+        queryFn: key => trpcClient.posts.getPostReplies.query({
+            postId: key.queryKey[1],
+            page
+        })
+    }))
+}
+export function usePostLikes(page?: number) {
     const params = useParams();
     return createQuery(() => ({
         queryKey: ['posts', params.postId, 'likes'],
-        queryFn: key => getPostLikes(key.queryKey[1])
+        queryFn: key => trpcClient.posts.getPostLikes.query({
+            postId: key.queryKey[1],
+            page
+        })
     }))
 }
+
 export function useLikes() {
     const queryClient = useQueryClient();
     const mutation = createMutation(() => ({
-        mutationFn: likeOrUnlikePost,
+        mutationFn: trpcClient.likes.likePost.mutate,
         onMutate: modifyLikesAndRepostsInCache('likes', queryClient),
         onError(error, variables, context) {
             queryClient.setQueriesData({
                 queryKey: ['posts']
-            }, context);
+            }, (old: PostResponse[] | PostResponse | undefined) => {
+                if (Array.isArray(old)) {
+                    const post = old.find(x => x.post.postId == variables)
+                    if (!post) {
+                        console.log(variables)
+                        return old
+                    }
+                    const newPost: PostResponse = JSON.parse(JSON.stringify(post))
+                    newPost.liked = context?.fieldIsActive
+                    newPost.likes = context?.count ?? 0
+                    return old.map(x => x.post.postId === variables ? newPost : x)
+                }
+                else if (old && old.post.postId === variables) {
+                    const newPost: PostResponse = JSON.parse(JSON.stringify(old))
+                    newPost.liked = context?.fieldIsActive
+                    newPost.likes = context?.count ?? 0
+                    return newPost
+                }
+            })
         },
     }));
     return mutation;
@@ -37,12 +70,30 @@ export function useLikes() {
 export function useRepost() {
     const queryClient = useQueryClient();
     const mutation = createMutation(() => ({
-        mutationFn: repostOrUnrepost,
+        mutationFn: trpcClient.reposts.repostPost.mutate,
         onMutate: modifyLikesAndRepostsInCache('reposts', queryClient),
         onError(error, variables, context) {
             queryClient.setQueriesData({
                 queryKey: ['posts']
-            }, context);
+            }, (old: PostResponse[] | PostResponse | undefined) => {
+                if (Array.isArray(old)) {
+                    const post = old.find(x => x.post.postId == variables)
+                    if (!post) {
+                        console.log(variables)
+                        return old
+                    }
+                    const newPost: PostResponse = JSON.parse(JSON.stringify(post))
+                    newPost.reposted = context?.fieldIsActive
+                    newPost.reposts = context?.count ?? 0
+                    return old.map(x => x.post.postId === variables ? newPost : x)
+                }
+                else if (old && old.post.postId === variables) {
+                    const newPost: PostResponse = JSON.parse(JSON.stringify(old))
+                    newPost.reposted = context?.fieldIsActive
+                    newPost.reposts = context?.count ?? 0
+                    return newPost
+                }
+            })
         },
     }));
     return mutation;

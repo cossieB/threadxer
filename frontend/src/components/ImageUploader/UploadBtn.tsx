@@ -10,11 +10,17 @@ import { validateAndUpload } from "~/utils/uploadToFirebase";
 type Props = {
     path: "avatar" | "banner",
     invalidate?: QueryKey
-    mutation: CreateMutationResult<void, Error, {
-        field: "avatar" | "banner";
-        url: string;
+    mutation: CreateMutationResult<{
+        jwt: string;
+        fb: string;
+    }, Error, {
+        displayName?: string | undefined;
+        bio?: string | undefined;
+        website?: string | undefined;
+        location?: string | undefined;
+        avatar?: string | undefined;
+        banner?: string | undefined;
     }, unknown>
-
 }
 export function UploadBtn(props: Props) {
     const merged = mergeProps({ limit: 1 }, props)
@@ -26,8 +32,9 @@ export function UploadBtn(props: Props) {
         const files = Array.from(e.target.files ?? []).slice(0, merged.limit)
         try {
             const urls = await Promise.all(validateAndUpload(files, `${merged.path}s`))
-            urls.length && props.mutation.mutate({ field: props.path, url: urls[0].url },)
-        } catch (error: any) {
+            urls.length && props.mutation.mutate({ [props.path]: urls[0].url },)
+        } 
+        catch (error: any) {
             setError(error.message ?? "Something went wrong please try again later")
         }
     }
@@ -48,5 +55,3 @@ export function UploadBtn(props: Props) {
         </>
     );
 }
-
-

@@ -2,6 +2,9 @@ import { JwtPayload, jwtDecode } from "jwt-decode";
 import { createStore } from "solid-js/store";
 import { firebaseAuth } from "../../firebase";
 import { signInWithCustomToken, signOut } from "firebase/auth";
+import { trpcClient } from "~/trpc";
+import { TRPCClientError } from "@trpc/client";
+import { errors } from "./popups";
 
 export type User = {
     username: string,
@@ -78,6 +81,18 @@ class Auth {
             this.setToken('firebase', jwt)
         } catch (error) {
             console.log(error)
+        }
+    }
+    logout = async () => {
+        try {
+            await trpcClient.auth.logoutUser.mutate()
+            this.deleteUser();
+            location.reload()
+        } 
+        catch (error) {
+            if (error instanceof TRPCClientError)
+                return errors.addError(error.message)
+            errors.addError("Something went wrong. Please try again later.")
         }
     }
     get user () {
