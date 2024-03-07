@@ -30,18 +30,19 @@ export function CustomInput(props: Props) {
             <div class={styles.formControl} classList={{ [styles.error]: errored() }} >
                 <input
                     {...merged}
+                    ref={props.ref}
                     id={merged.name}
                     placeholder=" "
                     onchange={e => {
                         setInput(e.target.value.trim());
-                        if (input().length === 0 && merged.clearErrors)
-                            merged.clearErrors()
-                        else if (merged.validatorFn)
-                            merged.validatorFn(e.target.value)
+                        if (input().length === 0 )
+                            merged.clearErrors?.()
+                        else
+                            merged.validatorFn?.(e.target.value)
                     }}
                     oninput={e => {
                         setInput(e.target.value)
-                        merged.clearErrors && merged.clearErrors()
+                        merged.clearErrors?.()
                     }}
                 />
                 <label for={merged.name}>

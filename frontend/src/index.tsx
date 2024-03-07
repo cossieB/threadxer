@@ -17,6 +17,7 @@ import UserPage from './routes/[username]/(username)';
 import { Likes, Replies, UserPosts } from './routes/[username]/Replies';
 import { PostLikes, PostQuotes, PostReplies } from './routes/[postId]/Engagement';
 import { UserMedia } from './routes/[username]/UserMedia';
+import { SearchPage } from './routes/search';
 
 const root = document.getElementById('root');
 const queryClient = new QueryClient({
@@ -41,7 +42,6 @@ render(() =>
             <Route path="/auth/login" component={Login} />
             <Route path="/auth/verify" component={VerifyEmail} />
             <Route path="/create" component={PostComposer} />
-            <Route path="*" component={NotFound} />
             <Route path="/profile" component={ProfilePage} />
             <Route path="/users/:username" component={UserPage} >
                 <Route path={["/", "/posts"]} component={UserPosts} />
@@ -54,6 +54,8 @@ render(() =>
                 <Route path={"/quotes"} component={PostQuotes} />
                 <Route path={"/likes"} component={PostLikes} />
             </Route>
+            <Route path="/search" component={SearchPage} />
+            <Route path="*" component={NotFound} />
         </Router>
     </QueryClientProvider>
     , root!)

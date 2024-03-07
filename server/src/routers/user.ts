@@ -132,7 +132,7 @@ export const userRouter = router({
             try {
                 const media = await db.select({
                     url: Media.url,
-                    isVideo: Media.isVideo,
+                    is_video: Media.isVideo,
                     postId: Media.postId,
                 })
                     .from(Media)

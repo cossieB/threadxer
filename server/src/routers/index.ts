@@ -7,6 +7,7 @@ import { repostRouter } from "./repost"
 import { refreshRoutes } from "./refresh"
 import { userRouter } from "./user"
 import { verificationRouter } from "./verify"
+import { searchRouter } from "./search"
 
 export const appRouter = router({
     hello: publicProcedure.input(z.string().nullish()).query(({ input }) => {
@@ -17,6 +18,7 @@ export const appRouter = router({
     likes: likeRouter,
     reposts: repostRouter,
     refresh: refreshRoutes,
+    search: searchRouter,
     user: userRouter,
     verify: verificationRouter
 })
