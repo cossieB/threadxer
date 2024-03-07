@@ -1,4 +1,4 @@
-import jwt, {type JwtPayload} from 'jsonwebtoken'
+import jwt, { type JwtPayload } from 'jsonwebtoken'
 import { publicProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import { eq } from 'drizzle-orm';
@@ -11,7 +11,7 @@ export const refreshRoutes = router({
         .query(async ({ ctx }) => {
             const refresh = ctx.req.cookies.rf;
             if (!refresh)
-                throw new TRPCError({code: 'UNAUTHORIZED', message: 'No Token'})
+                throw new TRPCError({ code: 'UNAUTHORIZED', message: 'No Token' })
             try {
                 const token = jwt.verify(refresh, process.env.REFRESH_TOKEN_SECRET!) as JwtPayload;
                 const found = await db.query.RefreshTokens.findFirst({
@@ -23,7 +23,7 @@ export const refreshRoutes = router({
                 if (!found) {
                     await db.delete(RefreshTokens).where(eq(RefreshTokens.userId, token.user.userId));
                     ctx.res.clearCookie('rf')
-                    throw new TRPCError({code: 'UNAUTHORIZED', message: 'Invalid Token'})
+                    throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Invalid Token' })
                 }
                 const { accessToken, cookie, fb } = await handleTokens(token.user, async refreshToken => {
                     await db.transaction(async tx => {
@@ -39,7 +39,7 @@ export const refreshRoutes = router({
             }
             catch (error: any) {
                 console.error(error)
-                throw new TRPCError({code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong. Please try again later."})
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong. Please try again later." })
             }
         })
 })

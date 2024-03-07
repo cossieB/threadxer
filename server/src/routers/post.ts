@@ -143,13 +143,13 @@ export const postRouter = router({
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong. Please try again later" })
             }
         }),
-        
+
     getPostLikes: publicProcedure
         .input(z.object({
             postId: z.string().uuid(),
             page: z.number().default(0)
         }))
-        .query(async ({ctx, input}) => {
+        .query(async ({ ctx, input }) => {
             try {
                 const users = await db.select({
                     userId: User.userId,
@@ -166,8 +166,8 @@ export const postRouter = router({
             }
             catch (error) {
                 if (error instanceof PostgresError && error.message.includes("invalid input syntax for type uuid"))
-                    throw new TRPCError({code: 'BAD_REQUEST', message: "That post doesn't exist"})
-                throw new TRPCError({code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong. Please try again later"})
+                    throw new TRPCError({ code: 'BAD_REQUEST', message: "That post doesn't exist" })
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong. Please try again later" })
             }
         })
 })

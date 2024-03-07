@@ -4,13 +4,13 @@
 - [x] User posts and reposts
 - [x] User replies
 - [x] User likes
-- [ ] User media
+- [x] User media
 
 ## Create Post
 - [x] create post
 - [x] create post with quote
 - [x] reply to post
-- [ ] upload images and clips
+- [x] upload images and clips
 - [ ] delete posts
 
 ## Post Page
@@ -19,8 +19,8 @@
 - [x] Likes
 
 ## Search
-- [ ] keyword search
-- [ ] hashtag search
+- [x] keyword search
+- [x] hashtag search
 
 ## User preferences
 - [ ] light/dark mode

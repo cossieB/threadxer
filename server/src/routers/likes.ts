@@ -10,7 +10,7 @@ import { TRPCError } from "@trpc/server";
 export const likeRouter = router({
     likePost: protectedProcedure
         .input(z.string().uuid())
-        .mutation(async ({ctx, input}) => {
+        .mutation(async ({ ctx, input }) => {
             await rateLimiter({
                 name: 'like',
                 ctx,
@@ -33,7 +33,7 @@ export const likeRouter = router({
                         return -1
                     }
                 }
-                throw new TRPCError({code: 'INTERNAL_SERVER_ERROR'})
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' })
             }
         })
 })

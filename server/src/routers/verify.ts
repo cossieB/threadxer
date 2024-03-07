@@ -75,16 +75,17 @@ export const verificationRouter = router({
                 })
                 ctx.res.header('Set-Cookie', cookie)
                 return { jwt: newAccessToken, fb }
-            } catch (error) {
+            } 
+            catch (error) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong. Please try again later." })
             }
         }),
-    
+
     resendToken: protectedProcedure
-        .mutation(async ({ctx}) => {
+        .mutation(async ({ ctx }) => {
             const code = randomInt(999999).toString().padStart(6, '0');
             if (!ctx.user.isUnverified)
-                throw new TRPCError({code: 'BAD_REQUEST', message: 'Already Verified'})
+                throw new TRPCError({ code: 'BAD_REQUEST', message: 'Already Verified' })
             try {
                 await db.insert(VerificationCodes)
                     .values({
@@ -104,9 +105,9 @@ export const verificationRouter = router({
             catch (error) {
                 if (error instanceof PostgresError) {
                     if (error.message.includes("violates foreign key constraint"))
-                        throw new TRPCError({code: 'BAD_REQUEST', message: "User Not Found"})
+                        throw new TRPCError({ code: 'BAD_REQUEST', message: "User Not Found" })
                 }
-                throw new TRPCError({code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong. Please try again later."})
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong. Please try again later." })
             }
         })
 })

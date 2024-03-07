@@ -1,6 +1,6 @@
 # [Threadxer (W.I.P)](https://threadxer.cossie.dev)
 
-Threadxer is a all-new social media platform where you can post your thoughts (in under 180 characters, of course). This platform features groundbreaking features like: creating an account using email; uploading images and video; likeing, reposting and quoting other posts; following your favorite content creators so that their posts are shown in your "feed".
+Threadxer is a all-new social media platform where you can post your thoughts in under 180 characters. This platform features groundbreaking features like: creating an account using email; uploading images and video; likeing, reposting and quoting other posts; following your favorite content creators so that their posts are shown in your "feed".
 
 ## Stack
 

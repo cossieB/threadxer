@@ -10,7 +10,7 @@ import { TRPCError } from "@trpc/server";
 export const repostRouter = router({
     repostPost: protectedProcedure
         .input(z.string().uuid())
-        .mutation(async ({ctx, input}) => {
+        .mutation(async ({ ctx, input }) => {
             await rateLimiter({
                 name: 'repost',
                 ctx,
@@ -30,11 +30,11 @@ export const repostRouter = router({
                     if (error.message.includes("reposts_post_id_user_id_unique")) {
                         await db.delete(Repost).where(eq(Repost.postId, input))
                         ctx.res.status(200)
-                        return 
+                        return
                     }
                 }
                 console.error(error)
-                throw new TRPCError({code: 'INTERNAL_SERVER_ERROR'})
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' })
             }
         })
 })

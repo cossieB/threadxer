@@ -118,7 +118,7 @@ export const userRouter = router({
             username: z.string(),
             page: z.number().optional().default(0)
         }))
-        .query(async ({ctx, input}) => {
+        .query(async ({ ctx, input }) => {
             const posts = await getLikes(input.username, ctx.user);
             return posts.map(formatPosts)
         }),
@@ -128,7 +128,7 @@ export const userRouter = router({
             username: z.string(),
             page: z.number().optional().default(0)
         }))
-        .query(async ({ctx, input}) => {
+        .query(async ({ ctx, input }) => {
             try {
                 const media = await db.select({
                     url: Media.url,
@@ -140,11 +140,11 @@ export const userRouter = router({
                     .innerJoin(User, eq(Post.userId, User.userId))
                     .where(eq(User.usernameLower, input.username.toLowerCase()))
                     .orderBy(desc(Post.dateCreated))
-        
+
                 return media
             }
             catch (error) {
-                throw new TRPCError({code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong. Please try again later."})
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong. Please try again later." })
             }
         })
 })

@@ -90,11 +90,11 @@ export const authRouter = router({
             catch (error) {
                 if (error instanceof PostgresError) {
                     if (error.message.includes('users_username_unique'))
-                    throw new TRPCError({ code: 'BAD_REQUEST', message: 'Username is not available' })
-                if (error.message.includes("users_email_unique"))
-                throw new TRPCError({ code: 'BAD_REQUEST', message: 'Email is not available' })
-        }
-        console.error(error)
+                        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Username is not available' })
+                    if (error.message.includes("users_email_unique"))
+                        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Email is not available' })
+                }
+                console.error(error)
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong." })
             }
         }),
