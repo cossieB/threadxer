@@ -2,8 +2,7 @@ import { z } from "zod"
 import { router, publicProcedure } from "../trpc"
 import { authRouter } from "./auth"
 import { postRouter } from "./post"
-import { likeRouter } from "./likes"
-import { repostRouter } from "./repost"
+import { engagementRouter } from "./engagement"
 import { refreshRoutes } from "./refresh"
 import { userRouter } from "./user"
 import { verificationRouter } from "./verify"
@@ -15,8 +14,7 @@ export const appRouter = router({
     }),
     auth: authRouter,
     posts: postRouter,
-    likes: likeRouter,
-    reposts: repostRouter,
+    engagement: engagementRouter,
     refresh: refreshRoutes,
     search: searchRouter,
     user: userRouter,

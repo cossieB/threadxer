@@ -1,5 +1,3 @@
-import { FastifyReply, FastifyRequest } from "fastify";
-import AppError from "../utils/AppError"
 import { redis } from "../redis";
 import { TRPCError } from "@trpc/server"
 import { Context } from "../context";

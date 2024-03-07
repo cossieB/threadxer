@@ -14,7 +14,7 @@ export function SearchPage() {
     const hashtag = () => searchParams.hashtag
 
     const query = createQuery(() => ({
-        queryKey: ['search', {q: q(), h: hashtag()}],
+        queryKey: ['search', { q: q(), h: hashtag() }],
         enabled: q().length > 2 || !!hashtag(),
         queryFn: () => trpcClient.search.byTerm.query({
             term: q(),
@@ -26,15 +26,20 @@ export function SearchPage() {
             <UserForm
                 onsubmit={e => {
                     e.preventDefault();
-                    setSearchParams({'q': inputElem.value})
+                    setSearchParams({ 'q': inputElem.value })
                 }}
             >
                 <CustomInput
                     name='Search'
                     ref={inputElem}
                     value={q()}
+                    required={false}
                 />
-                <SubmitButton finished={false} loading={query.isLoading} text="Search"/>
+                <SubmitButton
+                    finished={false}
+                    loading={query.isLoading}
+                    text="Search"
+                />
             </UserForm>
             <PostLists query={query} />
         </Page>

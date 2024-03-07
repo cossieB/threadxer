@@ -39,7 +39,7 @@ export function usePostLikes(page?: number) {
 export function useLikes() {
     const queryClient = useQueryClient();
     const mutation = createMutation(() => ({
-        mutationFn: trpcClient.likes.likePost.mutate,
+        mutationFn: trpcClient.engagement.likePost.mutate,
         onMutate: modifyLikesAndRepostsInCache('likes', queryClient),
         onError(error, variables, context) {
             queryClient.setQueriesData({
@@ -70,7 +70,7 @@ export function useLikes() {
 export function useRepost() {
     const queryClient = useQueryClient();
     const mutation = createMutation(() => ({
-        mutationFn: trpcClient.reposts.repostPost.mutate,
+        mutationFn: trpcClient.engagement.repostPost.mutate,
         onMutate: modifyLikesAndRepostsInCache('reposts', queryClient),
         onError(error, variables, context) {
             queryClient.setQueriesData({
