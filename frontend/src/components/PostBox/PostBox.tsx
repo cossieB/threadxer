@@ -1,16 +1,38 @@
 import styles from "~/styles/components/PostBox.module.scss"
 import { useNavigate } from "@solidjs/router";
-import { Show } from "solid-js";
+import { Show, createSignal, onCleanup, onMount } from "solid-js";
 import { PostBoxButtons, PostBoxContent, PostBoxHeader } from "./PostBox.components";
 import { RepostSvg } from "~/svgs";
 import { MediaList } from "../Media";
 import { PostResponse } from "~/routes/[username]/Replies";
+import { useViewPost } from "~/data/engagement";
+
+const viewedPosts = new Set<string>()
 
 export function PostBox(props: { post: PostResponse }) {
+    let container!: HTMLDivElement
+    const viewMutation = useViewPost(props.post.post.postId)
+
+    const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && !viewedPosts.has(props.post.post.postId)) {
+                viewMutation.mutate()
+                viewedPosts.add(props.post.post.postId)
+            }
+        });
+    }, {
+        threshold: 1
+    });
     const navigate = useNavigate()
 
+    onMount(() => observer.observe(container))
+    onCleanup(() => observer.unobserve(container))
+
     return (
-        <div>
+        <div
+            ref={container}
+            role="link"
+        >
             <Show when={!!props.post.originalPost}>
                 <QuoteBox
                     originalPost={props.post.originalPost!}
@@ -21,11 +43,13 @@ export function PostBox(props: { post: PostResponse }) {
             <div class={styles.box} onclick={() => navigate(`/posts/${props.post.post.postId}`)}>
 
                 <div class={styles.avatar}>
-                    <img src={props.post.user?.avatar} onclick={(e) => {
-                        console.log(e.target)
-                        navigate(`/users/${props.post.user.username}`)
-                        e.stopPropagation()
-                    }} />
+                    <img src={props.post.user?.avatar}
+                        onclick={(e) => {
+                            console.log(e.target)
+                            navigate(`/users/${props.post.user.username}`)
+                            e.stopPropagation()
+                        }} 
+                        />
                 </div>
                 <div class={styles.div} >
                     <Show when={props.post.post.isRepost}>

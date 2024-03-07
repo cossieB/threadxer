@@ -26,3 +26,4 @@ dist-ssr
 *.sw?
 
 fb.json
+dev-utils/

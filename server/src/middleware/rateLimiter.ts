@@ -5,6 +5,7 @@ import { Context } from "../context";
 type RateLimitOptions = {
     name: string,
     limit: number,
+    /** Time in seconds */
     window: number,
     ctx: Context,
 }

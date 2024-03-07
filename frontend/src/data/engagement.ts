@@ -98,3 +98,11 @@ export function useRepost() {
     }));
     return mutation;
 }
+
+export function useViewPost(postId: string) {
+    return createMutation(() => ({
+        mutationKey: ["view", postId],
+        mutationFn: () => trpcClient.engagement.viewPost.mutate(postId),
+        gcTime: 60
+    }))
+}

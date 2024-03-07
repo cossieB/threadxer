@@ -48,7 +48,6 @@ export const authRouter = router({
     )
         .mutation(async ({ input, ctx }) => {
             try {
-                ctx.req
                 const { username, password, confirmPassword, email } = input
                 if (password != confirmPassword)
                     throw new TRPCError({ code: 'BAD_REQUEST', message: "Passwords do not match" })

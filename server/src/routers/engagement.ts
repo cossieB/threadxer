@@ -1,10 +1,10 @@
 import { rateLimiter } from "../middleware/rateLimiter";
-import { protectedProcedure, router } from "../trpc";
+import { protectedProcedure, publicProcedure, router } from "../trpc";
 import { z } from "zod";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { PostgresError } from "postgres";
 import { db } from "../db/drizzle";
-import { Likes, Repost } from "../db/schema";
+import { Likes, Post, Repost } from "../db/schema";
 import { TRPCError } from "@trpc/server";
 
 export const engagementRouter = router({
@@ -65,5 +65,20 @@ export const engagementRouter = router({
                 console.error(error)
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' })
             }
+        }),
+
+    viewPost: publicProcedure
+        .input(z.string().uuid())
+        .mutation(async ({input, ctx}) => {
+            await rateLimiter({
+                name: "view:" + input,
+                limit: 1,
+                window: 5 * 60,
+                ctx
+            })
+            await db
+            .update(Post)
+            .set({views: sql`${Post.views} + 1`})
+            .where(eq(Post.postId, input))
         })
 })
