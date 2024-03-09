@@ -71,7 +71,7 @@ export const engagementRouter = router({
         .input(z.string().uuid())
         .mutation(async ({input, ctx}) => {
             await rateLimiter({
-                name: "view:" + input,
+                name: "view:" + ctx.req.ip + input,
                 limit: 1,
                 window: 5 * 60,
                 ctx

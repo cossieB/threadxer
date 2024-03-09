@@ -1,4 +1,4 @@
-import { createQuery, createMutation, useQueryClient } from "@tanstack/solid-query";
+import { createQuery, createMutation, useQueryClient, createInfiniteQuery } from "@tanstack/solid-query";
 import auth from "~/globalState/auth";
 import { useParams } from "@solidjs/router";
 import { trpcClient } from "~/trpc";
@@ -48,25 +48,29 @@ export function useUserMutation() {
     }))
 }
 
-export function useUserPosts(page?: number) {
+export function useUserPosts() {
     const params = useParams()
 
-    return createQuery(() => ({
+    return createInfiniteQuery(() => ({
         queryKey: ['posts', 'byUsername', params.username.toLowerCase()],
         queryFn: key => trpcClient.user.getUserPosts.query({
             username: key.queryKey[2],
-            page
-        })
+            page: key.pageParam
+        }),
+        initialPageParam: 0,
+        getNextPageParam: (_a, _b, prev) => prev + 1
     }))
 }
-export function useUserLikes(page?: number) {
+export function useUserLikes() {
     const params = useParams()
-    return createQuery(() => ({
+    return createInfiniteQuery(() => ({
         queryKey: ['posts', 'likes', params.username.toLowerCase()],
         queryFn: key => trpcClient.user.getUserLikes.query({
             username: key.queryKey[2],
-            page
-        })
+            page: key.pageParam
+        }),
+        initialPageParam: 0,
+        getNextPageParam: (_a, _b, prev) => prev + 1
     }))
 }
 

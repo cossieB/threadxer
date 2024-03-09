@@ -11,6 +11,7 @@ import { getPostsAndReposts } from "../queries/getPostsAndReposts";
 import { formatPosts } from "../utils/formatPosts";
 import { getPosts } from "../queries/getPosts";
 import { getLikes } from "../queries/getLikes";
+import { postsPerPage } from "../config/variables";
 
 export const userRouter = router({
 
@@ -86,8 +87,9 @@ export const userRouter = router({
         }))
         .query(async ({ ctx, input }) => {
             const username = input.username.toLowerCase()
-            const query = getPostsAndReposts(username, ctx.user)
-            const posts = await query;
+            const posts = await getPostsAndReposts(username, ctx.user)
+                .limit(postsPerPage)
+                .offset(input.page * postsPerPage)
             return posts.map(formatPosts)
         }),
 
@@ -97,7 +99,7 @@ export const userRouter = router({
             page: z.number().optional().default(0)
         }))
         .query(async ({ ctx, input }) => {
-            const postsPerPage = 100
+
             const query = getPosts(ctx.user?.userId);
             query
                 .where(
@@ -105,7 +107,8 @@ export const userRouter = router({
                         isNotNull(Post.replyTo),
                         eq(User.usernameLower, input.username.toLowerCase())
                     )
-                ).limit(postsPerPage)
+                )
+                .limit(postsPerPage)
                 .offset(input.page * postsPerPage)
                 .orderBy(desc(Post.dateCreated));
 
@@ -119,7 +122,9 @@ export const userRouter = router({
             page: z.number().optional().default(0)
         }))
         .query(async ({ ctx, input }) => {
-            const posts = await getLikes(input.username, ctx.user);
+            const posts = await getLikes(input.username, ctx.user)
+                .limit(postsPerPage)
+                .offset(postsPerPage * input.page)
             return posts.map(formatPosts)
         }),
 
@@ -139,6 +144,8 @@ export const userRouter = router({
                     .innerJoin(Post, eq(Media.postId, Post.postId))
                     .innerJoin(User, eq(Post.userId, User.userId))
                     .where(eq(User.usernameLower, input.username.toLowerCase()))
+                    .limit(100)
+                    .offset(input.page * postsPerPage)
                     .orderBy(desc(Post.dateCreated))
 
                 return media

@@ -5,7 +5,7 @@ import { alias } from "drizzle-orm/pg-core";
 import { TokenUser } from "../types";
 import { likeCount, repostCount, quotesCount, replyCount, mediaAgg } from "./postSubQueries";
 
-export async function getLikes(username: string, currentUser?: TokenUser | null) {
+export function getLikes(username: string, currentUser?: TokenUser | null) {
 
 
     const quote = alias(Post, 'q');

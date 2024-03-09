@@ -9,6 +9,7 @@ import { getPosts } from '../queries/getPosts';
 import { PostgresError } from 'postgres';
 import { formatPosts } from '../utils/formatPosts';
 import { postRepliesQuery } from '../queries/postRepliesQuery';
+import { postsPerPage } from "../config/variables";
 
 export const postRouter = router({
     createPost: protectedProcedure
@@ -88,7 +89,6 @@ export const postRouter = router({
             page: z.number().optional().default(0)
         }))
         .query(async ({ ctx, input }) => {
-            const postsPerPage = 100
             const query = getPosts(ctx.user?.userId);
             query
                 .where(isNull(Post.replyTo))

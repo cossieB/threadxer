@@ -14,3 +14,11 @@
         
     }
 }
+
+.transparent {
+    @include mixins.flexCenter;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--blue1);
+}
