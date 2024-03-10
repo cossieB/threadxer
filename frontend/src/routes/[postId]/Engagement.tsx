@@ -3,6 +3,7 @@ import { usePostLikes, usePostReplies, useQuotes } from "~/data/engagement"
 import { For, Match, Switch } from "solid-js"
 import Loader from "~/components/shared/Loader/Loader"
 import { UserCard } from "~/components/UserCard"
+import { MoreDataBtn } from "~/components/MoreDataBtn"
 
 export function PostReplies() {
     const query = usePostReplies()
@@ -25,9 +26,14 @@ export function PostLikes() {
                 Something went wrong
             </Match>
             <Match when={query.isSuccess}>
-                <For each={query.data}>
-                    {user => <UserCard {...user} />}
+                <For each={query.data?.pages}>
+                    {page =>
+                        <For each={page.users}>
+                            {user => <UserCard {...user} />}
+                        </For>
+                    }
                 </For>
+                <MoreDataBtn query={query} text="users" />
             </Match>
         </Switch>
     )

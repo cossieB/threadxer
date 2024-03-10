@@ -91,10 +91,10 @@ export const userRouter = router({
                 .limit(postsPerPage + 1)
                 .offset(input.page * postsPerPage)
 
-                const posts = (await query).slice(0, postsPerPage)
+                const posts = await query
                 return {
-                    posts: posts.map(formatPosts),
-                    isLastPage: posts.length <= postsPerPage
+                    posts: posts.map(formatPosts).slice(0, postsPerPage),
+                    isLastPage: posts.length < postsPerPage + 1
                 }
         }),
 
@@ -117,10 +117,10 @@ export const userRouter = router({
                 .offset(input.page * postsPerPage)
                 .orderBy(desc(Post.dateCreated));
 
-                const posts = (await query).slice(0, postsPerPage)
+                const posts = await query
                 return {
-                    posts: posts.map(formatPosts),
-                    isLastPage: posts.length <= postsPerPage
+                    posts: posts.map(formatPosts).slice(0, postsPerPage),
+                    isLastPage: posts.length < postsPerPage + 1
                 }
         }),
 
@@ -134,10 +134,10 @@ export const userRouter = router({
                 .limit(postsPerPage + 1)
                 .offset(postsPerPage * input.page)
 
-                const posts = (await query).slice(0, postsPerPage)
+                const posts = await query
                 return {
-                    posts: posts.map(formatPosts),
-                    isLastPage: posts.length <= postsPerPage
+                    posts: posts.map(formatPosts).slice(0, postsPerPage),
+                    isLastPage: posts.length < postsPerPage + 1
                 }
         }),
 

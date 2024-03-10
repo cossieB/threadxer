@@ -31,10 +31,10 @@ export const searchRouter = router({
                 .limit(postsPerPage)
                 .offset(input.page * postsPerPage)
 
-            const posts = (await query).slice(0, postsPerPage)
+            const posts = await query
             return {
-                posts: posts.map(formatPosts),
-                isLastPage: posts.length <= postsPerPage
+                posts: posts.map(formatPosts).slice(0, postsPerPage),
+                isLastPage: posts.length < postsPerPage + 1
             }
         }),
 })

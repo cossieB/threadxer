@@ -1,10 +1,8 @@
-import { Switch, Match, For, Show, onMount, onCleanup } from "solid-js";
+import { Switch, Match, For, Show } from "solid-js";
 import { PostBox } from "~/components/PostBox/PostBox";
 import Loader from "~/components/shared/Loader/Loader";
 import { P } from "../routes/[username]/Replies";
-import { CustomBtn } from "./shared/buttons/CustomButtons";
-import { DownArrow } from "~/svgs";
-import { CreateInfiniteQueryResult } from "@tanstack/solid-query";
+import { MoreDataBtn } from "./MoreDataBtn";
 
 export function PostLists(props: P) {
 
@@ -19,37 +17,14 @@ export function PostLists(props: P) {
             <Match when={props.query.isSuccess}>
                 <For each={props.query.data?.pages}>
                     {page =>
-                        <For each={page}>
+                        <For each={page.posts}>
                             {post => <PostBox post={post ?? []} />}
                         </For>
                     }
                 </For>
-                <Btn query={props.query} />
+                <MoreDataBtn query={props.query} text="posts" />
             </Match>
         </Switch>
     );
 }
 
-function Btn(props: { query: CreateInfiniteQueryResult }) {
-    let ref!: HTMLButtonElement
-    const observer = new IntersectionObserver((entries, obs) => {
-        entries.forEach(entry => {
-            
-            if (entry.isIntersecting) {
-                props.query.fetchNextPage()
-            }
-        });
-    }, { threshold: 0.25 })
-    onMount(() => observer.observe(ref))
-    onCleanup(() => observer.unobserve(ref))
-
-    return (
-        <Show when={!props.query.isFetchingNextPage} fallback={<Loader />}>
-            <CustomBtn ref={ref} style={{ width: '100%', padding: '1rem' }} class="transparent" onclick={() => props.query.fetchNextPage()}>
-                <DownArrow />
-                {String(props.query.hasNextPage)}
-                Load more posts
-            </CustomBtn>
-        </Show>
-    )
-}

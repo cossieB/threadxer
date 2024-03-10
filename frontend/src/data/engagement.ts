@@ -1,38 +1,44 @@
 import { useParams } from "@solidjs/router";
-import { createQuery, useQueryClient, createMutation } from "@tanstack/solid-query";
+import { createQuery, useQueryClient, createMutation, createInfiniteQuery } from "@tanstack/solid-query";
 import { PostResponse } from "~/routes/[username]/Replies";
 import { trpcClient } from "~/trpc";
 import { modifyLikesAndRepostsInCache } from "~/utils/modifyLikesAndRepostsInCache";
 
 export function useQuotes(page?: number) {
     const params = useParams();
-    return createQuery(() => ({
+    return createInfiniteQuery(() => ({
         queryKey: ['posts', params.postId, 'quotes'],
         queryFn: key => trpcClient.posts.getPostQuotes.query({
             postId: key.queryKey[1],
             page
-        })
+        }),
+        initialPageParam: 0,
+        getNextPageParam: (last, _b, prev) => last.isLastPage ? null : prev + 1,
     }))
 }
 
 export function usePostReplies(page?: number) {
     const params = useParams();
-    return createQuery(() => ({
+    return createInfiniteQuery(() => ({
         queryKey: ['posts', params.postId, 'replies'],
         queryFn: key => trpcClient.posts.getPostReplies.query({
             postId: key.queryKey[1],
             page
-        })
+        }),
+        initialPageParam: 0,
+        getNextPageParam: (last, _b, prev) => last.isLastPage ? null : prev + 1,
     }))
 }
 export function usePostLikes(page?: number) {
     const params = useParams();
-    return createQuery(() => ({
+    return createInfiniteQuery(() => ({
         queryKey: ['posts', params.postId, 'likes'],
         queryFn: key => trpcClient.posts.getPostLikes.query({
             postId: key.queryKey[1],
             page
-        })
+        }),
+        initialPageParam: 0,
+        getNextPageParam: (last, _b, prev) => last.isLastPage ? null : prev + 1,
     }))
 }
 

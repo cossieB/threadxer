@@ -40,6 +40,7 @@ export function Slideshow(props: P2) {
                         }}
                         data-btn="prev"
                         ref={prevBtn}
+                        class="round"
                     >
                         ←
                     </CustomBtn>
@@ -74,6 +75,7 @@ export function Slideshow(props: P2) {
                         }}
                         data-btn="next"
                         ref={nextBtn}
+                        class="round"
                     >
                         →
                     </CustomBtn>

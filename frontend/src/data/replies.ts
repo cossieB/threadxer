@@ -15,7 +15,8 @@ export function useReplies() {
             page: key.pageParam
         }),
         initialPageParam: 0,
-        getNextPageParam: (_a, _b, prev) => prev + 1
+        getNextPageParam: (last, _b, prev) => last.isLastPage ? null : prev + 1,
+
     }))
 }
 

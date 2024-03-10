@@ -58,7 +58,7 @@ export function useUserPosts() {
             page: key.pageParam
         }),
         initialPageParam: 0,
-        getNextPageParam: (_a, _b, prev) => prev + 1
+        getNextPageParam: (last, _b, prev) => last.isLastPage ? null : prev + 1,
     }))
 }
 export function useUserLikes() {
@@ -70,7 +70,7 @@ export function useUserLikes() {
             page: key.pageParam
         }),
         initialPageParam: 0,
-        getNextPageParam: (_a, _b, prev) => prev + 1
+        getNextPageParam: (last, _b, prev) => last.isLastPage ? null : prev + 1,
     }))
 }
 
