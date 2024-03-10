@@ -92,12 +92,15 @@ export const postRouter = router({
             const query = getPosts(ctx.user?.userId);
             query
                 .where(isNull(Post.replyTo))
-                .limit(postsPerPage)
+                .limit(postsPerPage + 1)
                 .offset(input.page * postsPerPage)
                 .orderBy(desc(Post.dateCreated));
-            const posts = await query
+            const posts = (await query).slice(0, postsPerPage)
 
-            return posts.map(formatPosts)
+            return {
+                posts: posts.map(formatPosts),
+                isLastPage: posts.length <= postsPerPage
+            }
         }),
 
     getPostReplies: publicProcedure
@@ -110,10 +113,15 @@ export const postRouter = router({
                 const query = postRepliesQuery(ctx.user?.userId)
                 query
                     .where(eq(Post.replyTo, input.postId))
+                    .limit(postsPerPage + 1)
+                    .offset(input.page * postsPerPage)
                     .orderBy(desc(Post.dateCreated))
 
-                const posts = await query;
-                return posts.map(formatPosts)
+                const posts = (await query).slice(0, postsPerPage)
+                return {
+                    posts: posts.map(formatPosts),
+                    isLastPage: posts.length <= postsPerPage
+                }
             }
             catch (error) {
                 if (error instanceof PostgresError && error.message.includes("invalid input syntax for type uuid"))
@@ -132,10 +140,15 @@ export const postRouter = router({
                 const query = postRepliesQuery(ctx.user?.userId)
                 query
                     .where(eq(Post.quotedPost, input.postId))
+                    .limit(postsPerPage + 1)
+                    .offset(input.page * postsPerPage)
                     .orderBy(desc(Post.dateCreated))
 
-                const posts = await query;
-                return posts.map(formatPosts)
+                    const posts = (await query).slice(0, postsPerPage)
+                    return {
+                        posts: posts.map(formatPosts),
+                        isLastPage: posts.length <= postsPerPage
+                    }
             }
             catch (error) {
                 if (error instanceof PostgresError && error.message.includes("invalid input syntax for type uuid"))

@@ -4,6 +4,7 @@ import { publicProcedure, router } from "../trpc";
 import { z } from "zod";
 import { Hashtags, Post } from "../db/schema";
 import { formatPosts } from "../utils/formatPosts";
+import { postsPerPage } from "../config/variables";
 
 export const searchRouter = router({
     byTerm: publicProcedure
@@ -27,10 +28,13 @@ export const searchRouter = router({
                     .where(ilike(Post.text, `%${input.term}%`))
 
             query
-                .limit(100)
-                .offset(input.page * 100)
+                .limit(postsPerPage)
+                .offset(input.page * postsPerPage)
 
-            const posts = await query
-            return posts.map(formatPosts)
+            const posts = (await query).slice(0, postsPerPage)
+            return {
+                posts: posts.map(formatPosts),
+                isLastPage: posts.length <= postsPerPage
+            }
         }),
 })

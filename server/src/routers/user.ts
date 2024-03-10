@@ -87,10 +87,15 @@ export const userRouter = router({
         }))
         .query(async ({ ctx, input }) => {
             const username = input.username.toLowerCase()
-            const posts = await getPostsAndReposts(username, ctx.user)
-                .limit(postsPerPage)
+            const query = getPostsAndReposts(username, ctx.user)
+                .limit(postsPerPage + 1)
                 .offset(input.page * postsPerPage)
-            return posts.map(formatPosts)
+
+                const posts = (await query).slice(0, postsPerPage)
+                return {
+                    posts: posts.map(formatPosts),
+                    isLastPage: posts.length <= postsPerPage
+                }
         }),
 
     getUserReplies: publicProcedure
@@ -108,12 +113,15 @@ export const userRouter = router({
                         eq(User.usernameLower, input.username.toLowerCase())
                     )
                 )
-                .limit(postsPerPage)
+                .limit(postsPerPage + 1)
                 .offset(input.page * postsPerPage)
                 .orderBy(desc(Post.dateCreated));
 
-            const posts = await query
-            return posts.map(formatPosts)
+                const posts = (await query).slice(0, postsPerPage)
+                return {
+                    posts: posts.map(formatPosts),
+                    isLastPage: posts.length <= postsPerPage
+                }
         }),
 
     getUserLikes: publicProcedure
@@ -122,10 +130,15 @@ export const userRouter = router({
             page: z.number().optional().default(0)
         }))
         .query(async ({ ctx, input }) => {
-            const posts = await getLikes(input.username, ctx.user)
-                .limit(postsPerPage)
+            const query = getLikes(input.username, ctx.user)
+                .limit(postsPerPage + 1)
                 .offset(postsPerPage * input.page)
-            return posts.map(formatPosts)
+
+                const posts = (await query).slice(0, postsPerPage)
+                return {
+                    posts: posts.map(formatPosts),
+                    isLastPage: posts.length <= postsPerPage
+                }
         }),
 
     getUserMedia: publicProcedure

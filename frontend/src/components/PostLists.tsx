@@ -44,9 +44,10 @@ function Btn(props: { query: CreateInfiniteQueryResult }) {
     onCleanup(() => observer.unobserve(ref))
 
     return (
-        <Show  when={!props.query.isFetchingNextPage} fallback={<Loader />}>
+        <Show when={!props.query.isFetchingNextPage} fallback={<Loader />}>
             <CustomBtn ref={ref} style={{ width: '100%', padding: '1rem' }} class="transparent" onclick={() => props.query.fetchNextPage()}>
                 <DownArrow />
+                {String(props.query.hasNextPage)}
                 Load more posts
             </CustomBtn>
         </Show>
