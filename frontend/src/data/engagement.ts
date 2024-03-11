@@ -1,8 +1,9 @@
 import { useParams } from "@solidjs/router";
-import { createQuery, useQueryClient, createMutation, createInfiniteQuery } from "@tanstack/solid-query";
-import { PostResponse } from "~/routes/[username]/Replies";
+import { createQuery, useQueryClient, createMutation, createInfiniteQuery, InfiniteData } from "@tanstack/solid-query";
+import { ApiPostResponse, PostResponse } from "~/routes/[username]/Replies";
 import { trpcClient } from "~/trpc";
-import { modifyLikesAndRepostsInCache } from "~/utils/modifyLikesAndRepostsInCache";
+import { Post } from "~/types";
+import { modifyLikesAndRepostsInCache, rollbackLikesAndReposts } from "~/utils/modifyLikesAndRepostsInCache";
 
 export function useQuotes(page?: number) {
     const params = useParams();
@@ -42,63 +43,33 @@ export function usePostLikes(page?: number) {
     }))
 }
 
-export function useLikes() {
+export function useLikes(postId: string) {
     const queryClient = useQueryClient();
     const mutation = createMutation(() => ({
         mutationFn: trpcClient.engagement.likePost.mutate,
         onMutate: modifyLikesAndRepostsInCache('likes', queryClient),
+        mutationKey: ['likes', postId],
         onError(error, variables, context) {
             queryClient.setQueriesData({
                 queryKey: ['posts']
-            }, (old: PostResponse[] | PostResponse | undefined) => {
-                if (Array.isArray(old)) {
-                    const post = old.find(x => x.post.postId == variables)
-                    if (!post) {
-                        console.log(variables)
-                        return old
-                    }
-                    const newPost: PostResponse = JSON.parse(JSON.stringify(post))
-                    newPost.liked = context?.fieldIsActive
-                    newPost.likes = context?.count ?? 0
-                    return old.map(x => x.post.postId === variables ? newPost : x)
-                }
-                else if (old && old.post.postId === variables) {
-                    const newPost: PostResponse = JSON.parse(JSON.stringify(old))
-                    newPost.liked = context?.fieldIsActive
-                    newPost.likes = context?.count ?? 0
-                    return newPost
-                }
+            }, (old: InfiniteData<ApiPostResponse> | Post | undefined) => {
+                return rollbackLikesAndReposts(old, variables, context)
             })
         },
     }));
     return mutation;
 }
-export function useRepost() {
+export function useRepost(postId: string) {
     const queryClient = useQueryClient();
     const mutation = createMutation(() => ({
         mutationFn: trpcClient.engagement.repostPost.mutate,
         onMutate: modifyLikesAndRepostsInCache('reposts', queryClient),
+        mutationKey: ['reposts', postId],
         onError(error, variables, context) {
             queryClient.setQueriesData({
                 queryKey: ['posts']
-            }, (old: PostResponse[] | PostResponse | undefined) => {
-                if (Array.isArray(old)) {
-                    const post = old.find(x => x.post.postId == variables)
-                    if (!post) {
-                        console.log(variables)
-                        return old
-                    }
-                    const newPost: PostResponse = JSON.parse(JSON.stringify(post))
-                    newPost.reposted = context?.fieldIsActive
-                    newPost.reposts = context?.count ?? 0
-                    return old.map(x => x.post.postId === variables ? newPost : x)
-                }
-                else if (old && old.post.postId === variables) {
-                    const newPost: PostResponse = JSON.parse(JSON.stringify(old))
-                    newPost.reposted = context?.fieldIsActive
-                    newPost.reposts = context?.count ?? 0
-                    return newPost
-                }
+            }, (old: InfiniteData<ApiPostResponse> | Post | undefined) => {
+                return rollbackLikesAndReposts(old, variables, context)
             })
         },
     }));
@@ -112,3 +83,4 @@ export function useViewPost(postId: string) {
         gcTime: 60
     }))
 }
+

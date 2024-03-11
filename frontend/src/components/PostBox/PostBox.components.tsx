@@ -1,4 +1,4 @@
-import { A, useNavigate } from "@solidjs/router"
+import { A, useNavigate, useParams } from "@solidjs/router"
 import { For, Switch, Match } from "solid-js"
 import { PostResponse } from "~/routes/[username]/Replies";
 import { setComposerState } from "~/globalState/composer"
@@ -65,8 +65,9 @@ export function PostBoxContent(props: P2) {
 }
 
 export function PostBoxButtons(props: Props) {
-    const likeMutation = useLikes()
-    const repostMutation = useRepost()
+    const params = useParams()
+    const likeMutation = useLikes(params.postId)
+    const repostMutation = useRepost(params.postId)
 
     return (
         <div class={styles.btns} >
