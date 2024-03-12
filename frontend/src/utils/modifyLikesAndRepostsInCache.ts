@@ -10,6 +10,7 @@ export function modifyLikesAndRepostsInCache(field: 'likes' | 'reposts', queryCl
         const activeField = field == 'likes' ? 'liked' : 'reposted'
         let count = 0
         let fieldIsActive = false;
+        
         queryClient.setQueriesData({
             queryKey: ['posts']
         }, (old: InfiniteData<ApiPostResponse> | Post | undefined) => {

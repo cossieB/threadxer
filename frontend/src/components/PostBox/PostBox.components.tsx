@@ -71,6 +71,7 @@ export function PostBoxButtons(props: Props) {
 
     return (
         <div class={styles.btns} >
+            {likeMutation.status}
             <StatIcon
                 icon={<CommentSvg />}
                 number={props.post.replies}

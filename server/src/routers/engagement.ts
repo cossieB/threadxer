@@ -1,11 +1,13 @@
 import { rateLimiter } from "../middleware/rateLimiter";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
 import { z } from "zod";
-import { eq, sql } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 import { PostgresError } from "postgres";
 import { db } from "../db/drizzle";
 import { Likes, Post, Repost } from "../db/schema";
 import { TRPCError } from "@trpc/server";
+import { redis } from "../redis";
+import { filterViews } from "../utils/filterViews";
 
 export const engagementRouter = router({
     likePost: protectedProcedure
@@ -68,17 +70,15 @@ export const engagementRouter = router({
         }),
 
     viewPost: publicProcedure
-        .input(z.string().uuid())
-        .mutation(async ({input, ctx}) => {
-            await rateLimiter({
-                name: "view:" + ctx.req.ip + input,
-                limit: 1,
-                window: 5 * 60,
-                ctx
-            })
+        .input(z.array(z.string().uuid()))
+        .mutation(async ({ input, ctx }) => {
+            const arr = await filterViews(input, ctx.req.ip)
+            if (arr.length === 0) return;
+            arr.forEach(postId => redis.setex(`views:${ctx.req.ip}:${postId}`, 3600, `views:${ctx.req.ip}:${postId}`))
             await db
-            .update(Post)
-            .set({views: sql`${Post.views} + 1`})
-            .where(eq(Post.postId, input))
+                .update(Post)
+                .set({ views: sql`${Post.views} + 1` })
+                .where(inArray(Post.postId, arr))
         })
 })
+
