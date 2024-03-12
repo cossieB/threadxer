@@ -1,9 +1,8 @@
 import { useParams } from "@solidjs/router";
-import { useQueryClient, createMutation, createInfiniteQuery, type InfiniteData } from "@tanstack/solid-query";
-import type { ApiPostResponse } from "~/routes/[username]/Replies";
+import { useQueryClient, createMutation, createInfiniteQuery } from "@tanstack/solid-query";
+import { errors } from "~/globalState/popups";
 import { trpcClient } from "~/trpc";
-import type { Post } from "~/types";
-import { modifyLikesAndRepostsInCache, rollbackLikesAndReposts } from "~/utils/modifyLikesAndRepostsInCache";
+import { modifyLikesAndRepostsInCache } from "~/utils/modifyLikesAndRepostsInCache";
 
 export function useQuotes(page?: number) {
     const params = useParams();
@@ -43,19 +42,15 @@ export function usePostLikes(page?: number) {
     }))
 }
 
-export function useLikes(postId: string) {
+export function useLike(postId: string) {
     const queryClient = useQueryClient();
     const mutation = createMutation(() => ({
         mutationFn: trpcClient.engagement.likePost.mutate,
-        onMutate: modifyLikesAndRepostsInCache('likes', queryClient),
         mutationKey: ['likes', postId],
-        onError(error, variables, context) {
-            queryClient.setQueriesData({
-                queryKey: ['posts']
-            }, (old: InfiniteData<ApiPostResponse> | Post | undefined) => {
-                return rollbackLikesAndReposts(old, variables, context)
-            })
-        },
+        onSuccess: modifyLikesAndRepostsInCache('likes', queryClient),
+        onError(error) {
+            errors.addError(error.message)
+        }
     }));
     return mutation;
 }
@@ -63,15 +58,11 @@ export function useRepost(postId: string) {
     const queryClient = useQueryClient();
     const mutation = createMutation(() => ({
         mutationFn: trpcClient.engagement.repostPost.mutate,
-        onMutate: modifyLikesAndRepostsInCache('reposts', queryClient),
         mutationKey: ['reposts', postId],
-        onError(error, variables, context) {
-            queryClient.setQueriesData({
-                queryKey: ['posts']
-            }, (old: InfiniteData<ApiPostResponse> | Post | undefined) => {
-                return rollbackLikesAndReposts(old, variables, context)
-            })
-        },
+        onSuccess: modifyLikesAndRepostsInCache('reposts', queryClient),
+        onError(error) {
+            errors.addError(error.message)
+        }
     }));
     return mutation;
 }

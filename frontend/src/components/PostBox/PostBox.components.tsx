@@ -7,8 +7,9 @@ import styles from "~/styles/components/PostBox.module.scss"
 import { CommentSvg, LikeSvg, RepostSvg, QuoteSvg, ViewsSvg } from "~/svgs"
 import { formatPostTime } from "~/utils/formatPostTime"
 import StatIcon from "../ActionIcon"
-import { useLikes } from "~/data/engagement"
-import { useRepost } from "~/data/engagement"
+import { useLike, useRepost } from "~/data/engagement"
+import auth from "~/globalState/auth";
+import { errors } from "~/globalState/popups";
 
 type Props = { post: PostResponse }
 
@@ -66,12 +67,11 @@ export function PostBoxContent(props: P2) {
 
 export function PostBoxButtons(props: Props) {
     const params = useParams()
-    const likeMutation = useLikes(params.postId)
+    const likeMutation = useLike(params.postId)
     const repostMutation = useRepost(params.postId)
 
     return (
         <div class={styles.btns} >
-            {likeMutation.status}
             <StatIcon
                 icon={<CommentSvg />}
                 number={props.post.replies}
@@ -88,14 +88,24 @@ export function PostBoxButtons(props: Props) {
                 icon={<LikeSvg />}
                 number={props.post.likes}
                 color="rgb(249, 24, 128)"
-                onClick={() => likeMutation.mutate(props.post.post.postId)}
+                onClick={() => {
+                    if (likeMutation.isPending) return
+                    if (!auth.user.username) return errors.addError("Please login in to like this post")
+                    likeMutation.mutate(props.post.post.postId)
+                }}
+                isBusy={likeMutation.isPending}
                 highlight={props.post.liked}
-            />
+                />
             <StatIcon
                 icon={<RepostSvg />}
                 number={props.post.reposts}
                 color="rgb(0,186,124)"
-                onClick={() => repostMutation.mutate(props.post.post.postId)}
+                onClick={() => {
+                    if (repostMutation.isPending) return
+                    if (!auth.user.username) return errors.addError("Please login in to repost this post")
+                    repostMutation.mutate(props.post.post.postId)
+                }}
+                isBusy={repostMutation.isPending}
                 highlight={props.post.reposted}
             />
             <StatIcon

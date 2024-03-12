@@ -54,14 +54,14 @@ export const engagementRouter = router({
                     userId: ctx.user.userId
                 })
                 ctx.res.status(201)
-                return
+                return 1
             }
             catch (error: unknown) {
                 if (error instanceof PostgresError) {
                     if (error.message.includes("reposts_post_id_user_id_unique")) {
                         await db.delete(Repost).where(eq(Repost.postId, input))
                         ctx.res.status(200)
-                        return
+                        return -1
                     }
                 }
                 console.error(error)
