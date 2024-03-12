@@ -2,7 +2,7 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-COPY /backend/package.json .
+COPY /server/package.json .
 
 COPY /frontend/package.json /frontend/
 
@@ -12,7 +12,7 @@ RUN cd /app/ && npm install
 
 COPY /frontend /frontend
 
-COPY /backend .
+COPY /server .
 
 RUN cd /frontend && npm run build
 
