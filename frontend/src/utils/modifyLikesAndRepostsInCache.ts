@@ -1,4 +1,4 @@
-import { InfiniteData, QueryClient } from "@tanstack/solid-query";
+import type { InfiniteData, QueryClient } from "@tanstack/solid-query";
 import { type ApiPostResponse } from "~/routes/[username]/Replies";
 import { type Post } from "~/types";
 

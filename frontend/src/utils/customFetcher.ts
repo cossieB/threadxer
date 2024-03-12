@@ -1,7 +1,7 @@
 import { TRPCClientError } from "@trpc/client";
 import auth from "~/globalState/auth"
 import { trpcClient } from "~/trpc";
-import { AppRouter } from 'threadxer-server'
+import { type AppRouter } from 'threadxer-server'
 
 type U = Parameters<typeof fetch>[0]
 type V = Parameters<typeof fetch>[1]
@@ -35,7 +35,6 @@ async function refresh() {
     catch (e: unknown) {
         if (e instanceof TRPCClientError) {
             let error = e as TRPCClientError<AppRouter['refresh']>
-            console.log(error.data)
             if (error.data!.httpStatus == 401 || error.data!.httpStatus == 403) {
                 return auth.deleteUser()
             }

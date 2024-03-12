@@ -1,6 +1,6 @@
 import { A, useNavigate, useParams } from "@solidjs/router"
 import { For, Switch, Match } from "solid-js"
-import { PostResponse } from "~/routes/[username]/Replies";
+import type { PostResponse } from "~/routes/[username]/Replies";
 import { setComposerState } from "~/globalState/composer"
 import { formatDate } from "~/lib/formatDate"
 import styles from "~/styles/components/PostBox.module.scss"

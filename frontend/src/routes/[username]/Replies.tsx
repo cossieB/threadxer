@@ -1,4 +1,4 @@
-import { CreateQueryResult, CreateInfiniteQueryResult, InfiniteData } from "@tanstack/solid-query"
+import type { CreateQueryResult, CreateInfiniteQueryResult, InfiniteData } from "@tanstack/solid-query"
 import { useReplies } from "~/data/replies"
 import { useUserLikes, useUserPosts } from "~/data/user"
 import { PostLists } from "../../components/PostLists"

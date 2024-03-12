@@ -1,5 +1,5 @@
 import { createSignal, mergeProps } from "solid-js";
-import { ChangeEvent } from "~/lib/solidTypes";
+import type { ChangeEvent } from "~/lib/solidTypes";
 import { UploadSvg } from "~/svgs";
 import auth from "~/globalState/auth";
 import type { CreateMutationResult, QueryKey } from "@tanstack/solid-query";

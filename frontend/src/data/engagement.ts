@@ -1,8 +1,8 @@
 import { useParams } from "@solidjs/router";
-import { createQuery, useQueryClient, createMutation, createInfiniteQuery, InfiniteData } from "@tanstack/solid-query";
-import { ApiPostResponse, PostResponse } from "~/routes/[username]/Replies";
+import { useQueryClient, createMutation, createInfiniteQuery, type InfiniteData } from "@tanstack/solid-query";
+import type { ApiPostResponse } from "~/routes/[username]/Replies";
 import { trpcClient } from "~/trpc";
-import { Post } from "~/types";
+import type { Post } from "~/types";
 import { modifyLikesAndRepostsInCache, rollbackLikesAndReposts } from "~/utils/modifyLikesAndRepostsInCache";
 
 export function useQuotes(page?: number) {

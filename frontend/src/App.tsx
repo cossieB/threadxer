@@ -1,5 +1,5 @@
 import Navbar from './components/Navbar';
-import { JSXElement, Show, createEffect } from 'solid-js';
+import { type JSXElement, Show, createEffect } from 'solid-js';
 import auth from './globalState/auth';
 import { PostComposer } from './components/PostComposer';
 import { composerState } from './globalState/composer';

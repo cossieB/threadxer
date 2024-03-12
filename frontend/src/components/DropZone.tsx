@@ -1,4 +1,4 @@
-import { For, JSXElement, Setter, createSignal, onCleanup } from "solid-js"
+import { For, type JSXElement, type Setter, createSignal, onCleanup } from "solid-js"
 import styles from '~/styles/components/DropZone.module.scss'
 import { UploadSvg } from "~/svgs"
 import { MediaPreview } from "./MediaPreview"
