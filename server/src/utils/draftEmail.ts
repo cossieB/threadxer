@@ -1,4 +1,4 @@
-import { sendMail } from "../nodemailer"
+import { sendMail } from "../nodemailer.js"
 
 export async function draftVerificationEmail(name: string, code: string, to: string) {
     const message = `

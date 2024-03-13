@@ -1,4 +1,4 @@
-import { redis } from "../redis";
+import { redis } from "../redis.js";
 
 export async function filterViews(posts: string[], ip: string) {
     const promises = posts.map(x => redis.get(`views:${ip}:${x}`));

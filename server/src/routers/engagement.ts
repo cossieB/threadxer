@@ -1,13 +1,13 @@
-import { rateLimiter } from "../middleware/rateLimiter";
-import { protectedProcedure, publicProcedure, router } from "../trpc";
 import { z } from "zod";
 import { eq, inArray, sql } from "drizzle-orm";
-import { PostgresError } from "postgres";
-import { db } from "../db/drizzle";
-import { Likes, Post, Repost } from "../db/schema";
+import postgres from "postgres";
 import { TRPCError } from "@trpc/server";
-import { redis } from "../redis";
-import { filterViews } from "../utils/filterViews";
+import { db } from "../db/drizzle.js";
+import { Likes, Repost, Post } from "../db/schema.js";
+import { rateLimiter } from "../middleware/rateLimiter.js";
+import { redis } from "../redis.js";
+import { protectedProcedure, publicProcedure, router } from "../trpc.js";
+import { filterViews } from "../utils/filterViews.js";
 
 export const engagementRouter = router({
     likePost: protectedProcedure
@@ -28,7 +28,7 @@ export const engagementRouter = router({
                 return 1
             }
             catch (error: unknown) {
-                if (error instanceof PostgresError) {
+                if (error instanceof postgres.PostgresError) {
                     if (error.message.includes("likes_post_id_user_id_unique")) {
                         await db.delete(Likes).where(eq(Likes.postId, input))
                         ctx.res.status(200)
@@ -57,7 +57,7 @@ export const engagementRouter = router({
                 return 1
             }
             catch (error: unknown) {
-                if (error instanceof PostgresError) {
+                if (error instanceof postgres.PostgresError) {
                     if (error.message.includes("reposts_post_id_user_id_unique")) {
                         await db.delete(Repost).where(eq(Repost.postId, input))
                         ctx.res.status(200)

@@ -1,10 +1,10 @@
 import jwt, { type JwtPayload } from 'jsonwebtoken'
-import { publicProcedure, router } from "../trpc";
+import { publicProcedure, router } from "../trpc.js";
 import { TRPCError } from "@trpc/server";
 import { eq } from 'drizzle-orm';
-import { db } from '../db/drizzle';
-import { RefreshTokens } from '../db/schema';
-import { handleTokens } from '../utils/generateCookies';
+import { db } from '../db/drizzle.js';
+import { RefreshTokens } from '../db/schema.js';
+import { handleTokens } from '../utils/generateCookies.js';
 
 export const refreshRoutes = router({
     getAccessToken: publicProcedure

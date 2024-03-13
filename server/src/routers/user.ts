@@ -1,17 +1,18 @@
+import { and, desc, eq, isNotNull } from "drizzle-orm";
 import { z } from "zod";
-import { protectedProcedure, publicProcedure, router } from "../trpc";
-import { db } from "../db/drizzle";
+import { protectedProcedure, publicProcedure, router } from "../trpc.js";
+import { postsPerPage } from "../config/variables.js";
+import { Media, Post, RefreshTokens, User } from "../db/schema.js";
+import { getPosts } from "../queries/getPosts.js";
+import { formatPosts } from "../utils/formatPosts.js";
 import { TRPCError } from "@trpc/server";
-import jwt, { JwtPayload } from 'jsonwebtoken'
-import { validateUrl } from "../lib/validateUrl";
-import { and, eq, desc, isNotNull } from "drizzle-orm";
-import { Media, Post, RefreshTokens, User } from "../db/schema";
-import { handleTokens } from "../utils/generateCookies";
-import { getPostsAndReposts } from "../queries/getPostsAndReposts";
-import { formatPosts } from "../utils/formatPosts";
-import { getPosts } from "../queries/getPosts";
-import { getLikes } from "../queries/getLikes";
-import { postsPerPage } from "../config/variables";
+import { JwtPayload } from "jsonwebtoken";
+import { db } from "../db/drizzle.js";
+import { validateUrl } from "../lib/validateUrl.js";
+import { getLikes } from "../queries/getLikes.js";
+import { getPostsAndReposts } from "../queries/getPostsAndReposts.js";
+import { handleTokens } from "../utils/generateCookies.js";
+import jwt from 'jsonwebtoken'
 
 export const userRouter = router({
 

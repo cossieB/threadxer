@@ -1,10 +1,10 @@
 import cookie from 'cookie';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken'
-import { type TokenUser } from '../types';
-import { db } from '../db/drizzle';
-import { RefreshTokens } from '../db/schema';
 import { getAuth } from 'firebase-admin/auth';
+import { db } from '../db/drizzle.js';
+import { RefreshTokens } from '../db/schema.js';
+import { TokenUser } from '../types.js';
 
 dotenv.config()
 

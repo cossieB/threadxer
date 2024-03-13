@@ -1,10 +1,10 @@
 import { and, eq, ilike } from "drizzle-orm";
-import { getPosts } from "../queries/getPosts";
-import { publicProcedure, router } from "../trpc";
 import { z } from "zod";
-import { Hashtags, Post } from "../db/schema";
-import { formatPosts } from "../utils/formatPosts";
-import { postsPerPage } from "../config/variables";
+import { publicProcedure, router } from "../trpc.js";
+import { postsPerPage } from "../config/variables.js";
+import { Hashtags, Post } from "../db/schema.js";
+import { getPosts } from "../queries/getPosts.js";
+import { formatPosts } from "../utils/formatPosts.js";
 
 export const searchRouter = router({
     byTerm: publicProcedure

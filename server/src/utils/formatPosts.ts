@@ -1,4 +1,4 @@
-import type { getPosts } from "../queries/getPosts"
+import type { getPosts } from "../queries/getPosts.js"
 
 export function formatPosts(post: Awaited<ReturnType<typeof getPosts>>[number] & {post: {isRepost?: boolean}}) {
     const { originalPost, originalPostAuthor, quoteAuthor, quotePost, ...x } = post

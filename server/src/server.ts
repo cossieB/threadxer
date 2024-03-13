@@ -1,12 +1,12 @@
-import { AppRouter, appRouter } from './routers'
-import { createContext } from './context'
+import { createContext } from './context.js'
 import { fastifyTRPCPlugin, FastifyTRPCPluginOptions } from "@trpc/server/adapters/fastify"
 import Fastify from 'fastify'
 import cors from '@fastify/cors';
 import serveStatic from "@fastify/static"
 import path from 'path';
 import fastifyCookie from '@fastify/cookie';
-import { startFire } from './config/firebase';
+import { startFire } from './config/firebase.js';
+import { appRouter, AppRouter } from './routers/index.js';
 
 const server = Fastify({
     logger: true,
@@ -18,11 +18,11 @@ process.env.NODE_ENV == 'development' &&
     })
     
 server.register(serveStatic, {
-    root: path.join(__dirname, "..", "public")
+    root: path.join("..", "public")
 })
 server.register(fastifyCookie)
 server.setNotFoundHandler((req, reply) => {
-    return reply.sendFile("index.html", path.resolve(__dirname, "..", "public"))
+    return reply.sendFile("index.html", path.resolve("..", "public"))
 })
 server.register(fastifyTRPCPlugin, {
     prefix: '/trpc',
@@ -47,4 +47,4 @@ const PORT = Number(process.env.PORT) || 8080;
         server.log.error(err)
     }
 })()
-export * from "./routers"
+export * from "./routers/index.js"

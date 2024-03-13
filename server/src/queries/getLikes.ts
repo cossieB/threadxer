@@ -1,9 +1,9 @@
-import { db } from "../db/drizzle";
-import { Likes, Post, Repost, User } from "../db/schema";
+import { db } from "../db/drizzle.js";
+import { Likes, Post, Repost, User } from "../db/schema.js";
 import { SQL, and, count, eq, isNotNull, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
-import { TokenUser } from "../types";
-import { likeCount, repostCount, quotesCount, replyCount, mediaAgg } from "./postSubQueries";
+import { TokenUser } from "../types.js";
+import { likeCount, repostCount, quotesCount, replyCount, mediaAgg } from "./postSubQueries.js";
 
 export function getLikes(username: string, currentUser?: TokenUser | null) {
 

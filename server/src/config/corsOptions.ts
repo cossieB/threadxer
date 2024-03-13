@@ -1,5 +1,5 @@
 import { FastifyCorsOptions } from "@fastify/cors";
-import AppError from "../utils/AppError";
+import AppError from "../utils/AppError.js";
 
 const allowList = [process.env.DOMAIN, 'http://localhost:5173', 'http://127.0.0.1:5173'];
 export const corsOptions: FastifyCorsOptions = {

@@ -1,5 +1,5 @@
 import { IncomingHttpHeaders } from "http";
-import { type TokenUser } from "../types";
+import { type TokenUser } from "../types.js";
 import jwt from 'jsonwebtoken'
 
 export function getUserFromHeader(headers: IncomingHttpHeaders) {

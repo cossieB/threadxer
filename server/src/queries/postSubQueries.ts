@@ -1,6 +1,6 @@
 import { count, sql } from "drizzle-orm";
-import { db } from "../db/drizzle";
-import { Likes, Repost, Post, Media } from "../db/schema";
+import { db } from "../db/drizzle.js";
+import { Likes, Repost, Post, Media } from "../db/schema.js";
 
 export const likeCount = db.$with('l').as(
     db.select({
