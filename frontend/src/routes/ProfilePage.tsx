@@ -1,8 +1,6 @@
 import { Navigate } from "@solidjs/router";
-import { Switch, Match } from "solid-js";
+import { Switch, Match, createEffect, createMemo } from "solid-js";
 import { createStore } from "solid-js/store";
-import { CustomInput } from "~/components/CustomInput";
-import { TextareaWithCounter } from "~/components/CustomTextarea";
 import Loader from "~/components/shared/Loader/Loader";
 import Page from "~/components/shared/Page";
 import UserForm from "~/components/shared/UserForm";
@@ -10,20 +8,60 @@ import auth from "~/globalState/auth";
 import { validateUrl } from "~/lib/validateUrl";
 import styles from "~/styles/routes/ProfilePage.module.scss"
 import { DeleteSvg } from "~/svgs";
-import { UploadBtn } from "../components/ImageUploader/UploadBtn";
+import { UploadBtn } from "~/components/ImageUploader/UploadBtn";
 import { Popup } from "~/components/shared/Popup";
 import { useUser, useUserMutation } from "~/data/user";
 import { SubmitButton } from "~/components/shared/buttons/SubmitButton";
+import { FormInput, FormTextarea } from "~/components/shared/FormInput";
+import { compareObjects } from "../utils/compareObjects";
+import { CharacterCounter } from "~/components/CharacterCounter";
 
-const [fieldErrors, setFieldErrors] = createStore({
-    username: [] as string[],
-    website: [] as string[],
-})
+type NewType = Parameters<ReturnType<typeof useUserMutation>['mutate']>[0];
+
+const [state, setState] = createStore<NewType>({})
 
 export default function PreferencesPage() {
-    const errored = () => Object.values(fieldErrors).flat().length > 0;
+    let ref!: HTMLFormElement
+
     const query = useUser(auth.user.username)
     const mutation = useUserMutation()
+
+    createEffect(() => {
+        query.data && setState(query.data)
+    })
+    const websiteErrors = createMemo(() => {
+        if (!state.website || validateUrl(state.website)) return []
+        return ["Invalid URL. Copy and paste your website here including the http(s)"]
+    })
+    const usernameErrors = createMemo(() => {
+        const arr: string[] = []
+        if (typeof state.username !== 'string') return arr
+        if (state.username.length < 3 || state.username.length > 15)
+            arr.push("Username must be between 3 and 15 characters");
+        if (/\W/.test(state.username))
+            arr.push("Username can only contain letters, numbers and underscores");
+        return arr
+    })
+    const errored = () => websiteErrors().length > 0 || usernameErrors().length > 0;
+
+    const hasNotChanged = () => compareObjects(state, query.data!)
+
+    function handleSubmit(e: SubmitEvent) {
+        e.preventDefault()
+        const obj: NewType = {};
+        let canSend = false
+        for (const key in state) {
+            // @ts-expect-error
+            if (state[key] !== query.data?.[key]) {
+                // @ts-expect-error
+                obj[key] = state[key]
+                canSend = true;
+            }
+        }
+        obj.website ||= null;
+        if (canSend)
+            mutation.mutate(obj)
+    }
 
     return (
         <Page title="Preferences">
@@ -48,12 +86,12 @@ export default function PreferencesPage() {
                                 <UploadBtn path="avatar" mutation={mutation} />
                             </div>
                         </div>
-                        <UserForm 
-                            onsubmit={() => mutation.mutate({
-                                
-                            })}>
-                            <CustomInput
+                        <UserForm
+                            ref={ref}
+                            onsubmit={handleSubmit}>
+                            <FormInput
                                 name="username"
+                                setter={setState}
                                 disabled
                                 minlength={3}
                                 value={query.data?.username}
@@ -62,42 +100,38 @@ export default function PreferencesPage() {
                                     e.target.value = e.target.value.trim().replace(/\s/g, '_').replace(/\W/g, "")
                                 }}
                             />
-                            <CustomInput
+                            <FormInput
                                 name="displayName"
+                                setter={setState}
                                 value={query.data?.displayName}
                             />
-                            <CustomInput
+                            <FormInput
                                 name="location"
+                                setter={setState}
                                 required={false}
                                 value={query.data?.location}
                             />
-                            <TextareaWithCounter
+                            <FormTextarea
                                 name="bio"
+                                setter={setState}
                                 required={false}
                                 value={query.data?.bio}
-
                                 maxLength={180}
+                                oninput={e => setState('bio', e.target.value)}
                             />
-                            <CustomInput
+                            <CharacterCounter inputLength={state.bio?.length ?? 0} max={180} />
+                            <FormInput
                                 name="website"
+                                setter={setState}
                                 type="url"
                                 required={false}
-                                oninput={() => setFieldErrors('website', [])}
-                                validatorFn={value => {
-                                    if (!value)
-                                        return setFieldErrors('website', [])
-                                    const url = validateUrl(value)
-                                    if (!url)
-                                        setFieldErrors('website', ["Enter valid URL starting with https"])
-
-                                }}
-                                validationErrors={fieldErrors.website}
-                                value={query.data?.website ?? undefined}
+                                validationErrors={websiteErrors()}
+                                value={query.data?.website as string | undefined}
                             />
                             <SubmitButton
                                 finished={mutation.isSuccess}
                                 loading={mutation.isPending}
-                                disabled={errored() || mutation.isPending || mutation.isPending}
+                                disabled={errored() || mutation.isPending || hasNotChanged()}
                             />
                         </UserForm>
                     </div>

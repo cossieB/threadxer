@@ -1,4 +1,4 @@
-import { JSXElement } from "solid-js";
+import { type JSXElement } from "solid-js";
 import ExternalLink from "./ExternalLink";
 
 type P = {

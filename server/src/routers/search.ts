@@ -1,9 +1,10 @@
 import { and, eq, ilike } from "drizzle-orm";
-import { getPosts } from "../queries/getPosts";
-import { publicProcedure, router } from "../trpc";
 import { z } from "zod";
-import { Hashtags, Post } from "../db/schema";
-import { formatPosts } from "../utils/formatPosts";
+import { publicProcedure, router } from "../trpc.js";
+import { postsPerPage } from "../config/variables.js";
+import { Hashtags, Post } from "../db/schema.js";
+import { getPosts } from "../queries/getPosts.js";
+import { formatPosts } from "../utils/formatPosts.js";
 
 export const searchRouter = router({
     byTerm: publicProcedure
@@ -27,10 +28,13 @@ export const searchRouter = router({
                     .where(ilike(Post.text, `%${input.term}%`))
 
             query
-                .limit(100)
-                .offset(input.page * 100)
+                .limit(postsPerPage)
+                .offset(input.page * postsPerPage)
 
             const posts = await query
-            return posts.map(formatPosts)
+            return {
+                posts: posts.map(formatPosts).slice(0, postsPerPage),
+                isLastPage: posts.length < postsPerPage + 1
+            }
         }),
 })

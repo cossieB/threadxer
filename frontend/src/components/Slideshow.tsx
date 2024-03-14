@@ -1,7 +1,7 @@
 import { For, Show, onMount } from "solid-js";
 import { Portal } from "solid-js/web";
 import styles from "~/styles/components/Media.module.scss";
-import { RoundBtn } from "./shared/buttons/RoundBtn";
+import { CustomBtn } from "./shared/buttons/CustomButtons";
 import { Transition, TransitionGroup } from "solid-transition-group";
 import { P, Media } from "./Media";
 import clickOutside from "~/lib/clickOutside";
@@ -33,16 +33,17 @@ export function Slideshow(props: P2) {
         <Portal ref={el => el.classList.add('modal')}>
             <div class={styles.slideshow} use:clickOutside={props.close}>
                 <Show when={props.i !== 0}>
-                    <RoundBtn
+                    <CustomBtn
                         onclick={() => {
                             direction = 1;
                             props.changeSlide(-1);
                         }}
                         data-btn="prev"
                         ref={prevBtn}
+                        class="round"
                     >
                         ←
-                    </RoundBtn>
+                    </CustomBtn>
                 </Show>
                 <Transition
                     onEnter={(el, done) => {
@@ -67,16 +68,17 @@ export function Slideshow(props: P2) {
                     </For>
                 </Transition>
                 <Show when={props.i !== props.media.length - 1}>
-                    <RoundBtn
+                    <CustomBtn
                         onclick={() => {
                             direction = -1;
                             props.changeSlide(1);
                         }}
                         data-btn="next"
                         ref={nextBtn}
+                        class="round"
                     >
                         →
-                    </RoundBtn>
+                    </CustomBtn>
                 </Show>
             </div>
         </Portal>

@@ -1,17 +1,17 @@
-import { rateLimiter } from "../middleware/rateLimiter";
-import { publicProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server"
 import { z } from "zod";
-import { db } from "../db/drizzle";
 import { randomInt } from "crypto";
-import { PostgresError } from "postgres";
-import { RefreshTokens, User, VerificationCodes } from "../db/schema";
-import titleCase from "../lib/titleCase";
-import { redis } from "../redis";
-import { draftVerificationEmail } from "../utils/draftEmail";
-import { handleTokens } from "../utils/generateCookies";
+import postgres from "postgres";
 import { compare, genSalt, hash } from "bcrypt";
 import { eq } from "drizzle-orm";
+import { db } from "../db/drizzle.js";
+import { User, VerificationCodes, RefreshTokens } from "../db/schema.js";
+import titleCase from "../lib/titleCase.js";
+import { rateLimiter } from "../middleware/rateLimiter.js";
+import { redis } from "../redis.js";
+import { publicProcedure, router } from "../trpc.js";
+import { draftVerificationEmail } from "../utils/draftEmail.js";
+import { handleTokens } from "../utils/generateCookies.js";
 
 export const authRouter = router({
 
@@ -87,7 +87,7 @@ export const authRouter = router({
                 return ({ jwt: accessToken, redirect: '/auth/verify', fb })
             }
             catch (error) {
-                if (error instanceof PostgresError) {
+                if (error instanceof postgres.PostgresError) {
                     if (error.message.includes('users_username_unique'))
                         throw new TRPCError({ code: 'BAD_REQUEST', message: 'Username is not available' })
                     if (error.message.includes("users_email_unique"))

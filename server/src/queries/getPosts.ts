@@ -1,9 +1,8 @@
-import { type Response } from "express";
-import { db } from "../db/drizzle";
-import { Likes, Post, Repost, User } from "../db/schema";
+import { db } from "../db/drizzle.js";
+import { Likes, Post, Repost, User } from "../db/schema.js";
 import { SQL, and, eq, isNotNull, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
-import { likeCount, repostCount, quotesCount, replyCount, mediaAgg } from "./postSubQueries";
+import { likeCount, repostCount, quotesCount, replyCount, mediaAgg } from "./postSubQueries.js";
 
 export function getPosts(loggedInUserId?: string) {
 

@@ -1,6 +1,6 @@
-import { redis } from "../redis";
+import { redis } from "../redis.js";
 import { TRPCError } from "@trpc/server"
-import { Context } from "../context";
+import { Context } from "../context.js";
 
 type RateLimitOptions = {
     name: string,

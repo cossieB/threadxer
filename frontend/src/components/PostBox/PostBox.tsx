@@ -1,23 +1,18 @@
 import styles from "~/styles/components/PostBox.module.scss"
 import { useNavigate } from "@solidjs/router";
-import { Show, createSignal, onCleanup, onMount } from "solid-js";
+import { Show, onCleanup, onMount } from "solid-js";
 import { PostBoxButtons, PostBoxContent, PostBoxHeader } from "./PostBox.components";
 import { RepostSvg } from "~/svgs";
 import { MediaList } from "../Media";
 import { PostResponse } from "~/routes/[username]/Replies";
-import { useViewPost } from "~/data/engagement";
-
-const viewedPosts = new Set<string>()
+import { viewedPosts } from "../PostLists";
 
 export function PostBox(props: { post: PostResponse }) {
     let container!: HTMLDivElement
-    const viewMutation = useViewPost(props.post.post.postId)
-
     const observer = new IntersectionObserver((entries, obs) => {
         entries.forEach(entry => {
-            if (entry.isIntersecting && !viewedPosts.has(props.post.post.postId)) {
-                viewMutation.mutate()
-                viewedPosts.add(props.post.post.postId)
+            if (entry.isIntersecting) {
+                viewedPosts[props.post.post.postId] ??= false
             }
         });
     }, {

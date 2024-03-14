@@ -11,7 +11,7 @@
 - [x] create post with quote
 - [x] reply to post
 - [x] upload images and clips
-- [ ] delete posts
+- [ ] delete post
 
 ## Post Page
 - [x] Replies
@@ -27,8 +27,13 @@
 - [ ] delete banner image
 - [ ] fancy birthday input
 
-## Miscellaneous
-- [ ] View count
+## Engagement
+- [x] Like post
+- [x] Like count
+- [x] Repost post
+- [x] Repost count
+- [x] View post
+- [x] View count
 
 ## Auth
 - [x] Register

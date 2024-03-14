@@ -3,12 +3,13 @@ import styles from "~/styles/components/shared/Buttons.module.scss";
 
 type P = {
     children: JSX.Element
+    class: "round" | "transparent"
 } & JSX.ButtonHTMLAttributes<HTMLButtonElement>
 
-export function RoundBtn(props: P) {
+export function CustomBtn(props: P) {
     const [p, others] = splitProps(props, ['children'])
     return (
-        <button ref={props.ref} class={styles.round} onclick={props.onclick} {...others}>
+        <button ref={props.ref} onclick={props.onclick} {...others} class={styles[props.class]}>
             {p.children}
         </button>
     )

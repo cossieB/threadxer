@@ -83,3 +83,7 @@ button {
         background-color: rgb(196, 26, 26);
     }
 }
+
+.flexCenter {
+    @include mixins.flexCenter
+}

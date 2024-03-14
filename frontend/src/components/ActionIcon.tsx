@@ -1,4 +1,4 @@
-import { JSXElement } from "solid-js"
+import type { JSXElement } from "solid-js"
 import styles from "~/styles/components/PostBox.module.scss"
 
 type Props = {
@@ -7,6 +7,7 @@ type Props = {
     onClick?: () => void
     color?: string
     highlight?: boolean
+    isBusy?: boolean
 }
 
 export default function StatIcon(props: Props) {
@@ -17,7 +18,10 @@ export default function StatIcon(props: Props) {
                 props.onClick && props.onClick();
                 e.stopPropagation()
             }}
-            classList={{[styles.highlight]: props.highlight}}
+            classList={{
+                [styles.highlight]: props.highlight,
+                [styles.busy]: props.isBusy
+            }}
         >
             {props.icon}
             <span>

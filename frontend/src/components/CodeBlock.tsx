@@ -1,5 +1,5 @@
-import { Accessor } from "solid-js";
-import { SetStoreFunction } from "solid-js/store";
+import type { Accessor } from "solid-js";
+import type { SetStoreFunction } from "solid-js/store";
 import styles from '~/styles/components/VerificationCode.module.scss';
 
 export type P = {

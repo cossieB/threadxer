@@ -1,5 +1,5 @@
 import {test, expect, describe, assert} from "vitest"
-import { getHashtags } from "../../utils/getHashtags"
+import { getHashtags } from "../../utils/getHashtags.js"
 
 describe("Hashtags test", () => {
     test("returns array", () => {

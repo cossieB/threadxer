@@ -1,14 +1,14 @@
-import { randomInt } from 'crypto'
-import { sql, eq } from 'drizzle-orm'
-import { db } from '../db/drizzle'
-import { VerificationCodes, User, RefreshTokens } from '../db/schema'
-import { redis } from '../redis'
-import { protectedProcedure, router } from '../trpc'
-import { TRPCError } from '@trpc/server'
-import { draftVerificationEmail } from '../utils/draftEmail'
-import { handleTokens } from '../utils/generateCookies'
-import { z } from 'zod'
-import { PostgresError } from 'postgres'
+import { z } from "zod";
+import { TRPCError } from "@trpc/server";
+import { eq, sql } from "drizzle-orm";
+import postgres from 'postgres';
+import { db } from "../db/drizzle.js";
+import { User, RefreshTokens, VerificationCodes } from "../db/schema.js";
+import { protectedProcedure, router } from "../trpc.js";
+import { randomInt } from "crypto";
+import { redis } from "../redis.js";
+import { draftVerificationEmail } from "../utils/draftEmail.js";
+import { handleTokens } from "../utils/generateCookies.js";
 
 export const verificationRouter = router({
     verifyUser: protectedProcedure
@@ -103,7 +103,7 @@ export const verificationRouter = router({
                 return
             }
             catch (error) {
-                if (error instanceof PostgresError) {
+                if (error instanceof postgres.PostgresError) {
                     if (error.message.includes("violates foreign key constraint"))
                         throw new TRPCError({ code: 'BAD_REQUEST', message: "User Not Found" })
                 }

@@ -1,7 +1,8 @@
-import { createMutation, createQuery, useQueryClient } from "@tanstack/solid-query";
+import { InfiniteData, createInfiniteQuery, createMutation, createQuery, useQueryClient } from "@tanstack/solid-query";
 import { useNavigate, useParams } from "@solidjs/router";
 import { composerState } from "~/globalState/composer";
 import { trpcClient } from "~/trpc";
+import { ApiPostResponse } from "~/routes/[username]/Replies";
 
 export function usePost() {
     const params = useParams()
@@ -15,8 +16,8 @@ export function usePost() {
         queryKey: ['posts', 'byId', params.postId],
         queryFn: key => trpcClient.posts.getPost.query(key.queryKey[2]),
         initialData: () => {
-            type X = Awaited<ReturnType<typeof trpcClient.posts.getPost.query>>
-            const posts = queryClient.getQueryData<X[]>(['posts'])
+            const cache = queryClient.getQueryData<InfiniteData<ApiPostResponse[]>>(['posts']);
+            const posts = cache?.pages.flat().map(x => x.posts).flat(); 
             return posts?.find(p => p.post.postId == params.postId)
         },
         retry(failureCount, error) {
@@ -36,12 +37,13 @@ export function usePost() {
     return { mutation, postQuery }
 }
 
-export function useAllPosts(page?: number) {
-    return createQuery(() => ({
+export function useAllPosts() {
+    return createInfiniteQuery(() => ({
         queryKey: ['posts'],
-        queryFn: () => trpcClient.posts.getAllPosts.query({
-            page
+        queryFn: (key) => trpcClient.posts.getAllPosts.query({
+            page: key.pageParam
         }),
-
+        initialPageParam: 0,
+        getNextPageParam: (last, _b, prev) => last.isLastPage ? null : prev + 1,
     }))
 }

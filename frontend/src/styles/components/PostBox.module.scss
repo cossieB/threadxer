@@ -117,4 +117,18 @@
             opacity: 0.1;
         }
     }
+    &.busy {
+        animation: blink 0.5s linear infinite alternate;
+    }
+}
+
+@keyframes blink {
+    from {
+        color: white;
+        fill: white
+    }
+    to {
+        color: var(--color);
+        fill: var(var(--color))
+    }
 }

@@ -1,12 +1,12 @@
 import { z } from "zod"
-import { router, publicProcedure } from "../trpc"
-import { authRouter } from "./auth"
-import { postRouter } from "./post"
-import { engagementRouter } from "./engagement"
-import { refreshRoutes } from "./refresh"
-import { userRouter } from "./user"
-import { verificationRouter } from "./verify"
-import { searchRouter } from "./search"
+import { publicProcedure, router } from "../trpc.js"
+import { authRouter } from "./auth.js"
+import { engagementRouter } from "./engagement.js"
+import { postRouter } from "./post.js"
+import { refreshRoutes } from "./refresh.js"
+import { searchRouter } from "./search.js"
+import { userRouter } from "./user.js"
+import { verificationRouter } from "./verify.js"
 
 export const appRouter = router({
     hello: publicProcedure.input(z.string().nullish()).query(({ input }) => {

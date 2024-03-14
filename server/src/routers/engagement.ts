@@ -1,11 +1,13 @@
-import { rateLimiter } from "../middleware/rateLimiter";
-import { protectedProcedure, publicProcedure, router } from "../trpc";
 import { z } from "zod";
-import { eq, sql } from "drizzle-orm";
-import { PostgresError } from "postgres";
-import { db } from "../db/drizzle";
-import { Likes, Post, Repost } from "../db/schema";
+import { eq, inArray, sql } from "drizzle-orm";
+import postgres from "postgres";
 import { TRPCError } from "@trpc/server";
+import { db } from "../db/drizzle.js";
+import { Likes, Repost, Post } from "../db/schema.js";
+import { rateLimiter } from "../middleware/rateLimiter.js";
+import { redis } from "../redis.js";
+import { protectedProcedure, publicProcedure, router } from "../trpc.js";
+import { filterViews } from "../utils/filterViews.js";
 
 export const engagementRouter = router({
     likePost: protectedProcedure
@@ -26,7 +28,7 @@ export const engagementRouter = router({
                 return 1
             }
             catch (error: unknown) {
-                if (error instanceof PostgresError) {
+                if (error instanceof postgres.PostgresError) {
                     if (error.message.includes("likes_post_id_user_id_unique")) {
                         await db.delete(Likes).where(eq(Likes.postId, input))
                         ctx.res.status(200)
@@ -52,14 +54,14 @@ export const engagementRouter = router({
                     userId: ctx.user.userId
                 })
                 ctx.res.status(201)
-                return
+                return 1
             }
             catch (error: unknown) {
-                if (error instanceof PostgresError) {
+                if (error instanceof postgres.PostgresError) {
                     if (error.message.includes("reposts_post_id_user_id_unique")) {
                         await db.delete(Repost).where(eq(Repost.postId, input))
                         ctx.res.status(200)
-                        return
+                        return -1
                     }
                 }
                 console.error(error)
@@ -68,17 +70,15 @@ export const engagementRouter = router({
         }),
 
     viewPost: publicProcedure
-        .input(z.string().uuid())
-        .mutation(async ({input, ctx}) => {
-            await rateLimiter({
-                name: "view:" + input,
-                limit: 1,
-                window: 5 * 60,
-                ctx
-            })
+        .input(z.array(z.string().uuid()))
+        .mutation(async ({ input, ctx }) => {
+            const arr = await filterViews(input, ctx.req.ip)
+            if (arr.length === 0) return;
+            arr.forEach(postId => redis.setex(`views:${ctx.req.ip}:${postId}`, 3600, `views:${ctx.req.ip}:${postId}`))
             await db
-            .update(Post)
-            .set({views: sql`${Post.views} + 1`})
-            .where(eq(Post.postId, input))
+                .update(Post)
+                .set({ views: sql`${Post.views} + 1` })
+                .where(inArray(Post.postId, arr))
         })
 })
+

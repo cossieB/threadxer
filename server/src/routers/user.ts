@@ -1,16 +1,18 @@
+import { and, desc, eq, isNotNull } from "drizzle-orm";
 import { z } from "zod";
-import { protectedProcedure, publicProcedure, router } from "../trpc";
-import { db } from "../db/drizzle";
+import { protectedProcedure, publicProcedure, router } from "../trpc.js";
+import { postsPerPage } from "../config/variables.js";
+import { Media, Post, RefreshTokens, User } from "../db/schema.js";
+import { getPosts } from "../queries/getPosts.js";
+import { formatPosts } from "../utils/formatPosts.js";
 import { TRPCError } from "@trpc/server";
-import jwt, { JwtPayload } from 'jsonwebtoken'
-import { validateUrl } from "../lib/validateUrl";
-import { and, eq, desc, isNotNull } from "drizzle-orm";
-import { Media, Post, RefreshTokens, User } from "../db/schema";
-import { handleTokens } from "../utils/generateCookies";
-import { getPostsAndReposts } from "../queries/getPostsAndReposts";
-import { formatPosts } from "../utils/formatPosts";
-import { getPosts } from "../queries/getPosts";
-import { getLikes } from "../queries/getLikes";
+import { JwtPayload } from "jsonwebtoken";
+import { db } from "../db/drizzle.js";
+import { validateUrl } from "../lib/validateUrl.js";
+import { getLikes } from "../queries/getLikes.js";
+import { getPostsAndReposts } from "../queries/getPostsAndReposts.js";
+import { handleTokens } from "../utils/generateCookies.js";
+import jwt from 'jsonwebtoken'
 
 export const userRouter = router({
 
@@ -39,10 +41,11 @@ export const userRouter = router({
         .input(z.object({
             displayName: z.string().max(25).optional(),
             bio: z.string().max(180).optional(),
-            website: z.string().url().optional(),
+            website: z.string().url().nullish(),
             location: z.string().optional(),
             avatar: z.string().url().optional(),
             banner: z.string().url().optional(),
+            username: z.string().optional()
         }))
         .mutation(async ({ ctx, input }) => {
             if (Object.keys(input).length === 0)
@@ -87,8 +90,14 @@ export const userRouter = router({
         .query(async ({ ctx, input }) => {
             const username = input.username.toLowerCase()
             const query = getPostsAndReposts(username, ctx.user)
-            const posts = await query;
-            return posts.map(formatPosts)
+                .limit(postsPerPage + 1)
+                .offset(input.page * postsPerPage)
+
+                const posts = await query
+                return {
+                    posts: posts.map(formatPosts).slice(0, postsPerPage),
+                    isLastPage: posts.length < postsPerPage + 1
+                }
         }),
 
     getUserReplies: publicProcedure
@@ -97,7 +106,7 @@ export const userRouter = router({
             page: z.number().optional().default(0)
         }))
         .query(async ({ ctx, input }) => {
-            const postsPerPage = 100
+
             const query = getPosts(ctx.user?.userId);
             query
                 .where(
@@ -105,12 +114,16 @@ export const userRouter = router({
                         isNotNull(Post.replyTo),
                         eq(User.usernameLower, input.username.toLowerCase())
                     )
-                ).limit(postsPerPage)
+                )
+                .limit(postsPerPage + 1)
                 .offset(input.page * postsPerPage)
                 .orderBy(desc(Post.dateCreated));
 
-            const posts = await query
-            return posts.map(formatPosts)
+                const posts = await query
+                return {
+                    posts: posts.map(formatPosts).slice(0, postsPerPage),
+                    isLastPage: posts.length < postsPerPage + 1
+                }
         }),
 
     getUserLikes: publicProcedure
@@ -119,8 +132,15 @@ export const userRouter = router({
             page: z.number().optional().default(0)
         }))
         .query(async ({ ctx, input }) => {
-            const posts = await getLikes(input.username, ctx.user);
-            return posts.map(formatPosts)
+            const query = getLikes(input.username, ctx.user)
+                .limit(postsPerPage + 1)
+                .offset(postsPerPage * input.page)
+
+                const posts = await query
+                return {
+                    posts: posts.map(formatPosts).slice(0, postsPerPage),
+                    isLastPage: posts.length < postsPerPage + 1
+                }
         }),
 
     getUserMedia: publicProcedure
@@ -139,6 +159,8 @@ export const userRouter = router({
                     .innerJoin(Post, eq(Media.postId, Post.postId))
                     .innerJoin(User, eq(Post.userId, User.userId))
                     .where(eq(User.usernameLower, input.username.toLowerCase()))
+                    .limit(100)
+                    .offset(input.page * postsPerPage)
                     .orderBy(desc(Post.dateCreated))
 
                 return media

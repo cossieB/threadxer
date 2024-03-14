@@ -1,7 +1,7 @@
 import { type Navigator } from '@solidjs/router';
 import { QueryClient, useQueryClient } from '@tanstack/solid-query';
 import { TRPCClientError } from '@trpc/client';
-import { SetStoreFunction } from 'solid-js/store';
+import type { SetStoreFunction } from 'solid-js/store';
 import auth from '~/globalState/auth';
 import { errors } from '~/globalState/popups';
 

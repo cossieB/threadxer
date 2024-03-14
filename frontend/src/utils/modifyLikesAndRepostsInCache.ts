@@ -1,42 +1,37 @@
-import { QueryClient } from "@tanstack/solid-query";
-import { PostResponse } from "~/routes/[username]/Replies";;
+import type { InfiniteData, QueryClient } from "@tanstack/solid-query";
+import { type ApiPostResponse } from "~/routes/[username]/Replies";
+import { type Post } from "~/types";
 
 export function modifyLikesAndRepostsInCache(field: 'likes' | 'reposts', queryClient: QueryClient) {
-    return async function (postId: string) {
-        await queryClient.cancelQueries({
-            queryKey: ['posts']
-        });
+    return  function (data: -1 | 1, postId: string) {
 
         const activeField = field == 'likes' ? 'liked' : 'reposted'
-        let count = 0
-        let fieldIsActive = false;
+        
         queryClient.setQueriesData({
             queryKey: ['posts']
-        }, (old: PostResponse[] | PostResponse | undefined) => {
-            if (Array.isArray(old)) {
-                const post = old.find(x => x.post.postId == postId);
-                if (!post) {
-                    return old;
+        }, (old: InfiniteData<ApiPostResponse> | Post | undefined) => {
+            if (!old) return old;
+            if ('pages' in old)
+                return {
+                    ...old,
+                    pages: old?.pages.map(page => ({
+                        ...page,
+                        posts: page.posts.map(post => {
+                            if (post.post.postId != postId)
+                                return post
+
+                            const newPost: Post = JSON.parse(JSON.stringify(post));
+                            newPost[activeField] = data == 1;
+                            newPost[field] += data;
+                            return newPost;
+                        })
+                    }))
                 }
-                fieldIsActive = post[activeField] ?? false
-                count = post[field]
-                const incr = post[activeField] ? -1 : 1;
-                const newPost: PostResponse = JSON.parse(JSON.stringify(post));
-                newPost[activeField] = !post[activeField];
-                newPost[field] += incr;
-                return old.map(x => x.post.postId === postId ? newPost : x);
-            }
-            else if (old && old.post.postId === postId) {
-                const newPost: PostResponse = JSON.parse(JSON.stringify(old));
-                fieldIsActive = old[activeField] ?? false
-                count = old[field]
-                const incr = old[activeField] ? -1 : 1;
-                newPost[activeField] = !old[activeField];
-                newPost[field] += incr;
-                return newPost;
+            return {
+                ...old,
+                [activeField]: data == 1,
+                [field]: old[field] + data
             }
         });
-        return {count, fieldIsActive};
     };
 }
-
