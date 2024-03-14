@@ -92,7 +92,7 @@ export default function PreferencesPage() {
 
                                 }}
                                 validationErrors={fieldErrors.website}
-                                value={query.data?.website ?? undefined}
+                                value={query.data?.website as string | undefined}
                             />
                             <SubmitButton
                                 finished={mutation.isSuccess}

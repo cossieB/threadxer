@@ -4,7 +4,9 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/server.ts",
-    "test": "vitest"
+    "test": "vitest",
+    "start": "node dist/server.js",
+    "start:railway": "sleep 3 && node dist/server.js"
   },
   "main": "src/server.ts",
   "dependencies": {

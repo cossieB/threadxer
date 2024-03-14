@@ -2,7 +2,7 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-COPY /server/package.json .
+COPY /server/package.prod.json package.json
 
 COPY /frontend/package.json /frontend/
 

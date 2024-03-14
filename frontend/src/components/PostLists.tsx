@@ -14,7 +14,7 @@ export function PostLists(props: P) {
     let t: NodeJS.Timeout | undefined
     onMount(() => {
         t = setInterval(() => {
-            // Send viewed posts to the backend every 30 seconds
+            // Send viewed posts to the backend every 10 seconds
             const entries = Object.entries(viewedPosts);
             const postIds = filterMap(entries, val => !val[1], val => val[0])
             if (postIds.length == 0) return;
@@ -22,7 +22,7 @@ export function PostLists(props: P) {
             for (const key in viewedPosts) {
                 viewedPosts[key] = true
             }
-        }, 1000 * 30)
+        }, 1000 * 10)
     })
     onCleanup(() => clearInterval(t))
     return (

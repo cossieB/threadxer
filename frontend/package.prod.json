@@ -1,0 +1,29 @@
+{
+  "name": "threadxer-frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@solidjs/router": "^0.10.3",
+    "@tanstack/solid-query": "^5.13.4",
+    "@trpc/client": "^10.45.1",
+    "firebase": "^10.7.1",
+    "jwt-decode": "^4.0.0",
+    "solid-js": "^1.7.8",
+    "solid-transition-group": "^0.2.3",
+    "superjson": "^2.2.1",
+    "uploadthing": "^6.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.4",
+    "sass": "^1.69.3",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.7",
+    "vite-plugin-solid": "^2.8.0"
+  }
+}
