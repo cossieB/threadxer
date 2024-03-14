@@ -20,7 +20,16 @@ export function FormInput<T>(props: Props<HTMLInputElement, T>) {
     return (
         <>
             <div class={styles.formControl} classList={{ [styles.error]: errored() }}>
-                <input {...props} onchange={getOnChange(props)} type={props.type ?? 'text'} autocomplete="off" name={merged.name} id={merged.name} required={merged.required} placeholder=" " value={merged.value} />
+                <input
+                    {...props}
+                    onchange={getOnChange(props)}
+                    type={props.type ?? 'text'}
+                    autocomplete="off"
+                    name={merged.name} id={merged.name}
+                    required={merged.required}
+                    placeholder=" "
+                    value={merged.value}
+                />
                 <label for={merged.name}>
                     {titleCase(merged.label)}
                     <Show when={merged.required}>*</Show>
@@ -41,7 +50,14 @@ export function FormTextarea<T>(props: Props<HTMLTextAreaElement, T>) {
     const merged = mergeProps({ label: props.name, required: true }, props)
     return (
         <div class={styles.formControl}>
-            <textarea {...props} name={merged.name} onchange={getOnChange(props)} id={merged.name} required={merged.required} placeholder=" " />
+            <textarea
+                {...props}
+                name={merged.name}
+                onchange={getOnChange(props)}
+                id={merged.name}
+                required={merged.required}
+                placeholder=" "
+            />
             <label for={merged.name}>
                 {titleCase(merged.label)}
                 <Show when={merged.required}>*</Show>

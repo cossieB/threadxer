@@ -41,10 +41,11 @@ export const userRouter = router({
         .input(z.object({
             displayName: z.string().max(25).optional(),
             bio: z.string().max(180).optional(),
-            website: z.string().url().optional(),
+            website: z.string().url().nullish(),
             location: z.string().optional(),
             avatar: z.string().url().optional(),
             banner: z.string().url().optional(),
+            username: z.string().optional()
         }))
         .mutation(async ({ ctx, input }) => {
             if (Object.keys(input).length === 0)

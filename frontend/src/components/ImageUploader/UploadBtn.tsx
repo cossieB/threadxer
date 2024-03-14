@@ -16,7 +16,7 @@ type Props = {
     }, Error, {
         displayName?: string | undefined;
         bio?: string | undefined;
-        website?: string | undefined;
+        website?: string | null | undefined;
         location?: string | undefined;
         avatar?: string | undefined;
         banner?: string | undefined;
