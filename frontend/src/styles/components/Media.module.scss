@@ -16,7 +16,6 @@
 .slideshow {
     background-color: unset !important;
     @include mixins.flexCenter;
-    height: 80%;
     width: 80%;
     position: relative;
     img, video {

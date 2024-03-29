@@ -19,7 +19,7 @@
         width: 100vw;
         height: var(--nav-height);
         bottom: 0;
-        z-index: 999;
+        z-index: 100;
     }
     @media (min-width: 768px) {
         flex-direction: column;

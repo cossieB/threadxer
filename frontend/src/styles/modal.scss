@@ -8,7 +8,7 @@
     @include mixins.flexCenter;
     position: fixed;
     backdrop-filter: blur(5px);
-    z-index: 50;
+    z-index: 999;
     &::after {
         position: absolute;
         content: "";
