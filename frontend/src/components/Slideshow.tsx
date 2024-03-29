@@ -5,6 +5,7 @@ import { CustomBtn } from "./shared/buttons/CustomButtons";
 import { Transition, TransitionGroup } from "solid-transition-group";
 import { P, Media } from "./Media";
 import clickOutside from "~/lib/clickOutside";
+import { useTouch } from "~/hooks/useTouchEnd";
 false && clickOutside
 
 type P2 = {
@@ -13,10 +14,16 @@ type P2 = {
     changeSlide(num: number): void;
 } & P;
 
+
 export function Slideshow(props: P2) {
     let prevBtn: HTMLButtonElement | undefined
     let nextBtn: HTMLButtonElement | undefined
     let direction = 1;
+
+    const {handleTouchEnd, handleTouchStart} = useTouch({
+        onSwipeLeft: () => nextBtn?.click(),
+        onSwipeRight: () => prevBtn?.click()
+    })
 
     function handleKeyup(e: KeyboardEvent) {
         if (e.key == 'ArrowLeft')
@@ -31,7 +38,12 @@ export function Slideshow(props: P2) {
 
     return (
         <Portal ref={el => el.classList.add('modal')}>
-            <div class={styles.slideshow} use:clickOutside={props.close}>
+            <div 
+            class={styles.slideshow} 
+            use:clickOutside={props.close}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            >
                 <Show when={props.i !== 0}>
                     <CustomBtn
                         onclick={() => {

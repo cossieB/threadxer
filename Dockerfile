@@ -2,9 +2,9 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-COPY /server/package.prod.json package.json
+COPY /server/package.json package.json
 
-COPY /frontend/package.json /frontend/
+COPY /frontend/package.prod.json /frontend/package.json
 
 RUN cd /frontend/ && npm install
 
