@@ -79,7 +79,7 @@ export const authRouter = router({
                         })
                     return row[0]
                 })
-                redis.setex(`verification:${user.userId}`, 259200, code)
+                redis.setex(`verification:${user.userId}`, 259200 /* 3 days */, code)
                     .catch(e => console.log(e))
                 const { accessToken, cookie, fb } = await handleTokens({ ...user, isUnverified: true })
                 ctx.res.header('set-cookie', cookie)

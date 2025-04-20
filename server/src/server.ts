@@ -13,7 +13,7 @@ import * as url from 'url';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 const server = Fastify({
-    logger: process.env.NODE_ENV == 'development',
+    logger: process.env.NODE_ENV === "development",
     maxParamLength: 5000
 })
 process.env.NODE_ENV == 'development' &&
@@ -48,10 +48,9 @@ const PORT = Number(process.env.PORT) || 8080;
             port: PORT,
             host: process.env.NODE_ENV == 'development' ? undefined : '0.0.0.0'
         })
-        console.log(`Server is running on port ${PORT}`)
     }
     catch (err) {
-        server.log.error(err)
+        
     }
 })()
 

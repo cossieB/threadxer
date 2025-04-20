@@ -8,7 +8,7 @@ type V = Parameters<typeof fetch>[1]
 
 let canRefresh = true;
 
-export async function customFetch(url: U, requestOpts?: V) {
+export async function customFetch(url: U, requestOpts: V) {
     let isStale = Boolean(auth.user.username) && (auth.token.decoded()?.exp ?? 0) * 1000 < new Date().getTime() + 60000
 
     if (isStale && canRefresh) {

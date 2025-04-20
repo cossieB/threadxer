@@ -1,12 +1,12 @@
 import { useParams } from "@solidjs/router";
-import { useQueryClient, createMutation, createInfiniteQuery } from "@tanstack/solid-query";
+import { useQueryClient, useMutation, useInfiniteQuery } from "@tanstack/solid-query";
 import { errors } from "~/globalState/popups";
 import { trpcClient } from "~/trpc";
 import { modifyLikesAndRepostsInCache } from "~/utils/modifyLikesAndRepostsInCache";
 
 export function useQuotes(page?: number) {
     const params = useParams();
-    return createInfiniteQuery(() => ({
+    return useInfiniteQuery(() => ({
         queryKey: ['posts', params.postId, 'quotes'],
         queryFn: key => trpcClient.posts.getPostQuotes.query({
             postId: key.queryKey[1],
@@ -19,7 +19,7 @@ export function useQuotes(page?: number) {
 
 export function usePostReplies(page?: number) {
     const params = useParams();
-    return createInfiniteQuery(() => ({
+    return useInfiniteQuery(() => ({
         queryKey: ['posts', params.postId, 'replies'],
         queryFn: key => trpcClient.posts.getPostReplies.query({
             postId: key.queryKey[1],
@@ -31,7 +31,7 @@ export function usePostReplies(page?: number) {
 }
 export function usePostLikes(page?: number) {
     const params = useParams();
-    return createInfiniteQuery(() => ({
+    return useInfiniteQuery(() => ({
         queryKey: ['posts', params.postId, 'likes'],
         queryFn: key => trpcClient.posts.getPostLikes.query({
             postId: key.queryKey[1],
@@ -44,7 +44,7 @@ export function usePostLikes(page?: number) {
 
 export function useLike(postId: string) {
     const queryClient = useQueryClient();
-    const mutation = createMutation(() => ({
+    const mutation = useMutation(() => ({
         mutationFn: trpcClient.engagement.likePost.mutate,
         mutationKey: ['likes', postId],
         onSuccess: modifyLikesAndRepostsInCache('likes', queryClient),
@@ -56,7 +56,7 @@ export function useLike(postId: string) {
 }
 export function useRepost(postId: string) {
     const queryClient = useQueryClient();
-    const mutation = createMutation(() => ({
+    const mutation = useMutation(() => ({
         mutationFn: trpcClient.engagement.repostPost.mutate,
         mutationKey: ['reposts', postId],
         onSuccess: modifyLikesAndRepostsInCache('reposts', queryClient),
@@ -68,7 +68,7 @@ export function useRepost(postId: string) {
 }
 
 export function useViewPost() {
-    return createMutation(() => ({
+    return useMutation(() => ({
         mutationKey: ["view"],
         mutationFn: trpcClient.engagement.viewPost.mutate,
         gcTime: 60

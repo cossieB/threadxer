@@ -1,5 +1,5 @@
 import { useSearchParams } from "@solidjs/router";
-import { createInfiniteQuery, createQuery } from "@tanstack/solid-query";
+import { useInfiniteQuery, createQuery } from "@tanstack/solid-query";
 import { CustomInput } from "~/components/CustomInput";
 import { PostLists } from "~/components/PostLists";
 import Page from "~/components/shared/Page";
@@ -10,10 +10,10 @@ import { trpcClient } from "~/trpc";
 export function SearchPage() {
     let inputElem!: HTMLInputElement
     const [searchParams, setSearchParams] = useSearchParams()
-    const q = () => searchParams.q ?? ""
+    const q = () => typeof searchParams.q === "string" ? searchParams.q : ""
     const hashtag = () => searchParams.hashtag
 
-    const query = createInfiniteQuery(() => ({
+    const query = useInfiniteQuery(() => ({
         queryKey: ['search', { q: q(), h: hashtag() }],
         enabled: q().length > 2 || !!hashtag(),
         queryFn: () => trpcClient.search.byTerm.query({

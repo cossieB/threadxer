@@ -1,11 +1,11 @@
-import { createQuery, createMutation, useQueryClient, createInfiniteQuery } from "@tanstack/solid-query";
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/solid-query";
 import auth from "~/globalState/auth";
 import { useParams } from "@solidjs/router";
 import { trpcClient } from "~/trpc";
 
 export function useUser(username: string) {
 
-    const query = createQuery(() => ({
+    const query = useQuery(() => ({
         get enabled() {
             return !!username
         },
@@ -36,7 +36,7 @@ export function useUser(username: string) {
 export function useUserMutation() {
     const queryClient = useQueryClient()
     type ApiUserResponse = Awaited<ReturnType<typeof trpcClient.user.getUser.query>>
-    return createMutation(() => ({
+    return useMutation(() => ({
         mutationFn: trpcClient.user.updateUser.mutate,
         onSuccess(data, variables, context) {
             queryClient.setQueryData(['users', auth.user.username.toLowerCase()], (old: ApiUserResponse) => ({
@@ -51,7 +51,7 @@ export function useUserMutation() {
 export function useUserPosts() {
     const params = useParams()
 
-    return createInfiniteQuery(() => ({
+    return useInfiniteQuery(() => ({
         queryKey: ['posts', 'byUsername', params.username.toLowerCase()],
         queryFn: key => trpcClient.user.getUserPosts.query({
             username: key.queryKey[2],
@@ -63,7 +63,7 @@ export function useUserPosts() {
 }
 export function useUserLikes() {
     const params = useParams()
-    return createInfiniteQuery(() => ({
+    return useInfiniteQuery(() => ({
         queryKey: ['posts', 'likes', params.username.toLowerCase()],
         queryFn: key => trpcClient.user.getUserLikes.query({
             username: key.queryKey[2],
@@ -76,7 +76,7 @@ export function useUserLikes() {
 
 export function useUserMedia() {
     const params = useParams()
-    return createQuery(() => ({
+    return useQuery(() => ({
         queryKey: ['media', params.username.toLowerCase()],
         queryFn: key => trpcClient.user.getUserMedia.query({
             username: key.queryKey[1]

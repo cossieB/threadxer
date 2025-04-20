@@ -1,11 +1,11 @@
 import { useParams } from "@solidjs/router";
-import { createInfiniteQuery } from "@tanstack/solid-query";
+import { useInfiniteQuery } from "@tanstack/solid-query";
 import { trpcClient } from "~/trpc";
 
 export function useReplies() {
     const params = useParams()
 
-    return createInfiniteQuery(() => ({
+    return useInfiniteQuery(() => ({
         refetchOnMount: false,
         refetchOnReconnect: false,
         refetchOnWindowFocus: false,

@@ -1,4 +1,4 @@
-import { InfiniteData, createInfiniteQuery, createMutation, createQuery, useQueryClient } from "@tanstack/solid-query";
+import { InfiniteData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/solid-query";
 import { useNavigate, useParams } from "@solidjs/router";
 import { composerState } from "~/globalState/composer";
 import { trpcClient } from "~/trpc";
@@ -9,7 +9,7 @@ export function usePost() {
     const queryClient = useQueryClient()
     const navigate = useNavigate()
 
-    const postQuery = createQuery(() => ({
+    const postQuery = useQuery(() => ({
         get enabled() {
             return !!params.postId
         },
@@ -24,7 +24,7 @@ export function usePost() {
             return failureCount < 3 && !error.message.includes("post doesn't exist")
         },
     }))
-    const mutation = createMutation(() => ({
+    const mutation = useMutation(() => ({
         mutationFn: trpcClient.posts.createPost.mutate,
         onSuccess(data, variables, context) {
             queryClient.invalidateQueries({
@@ -38,7 +38,7 @@ export function usePost() {
 }
 
 export function useAllPosts() {
-    return createInfiniteQuery(() => ({
+    return useInfiniteQuery(() => ({
         queryKey: ['posts'],
         queryFn: (key) => trpcClient.posts.getAllPosts.query({
             page: key.pageParam
