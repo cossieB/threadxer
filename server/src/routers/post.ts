@@ -4,58 +4,21 @@ import { eq, desc, isNull } from "drizzle-orm";
 import postgres from 'postgres';
 import { postsPerPage } from "../config/variables.js";
 import { db } from "../db/drizzle.js";
-import { Post, Media, Hashtags, User, Likes } from "../db/schema.js";
-import { getPosts } from "../queries/getPosts.js";
 import { postRepliesQuery } from "../queries/postRepliesQuery.js";
 import { protectedProcedure, publicProcedure, router } from "../trpc.js";
 import { formatPosts } from "../utils/formatPosts.js";
-import { getHashtags } from "../utils/getHashtags.js";
+import { CreatePostSchema } from "~/models/Post.js";
+import * as postService from "~/services/postService.js";
 
 export const postRouter = router({
     createPost: protectedProcedure
-        .input(z.object({
-            text: z.string().max(180),
-            quotedPost: z.string().uuid().optional(),
-            replyTo: z.string().uuid().optional(),
-            media: z.object({
-                url: z.string().url(),
-                isVideo: z.boolean(),
-                ref: z.string()
-            }).array().optional().default([]),
-        }))
+        .input(CreatePostSchema)
         .mutation(async ({ ctx, input }) => {
             if (input.text.length + input.media.length === 0)
                 throw new TRPCError({ code: 'BAD_REQUEST', message: "Empty posts are not allowed" })
 
-            const uniques = getHashtags(input.text);
-
             try {
-                const postId = await db.transaction(async tx => {
-                    const row = await tx.insert(Post)
-                        .values({
-                            userId: ctx.user.userId,
-                            text: input.text.trim(),
-                            quotedPost: input.quotedPost,
-                            didQuote: !!input.quotedPost,
-                            replyTo: input.replyTo,
-                            didReply: !!input.replyTo
-                        }).returning({
-                            postId: Post.postId
-                        })
-                    if (input.media.length > 0)
-                        await tx.insert(Media).values(input.media.map(m => ({
-                            postId: row[0].postId,
-                            url: m.url,
-                            firebaseRef: m.ref,
-                            isVideo: m.isVideo,
-                        })))
-                    if (uniques.length > 0)
-                        await tx.insert(Hashtags).values(uniques.map(tag => ({
-                            hashtag: tag,
-                            postId: row[0].postId,
-                        })))
-                    return row[0].postId
-                })
+                const postId = await postService.createPost(ctx.user, input)
                 ctx.res.status(201)
                 return postId
             }
@@ -68,18 +31,12 @@ export const postRouter = router({
     getPost: publicProcedure.input(z.string())
         .query(async ({ ctx, input }) => {
             try {
-                const query = getPosts(ctx.user?.userId)
-                query.where(eq(Post.postId, input))
-
-                const posts = await query
-                const post = posts.at(0);
+                const post = await postService.getPost(input, ctx.user)
                 if (!post)
                     throw new TRPCError({ code: 'NOT_FOUND', message: "That post doesn't exist" })
                 return formatPosts(post)
             }
             catch (error) {
-                if (error instanceof postgres.PostgresError && error.message.includes("invalid input syntax for type uuid"))
-                    throw new TRPCError({ code: 'BAD_REQUEST', message: "That post doesn't exist" })
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong. Please try again later" })
             }
         }),
@@ -89,14 +46,7 @@ export const postRouter = router({
             page: z.number().optional().default(0)
         }))
         .query(async ({ ctx, input }) => {
-            const query = getPosts(ctx.user?.userId);
-            query
-                .where(isNull(Post.replyTo))
-                .limit(postsPerPage + 1)
-                .offset(input.page * postsPerPage)
-                .orderBy(desc(Post.dateCreated));
-            const posts = await query
-
+            const posts = await postService.getAllPosts(input.page, ctx.user)
             return {
                 posts: posts.map(formatPosts).slice(0, postsPerPage),
                 isLastPage: posts.length < postsPerPage + 1
@@ -110,22 +60,15 @@ export const postRouter = router({
         }))
         .query(async ({ ctx, input }) => {
             try {
-                const query = postRepliesQuery(ctx.user?.userId)
-                query
-                    .where(eq(Post.replyTo, input.postId))
-                    .limit(postsPerPage + 1)
-                    .offset(input.page * postsPerPage)
-                    .orderBy(desc(Post.dateCreated))
-
-                const posts = await query
+                const posts = await postService.getPostReplies(input.postId, input.page, ctx.user)
                 return {
                     posts: posts.map(formatPosts).slice(0, postsPerPage),
                     isLastPage: posts.length < postsPerPage + 1
                 }
             }
             catch (error) {
-                if (error instanceof postgres.PostgresError && error.message.includes("invalid input syntax for type uuid"))
-                    throw new TRPCError({ code: 'BAD_REQUEST', message: "That post doesn't exist" })
+                if (error instanceof TRPCError)
+                    throw error
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong. Please try again later" })
             }
         }),
@@ -137,22 +80,15 @@ export const postRouter = router({
         }))
         .query(async ({ ctx, input }) => {
             try {
-                const query = postRepliesQuery(ctx.user?.userId)
-                query
-                    .where(eq(Post.quotedPost, input.postId))
-                    .limit(postsPerPage + 1)
-                    .offset(input.page * postsPerPage)
-                    .orderBy(desc(Post.dateCreated))
-
-                    const posts = await query
-                    return {
-                        posts: posts.map(formatPosts).slice(0, postsPerPage),
-                        isLastPage: posts.length < postsPerPage + 1
-                    }
+                const posts = await postService.getPostQuotes(input.postId, input.page, ctx.user)
+                return {
+                    posts: posts.map(formatPosts).slice(0, postsPerPage),
+                    isLastPage: posts.length < postsPerPage + 1
+                }
             }
             catch (error) {
-                if (error instanceof postgres.PostgresError && error.message.includes("invalid input syntax for type uuid"))
-                    throw new TRPCError({ code: 'BAD_REQUEST', message: "That post doesn't exist" })
+                if (error instanceof TRPCError)
+                    throw error
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong. Please try again later" })
             }
         }),
@@ -164,19 +100,7 @@ export const postRouter = router({
         }))
         .query(async ({ ctx, input }) => {
             try {
-                const users = await db.select({
-                    userId: User.userId,
-                    username: User.username,
-                    avatar: User.avatar,
-                    banner: User.avatar,
-                    displayName: User.displayName,
-                    bio: User.bio
-                })
-                    .from(Likes)
-                    .innerJoin(User, eq(Likes.userId, User.userId))
-                    .where(eq(Likes.postId, input.postId))
-                    .limit(postsPerPage + 1)
-                    .offset(input.page * postsPerPage)
+                const users = await postService.getPostLikes(input.postId, input.page, ctx.user)
 
                 return {
                     isLastPage: users.length <= postsPerPage,
@@ -184,8 +108,8 @@ export const postRouter = router({
                 }
             }
             catch (error) {
-                if (error instanceof postgres.PostgresError && error.message.includes("invalid input syntax for type uuid"))
-                    throw new TRPCError({ code: 'BAD_REQUEST', message: "That post doesn't exist" })
+                if (error instanceof TRPCError)
+                    throw error
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong. Please try again later" })
             }
         })
