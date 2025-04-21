@@ -1,0 +1,73 @@
+import cookie from 'cookie';
+import jwt from 'jsonwebtoken'
+import { getAuth } from 'firebase-admin/auth';
+import { db } from '../db/drizzle.js';
+import { RefreshTokens, User } from '../db/schema.js';
+import { TokenUser } from '../types.js';
+import { eq } from 'drizzle-orm';
+
+export async function createTokens(user: TokenUser) {
+    return handleTokens(user)
+}
+
+export async function updateTokens(user: TokenUser) {
+    return handleTokens(user, async refreshToken => {
+        db.transaction(async tx => {
+            await tx.insert(RefreshTokens).values({
+                token: refreshToken,
+                userId: user.userId
+            })
+            await tx.update(User).set({
+                lastLogin: new Date
+            })
+        })
+    })
+}
+
+export async function deleteTokens(refresh: string) {
+    await db.delete(RefreshTokens).where(eq(RefreshTokens.token, refresh))
+}
+
+/**
+ * This function creates access token, refresh token and a cookie of the refresh token and saves the token to the database.
+ * @param user 
+ * @param saveToDb Optional function to save the refresh token to the database in case you want to use a SQL transaction.
+ * @returns 
+ */
+async function handleTokens(user: TokenUser, saveToDb?: (refreshToken: string) => Promise<void>) {
+    const accessToken = createAccessToken(user);
+    const refreshToken = createRefreshToken(user)
+    const cookie = generateCookie(refreshToken);
+    const firebaseToken = await getAuth().createCustomToken(user.userId)
+
+    if (saveToDb)
+        await saveToDb(refreshToken)
+    else
+        await db
+            .insert(RefreshTokens)
+            .values({
+                token: refreshToken,
+                userId: user.userId
+            })
+
+    return { accessToken, cookie, firebaseToken }
+}
+
+function createAccessToken(user: TokenUser) {
+    return jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET!, {
+        expiresIn: '15m'
+    })
+}
+function createRefreshToken(user: TokenUser) {
+    return jwt.sign({ user }, process.env.REFRESH_TOKEN_SECRET!)
+}
+function generateCookie(refreshToken: string) {
+    const refreshCookie = cookie.serialize('rf', refreshToken, {
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV == 'production',
+        sameSite: true,
+        maxAge: 60 * 60 * 24 * 30,
+    });
+    return refreshCookie;
+}

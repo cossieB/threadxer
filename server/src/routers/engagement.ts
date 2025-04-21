@@ -15,7 +15,7 @@ export const engagementRouter = router({
         .mutation(async ({ ctx, input }) => {
             await rateLimiter({
                 name: 'like',
-                ctx,
+                userIdentifier: ctx.user?.userId ?? ctx.req.ip,
                 limit: 10,
                 window: 60,
             })
@@ -44,7 +44,7 @@ export const engagementRouter = router({
         .mutation(async ({ ctx, input }) => {
             await rateLimiter({
                 name: 'repost',
-                ctx,
+                userIdentifier: ctx.user?.userId ?? ctx.req.ip,
                 limit: 10,
                 window: 60,
             })

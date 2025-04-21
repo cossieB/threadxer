@@ -7,12 +7,12 @@ type RateLimitOptions = {
     limit: number,
     /** Time in seconds */
     window: number,
-    ctx: Context,
+    userIdentifier: string,
 }
 
 export async function rateLimiter(opts: RateLimitOptions) {
 
-    const key = `${opts.name}:${opts.ctx.user?.userId ?? opts.ctx.req.ip}`;
+    const key = `${opts.name}:${opts.userIdentifier}`;
     const count = await redis.incr(key);
     redis.expire(key, opts.window, 'NX')
     if (count > opts.limit)

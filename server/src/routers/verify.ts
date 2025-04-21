@@ -8,7 +8,7 @@ import { protectedProcedure, router } from "../trpc.js";
 import { randomInt } from "crypto";
 import { redis } from "../redis.js";
 import { draftVerificationEmail } from "../utils/draftEmail.js";
-import { handleTokens } from "../utils/generateCookies.js";
+import * as authService from "~/services/authService.js";
 
 export const verificationRouter = router({
     verifyUser: protectedProcedure
@@ -63,7 +63,7 @@ export const verificationRouter = router({
                     if (ctx.req.cookies.rf)
                         await tx.delete(RefreshTokens).where(eq(RefreshTokens.token, ctx.req.cookies.rf))
                 })
-                const { accessToken: newAccessToken, cookie, fb } = await handleTokens({ ...ctx.user, isUnverified: false }, async refreshToken => {
+                const { accessToken: newAccessToken, cookie, firebaseToken: fb } = await authService.handleTokens({ ...ctx.user, isUnverified: false }, async refreshToken => {
                     await db.transaction(async tx => {
                         if (ctx.req.cookies.rf)
                             await tx.delete(RefreshTokens).where(eq(RefreshTokens.token, ctx.req.cookies.rf))

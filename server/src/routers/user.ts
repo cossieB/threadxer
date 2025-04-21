@@ -1,52 +1,32 @@
+import { TRPCError } from "@trpc/server";
 import { and, desc, eq, isNotNull } from "drizzle-orm";
 import { z } from "zod";
-import { protectedProcedure, publicProcedure, router } from "../trpc.js";
-import { postsPerPage } from "../config/variables.js";
-import { Media, Post, RefreshTokens, User } from "../db/schema.js";
-import { getPosts } from "../queries/getPosts.js";
-import { formatPosts } from "../utils/formatPosts.js";
-import { TRPCError } from "@trpc/server";
-import { JwtPayload } from "jsonwebtoken";
-import { db } from "../db/drizzle.js";
-import { validateUrl } from "../lib/validateUrl.js";
-import { getLikes } from "../queries/getLikes.js";
-import { getPostsAndReposts } from "../queries/getPostsAndReposts.js";
-import { handleTokens } from "../utils/generateCookies.js";
-import jwt from 'jsonwebtoken'
+import { postsPerPage } from "~/config/variables.js";
+import { db } from "~/db/drizzle.js";
+import { RefreshTokens, User, Post, Media } from "~/db/schema.js";
+import { getLikes } from "~/queries/getLikes.js";
+import { getPosts } from "~/queries/getPosts.js";
+import { getPostsAndReposts } from "~/queries/getPostsAndReposts.js";
+import * as authService from "~/services/authService.js";
+import * as userService from "~/services/userService.js";
+import { router, publicProcedure, protectedProcedure } from "~/trpc.js";
+import { formatPosts } from "~/utils/formatPosts.js";
+import jwt, {type JwtPayload} from 'jsonwebtoken'
+import { UpdateUserSchema } from "~/models/User.js";
 
 export const userRouter = router({
 
     getUser: publicProcedure
         .input(z.string())
         .query(async ({ ctx, input }) => {
-            const row = await db.query.User.findFirst({
-                columns: {
-                    passwordHash: false,
-                    emailVerified: false,
-                    usernameLower: false,
-                    email: false,
-                    userId: false,
-                    lastLogin: false
-                },
-                where(fields, operators) {
-                    return operators.eq(fields.usernameLower, input.toLowerCase())
-                },
-            })
+            const row = await userService.getUserBy('usernameLower', input)
             if (!row)
                 throw new TRPCError({ code: 'NOT_FOUND', message: 'No user with that username exists' })
             return row
         }),
 
     updateUser: protectedProcedure
-        .input(z.object({
-            displayName: z.string().max(25).optional(),
-            bio: z.string().max(180).optional(),
-            website: z.string().url().nullish(),
-            location: z.string().optional(),
-            avatar: z.string().url().optional(),
-            banner: z.string().url().optional(),
-            username: z.string().optional()
-        }))
+        .input(UpdateUserSchema)
         .mutation(async ({ ctx, input }) => {
             if (Object.keys(input).length === 0)
                 throw new TRPCError({ code: 'BAD_REQUEST', message: "Empty request body" })
@@ -58,10 +38,8 @@ export const userRouter = router({
 
             try {
                 const user = ctx.user;
-                if (input.website && !validateUrl(input.website))
-                    throw new TRPCError({ code: 'BAD_REQUEST', message: "Please don't bypass client validation" })
 
-                const { accessToken, cookie, fb } = await handleTokens({ ...token.user, ...input }, async refreshToken => {
+                const { accessToken, cookie, firebaseToken: fb } = await authService.handleTokens({ ...token.user, ...input }, async refreshToken => {
                     await db.transaction(async tx => {
                         await tx.delete(RefreshTokens).where(eq(RefreshTokens.token, refresh))
                         await tx.insert(RefreshTokens).values({
