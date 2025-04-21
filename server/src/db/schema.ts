@@ -65,6 +65,7 @@ export const Media = pgTable('media', {
 
 export const Likes = pgTable('likes', {
     likeId: uuid('like_id').primaryKey().defaultRandom(),
+    /**User Id of the person who liked the post */
     userId: uuid('user_id').references(() => User.userId, { onDelete: 'cascade', onUpdate: 'cascade' }).notNull(),
     postId: uuid('post_id').references(() => Post.postId, { onDelete: 'cascade', onUpdate: 'cascade' }).notNull(),
     dateCreated: timestamp('date_created', { withTimezone: true }).defaultNow().notNull()

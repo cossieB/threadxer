@@ -29,3 +29,4 @@ export const UpdateUserSchema = z.object({
     banner: z.string().url().optional(),
     username: z.string().optional()
 })
+export type UserUpdate = z.infer<typeof UpdateUserSchema>

@@ -5,12 +5,13 @@ import { db } from '../db/drizzle.js';
 import { RefreshTokens, User } from '../db/schema.js';
 import { TokenUser } from '../types.js';
 import { eq } from 'drizzle-orm';
+import { UserUpdate } from '~/models/User.js';
 
 export async function createTokens(user: TokenUser) {
     return handleTokens(user)
 }
 
-export async function updateTokens(user: TokenUser) {
+export async function updateTokensAndLogin(user: TokenUser) {
     return handleTokens(user, async refreshToken => {
         db.transaction(async tx => {
             await tx.insert(RefreshTokens).values({
@@ -20,6 +21,22 @@ export async function updateTokens(user: TokenUser) {
             await tx.update(User).set({
                 lastLogin: new Date
             })
+        })
+    })
+}
+
+export async function updateTokensAndUser(user: TokenUser, refresh: string, input: UserUpdate) {
+    return handleTokens(user, async refreshToken => {
+        await db.transaction(async tx => {
+            await tx.delete(RefreshTokens).where(eq(RefreshTokens.token, refresh))
+            await tx.insert(RefreshTokens).values({
+                token: refreshToken,
+                userId: user.userId
+            })
+            await tx
+                .update(User)
+                .set({ ...input })
+                .where(eq(User.userId, user.userId))
         })
     })
 }

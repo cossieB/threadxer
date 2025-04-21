@@ -79,7 +79,7 @@ export const authRouter = router({
 
                 const u = UserResponseSchema.parse(user)
 
-                const { accessToken, cookie, firebaseToken } = await authService.updateTokens({...u, isUnverified: !emailVerified})
+                const { accessToken, cookie, firebaseToken } = await authService.updateTokensAndLogin({...u, isUnverified: !emailVerified})
                 let redirect = getRedirectPath(ctx.req.headers['x-client-url'])
                 if (!row.emailVerified)
                     redirect = '/auth/verify'

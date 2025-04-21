@@ -1,17 +1,12 @@
 import { TRPCError } from "@trpc/server";
-import { and, desc, eq, isNotNull } from "drizzle-orm";
 import { z } from "zod";
 import { postsPerPage } from "~/config/variables.js";
-import { db } from "~/db/drizzle.js";
-import { RefreshTokens, User, Post, Media } from "~/db/schema.js";
-import { getLikes } from "~/queries/getLikes.js";
-import { getPosts } from "~/queries/getPosts.js";
-import { getPostsAndReposts } from "~/queries/getPostsAndReposts.js";
+import * as postService from "~/services/postService.js";
 import * as authService from "~/services/authService.js";
 import * as userService from "~/services/userService.js";
 import { router, publicProcedure, protectedProcedure } from "~/trpc.js";
 import { formatPosts } from "~/utils/formatPosts.js";
-import jwt, {type JwtPayload} from 'jsonwebtoken'
+import jwt, { type JwtPayload } from 'jsonwebtoken'
 import { UpdateUserSchema } from "~/models/User.js";
 
 export const userRouter = router({
@@ -37,21 +32,7 @@ export const userRouter = router({
             const token = jwt.verify(refresh, process.env.REFRESH_TOKEN_SECRET!) as JwtPayload;
 
             try {
-                const user = ctx.user;
-
-                const { accessToken, cookie, firebaseToken: fb } = await authService.handleTokens({ ...token.user, ...input }, async refreshToken => {
-                    await db.transaction(async tx => {
-                        await tx.delete(RefreshTokens).where(eq(RefreshTokens.token, refresh))
-                        await tx.insert(RefreshTokens).values({
-                            token: refreshToken,
-                            userId: token.user.userId
-                        })
-                        await tx
-                            .update(User)
-                            .set({ ...input })
-                            .where(eq(User.userId, user.userId))
-                    })
-                })
+                const { accessToken, cookie, firebaseToken: fb } = await authService.updateTokensAndUser({ ...token.user!, ...input }, refresh, input)
                 ctx.res.header('Set-Cookie', cookie)
                 return { jwt: accessToken, fb }
             }
@@ -67,15 +48,11 @@ export const userRouter = router({
         }))
         .query(async ({ ctx, input }) => {
             const username = input.username.toLowerCase()
-            const query = getPostsAndReposts(username, ctx.user)
-                .limit(postsPerPage + 1)
-                .offset(input.page * postsPerPage)
-
-                const posts = await query
-                return {
-                    posts: posts.map(formatPosts).slice(0, postsPerPage),
-                    isLastPage: posts.length < postsPerPage + 1
-                }
+            const posts = await postService.getUserPosts(username, ctx.user, input.page)
+            return {
+                posts: posts.map(formatPosts).slice(0, postsPerPage),
+                isLastPage: posts.length < postsPerPage + 1
+            }
         }),
 
     getUserReplies: publicProcedure
@@ -85,23 +62,12 @@ export const userRouter = router({
         }))
         .query(async ({ ctx, input }) => {
 
-            const query = getPosts(ctx.user?.userId);
-            query
-                .where(
-                    and(
-                        isNotNull(Post.replyTo),
-                        eq(User.usernameLower, input.username.toLowerCase())
-                    )
-                )
-                .limit(postsPerPage + 1)
-                .offset(input.page * postsPerPage)
-                .orderBy(desc(Post.dateCreated));
+            const posts = await postService.getUserReplies(input.username.toLowerCase(), ctx.user, input.page)
 
-                const posts = await query
-                return {
-                    posts: posts.map(formatPosts).slice(0, postsPerPage),
-                    isLastPage: posts.length < postsPerPage + 1
-                }
+            return {
+                posts: posts.map(formatPosts).slice(0, postsPerPage),
+                isLastPage: posts.length < postsPerPage + 1
+            }
         }),
 
     getUserLikes: publicProcedure
@@ -110,15 +76,11 @@ export const userRouter = router({
             page: z.number().optional().default(0)
         }))
         .query(async ({ ctx, input }) => {
-            const query = getLikes(input.username, ctx.user)
-                .limit(postsPerPage + 1)
-                .offset(postsPerPage * input.page)
-
-                const posts = await query
-                return {
-                    posts: posts.map(formatPosts).slice(0, postsPerPage),
-                    isLastPage: posts.length < postsPerPage + 1
-                }
+            const posts = await postService.getUserLikes(input.username.toLowerCase(), ctx.user, input.page)
+            return {
+                posts: posts.map(formatPosts).slice(0, postsPerPage),
+                isLastPage: posts.length < postsPerPage + 1
+            }
         }),
 
     getUserMedia: publicProcedure
@@ -128,20 +90,7 @@ export const userRouter = router({
         }))
         .query(async ({ ctx, input }) => {
             try {
-                const media = await db.select({
-                    url: Media.url,
-                    is_video: Media.isVideo,
-                    postId: Media.postId,
-                })
-                    .from(Media)
-                    .innerJoin(Post, eq(Media.postId, Post.postId))
-                    .innerJoin(User, eq(Post.userId, User.userId))
-                    .where(eq(User.usernameLower, input.username.toLowerCase()))
-                    .limit(100)
-                    .offset(input.page * postsPerPage)
-                    .orderBy(desc(Post.dateCreated))
-
-                return media
+                return postService.getUserMedia(input.username.toLowerCase(), input.page)
             }
             catch (error) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong. Please try again later." })
