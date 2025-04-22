@@ -1,10 +1,9 @@
-import { and, eq, ilike } from "drizzle-orm";
 import { z } from "zod";
 import { publicProcedure, router } from "../trpc.js";
 import { postsPerPage } from "../config/variables.js";
-import { Hashtags, Post } from "../db/schema.js";
-import { getPosts } from "../queries/getPosts.js";
 import { formatPosts } from "../utils/formatPosts.js";
+import * as postService from "~/services/postService.js";
+import { TRPCError } from "@trpc/server";
 
 export const searchRouter = router({
     byTerm: publicProcedure
@@ -14,24 +13,9 @@ export const searchRouter = router({
             page: z.number().optional().default(0)
         }))
         .query(async ({ input, ctx }) => {
-            const query = getPosts(ctx.user?.userId);
-            if (input.hashtag)
-                query
-                    .innerJoin(Hashtags,
-                        and(
-                            eq(Hashtags.postId, Post.postId),
-                            eq(Hashtags.hashtag, input.hashtag.toLowerCase())
-                        )
-                    )
-            if (input.term)
-                query
-                    .where(ilike(Post.text, `%${input.term}%`))
-
-            query
-                .limit(postsPerPage)
-                .offset(input.page * postsPerPage)
-
-            const posts = await query
+           if (!input.term && !input.hashtag)
+                throw new TRPCError({code: "BAD_REQUEST", message: "Nothing to search for"});
+            const posts = await postService.searchPosts(ctx.user, input.page, input.term, input.hashtag)
             return {
                 posts: posts.map(formatPosts).slice(0, postsPerPage),
                 isLastPage: posts.length < postsPerPage + 1

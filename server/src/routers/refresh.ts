@@ -1,10 +1,7 @@
 import jwt, { type JwtPayload } from 'jsonwebtoken'
 import { publicProcedure, router } from "../trpc.js";
 import { TRPCError } from "@trpc/server";
-import { eq } from 'drizzle-orm';
-import { db } from '../db/drizzle.js';
-import { RefreshTokens } from '../db/schema.js';
-import { handleTokens } from '../utils/generateCookies.js';
+import * as authService from "~/services/authService.js";
 
 export const refreshRoutes = router({
     getAccessToken: publicProcedure
@@ -14,28 +11,17 @@ export const refreshRoutes = router({
                 throw new TRPCError({ code: 'UNAUTHORIZED', message: 'No Token' })
             try {
                 const token = jwt.verify(refresh, process.env.REFRESH_TOKEN_SECRET!) as JwtPayload;
-                const found = await db.query.RefreshTokens.findFirst({
-                    where(fields, operators) {
-                        return operators.eq(fields.token, refresh)
-                    },
-                })
-                // Handling refresh token reuse
+                const found = await authService.getToken(refresh);
+                // Handling refresh token reuse. The old refresh token is deleted when a new one gets issued, 
+                // so refresh token reuse is a possible cause of the `found` variable being null here.
                 if (!found) {
-                    await db.delete(RefreshTokens).where(eq(RefreshTokens.userId, token.user.userId));
+                    await authService.deleteUserTokens(token.user!.userId)
                     ctx.res.clearCookie('rf')
                     throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Invalid Token' })
                 }
-                const { accessToken, cookie, fb } = await handleTokens(token.user, async refreshToken => {
-                    await db.transaction(async tx => {
-                        await tx.delete(RefreshTokens).where(eq(RefreshTokens.token, refresh))
-                        await tx.insert(RefreshTokens).values({
-                            token: refreshToken,
-                            userId: token.user.userId
-                        })
-                    })
-                })
+                const { accessToken, cookie, firebaseToken } = await authService.newRefreshToken(token.user!, refresh,);
                 ctx.res.header('Set-Cookie', cookie)
-                return { jwt: accessToken, fb }
+                return { jwt: accessToken, firebaseToken }
             }
             catch (error: any) {
                 console.error(error)

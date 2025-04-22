@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server"
-import { isNotNull, and, eq, desc, isNull } from "drizzle-orm"
+import { isNotNull, and, eq, desc, isNull, ilike } from "drizzle-orm"
 import postgres from "postgres"
 import { postsPerPage } from "~/config/variables.js"
 import { db } from "~/db/drizzle.js"
@@ -94,7 +94,7 @@ export function getPostQuotes(postId: string, page: number, user: TokenUser | nu
             .orderBy(desc(Post.dateCreated))
 
         return query
-    } 
+    }
     catch (error) {
         if (error instanceof postgres.PostgresError && error.message.includes("invalid input syntax for type uuid"))
             throw new TRPCError({ code: 'BAD_REQUEST', message: "That post doesn't exist" })
@@ -117,7 +117,7 @@ export async function getPostLikes(postId: string, page: number, user: TokenUser
             .where(eq(Likes.postId, postId))
             .limit(postsPerPage + 1)
             .offset(page * postsPerPage)
-    } 
+    }
     catch (error) {
         if (error instanceof postgres.PostgresError && error.message.includes("invalid input syntax for type uuid"))
             throw new TRPCError({ code: 'BAD_REQUEST', message: "That post doesn't exist" })
@@ -168,4 +168,25 @@ export async function getUserMedia(username: string, page: number) {
         .orderBy(desc(Post.dateCreated))
 
     return media
+}
+
+export async function searchPosts(user: TokenUser | null, page: number, phrase?: string, hashtag?: string,) {
+    const query = getPosts(user?.userId);
+    if (hashtag)
+        query
+            .innerJoin(Hashtags,
+                and(
+                    eq(Hashtags.postId, Post.postId),
+                    eq(Hashtags.hashtag, hashtag.toLowerCase())
+                )
+            )
+    if (phrase)
+        query
+            .where(ilike(Post.text, `%${phrase}%`))
+
+    query
+        .limit(postsPerPage)
+        .offset(page * postsPerPage)
+
+    return await query
 }

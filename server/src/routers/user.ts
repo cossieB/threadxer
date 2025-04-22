@@ -32,9 +32,9 @@ export const userRouter = router({
             const token = jwt.verify(refresh, process.env.REFRESH_TOKEN_SECRET!) as JwtPayload;
 
             try {
-                const { accessToken, cookie, firebaseToken: fb } = await authService.updateTokensAndUser({ ...token.user!, ...input }, refresh, input)
+                const { accessToken, cookie, firebaseToken} = await authService.updateTokensAndUser({ ...token.user!, ...input }, refresh, input)
                 ctx.res.header('Set-Cookie', cookie)
-                return { jwt: accessToken, fb }
+                return { jwt: accessToken, firebaseToken }
             }
             catch (error) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong. Please try again later." })

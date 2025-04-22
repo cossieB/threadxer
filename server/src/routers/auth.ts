@@ -4,12 +4,14 @@ import { randomInt } from "crypto";
 import { rateLimiter } from "../middleware/rateLimiter.js";
 import { redis } from "../redis.js";
 import { publicProcedure, router } from "../trpc.js";
-import { draftVerificationEmail } from "../utils/draftEmail.js";
+import { draftVerificationEmail } from "../services/emailService.js";
 import * as userService from "~/services/userService.js"
 import * as authService from "~/services/authService.js";
 import { compare } from "bcrypt";
 import { UserCreateSchema, UserLoginSchema, UserResponseSchema } from "~/models/User.js";
 import { getRedirectPath } from "~/utils/getRedirectPath.js";
+import * as verificationService from "~/services/verificationService.js";
+import * as emailService from "~/services/emailService.js";
 
 export const authRouter = router({
     checkAvailability: publicProcedure.input(z.object({
@@ -36,15 +38,12 @@ export const authRouter = router({
                 if (password != confirmPassword)
                     throw new TRPCError({ code: 'BAD_REQUEST', message: "Passwords do not match" })
 
-                const code = randomInt(999999).toString().padStart(6, '0')
-                const user = await userService.createUser(email, password, username, code)
+                const user = await userService.createUser(email, password, username)
+                await verificationService.createNewVerificationCode(user, emailService.draftVerificationEmail)
 
-                redis.setex(`verification:${user.userId}`, 259200 /* 3 days */, code)
-                    .catch(e => console.log(e))
-                const { accessToken, cookie, firebaseToken: fb } = await authService.createTokens({ ...user, isUnverified: true })
+                const { accessToken, cookie, firebaseToken } = await authService.createTokens({ ...user, isUnverified: true })
                 ctx.res.header('set-cookie', cookie)
-                draftVerificationEmail(username, code, email)
-                return ({ jwt: accessToken, redirect: '/auth/verify', fb })
+                return ({ jwt: accessToken, redirect: '/auth/verify', firebaseToken })
             }
             catch (error) {
                 if (error instanceof TRPCError)
