@@ -13,7 +13,7 @@ import * as url from 'url';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 const server = Fastify({
-    logger: process.env.NODE_ENV === "development",
+    logger: false,
     maxParamLength: 5000
 })
 process.env.NODE_ENV == 'development' &&
@@ -34,7 +34,7 @@ server.register(fastifyTRPCPlugin, {
         router: appRouter,
         createContext,
         onError({ error, path }) {
-
+            
         }
     } satisfies FastifyTRPCPluginOptions<AppRouter>['trpcOptions']
 })

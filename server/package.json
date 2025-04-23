@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "build": "tsc",
-    "dev": "tsx --env-file-.env watch src/server.ts",
+    "dev": "tsx watch --env-file=.env src/server.ts",
     "test": "vitest",
     "start": "node dist/server.js",
     "start:railway": "sleep 3 && node dist/server.js"

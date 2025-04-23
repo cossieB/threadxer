@@ -22,13 +22,13 @@ describe("userService tests", () => {
         })
     })
     test("duplicate email", async () => {
-        const error = await userService.createUser("test@test.com", "dvavsdfea dfsa f", "Tester")
+        const error = await userService.createUser("test1@testers.com", "dvavsdfea dfsa f", "Tester")
         assert(error instanceof AppError)
         expect(error.message).toBe("Email is not available")
         expect(error.status).toBe(400)
     })
     test("duplicate username", async () => {
-        const error = await userService.createUser("hello@test.com", "sdkdfjskfasksdf", "test user")
+        const error = await userService.createUser("hello@test.com", "sdkdfjskfasksdf", "test5")
         assert(error instanceof AppError)
         expect(error.message).toBe("Username is not available")
         expect(error.status).toBe(400)

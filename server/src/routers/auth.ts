@@ -1,10 +1,7 @@
 import { TRPCError } from "@trpc/server"
 import { z } from "zod";
-import { randomInt } from "crypto";
 import { rateLimiter } from "../middleware/rateLimiter.js";
-import { redis } from "../redis.js";
 import { publicProcedure, router } from "../trpc.js";
-import { draftVerificationEmail } from "../services/emailService.js";
 import * as userService from "~/services/userService.js"
 import * as authService from "~/services/authService.js";
 import { compare } from "bcrypt";
@@ -12,6 +9,7 @@ import { UserCreateSchema, UserLoginSchema, UserResponseSchema } from "~/models/
 import { getRedirectPath } from "~/utils/getRedirectPath.js";
 import * as verificationService from "~/services/verificationService.js";
 import * as emailService from "~/services/emailService.js";
+import AppError from "~/utils/AppError.js";
 
 export const authRouter = router({
     checkAvailability: publicProcedure.input(z.object({
@@ -39,6 +37,9 @@ export const authRouter = router({
                     throw new TRPCError({ code: 'BAD_REQUEST', message: "Passwords do not match" })
 
                 const user = await userService.createUser(email, password, username)
+                if (user instanceof AppError)
+                    throw user.toTRPCError()
+                
                 await verificationService.createNewVerificationCode(user, emailService.draftVerificationEmail)
 
                 const { accessToken, cookie, firebaseToken } = await authService.createTokens({ ...user, isUnverified: true })
@@ -48,7 +49,6 @@ export const authRouter = router({
             catch (error) {
                 if (error instanceof TRPCError)
                     throw error
-                console.error(error)
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong." })
             }
         }),

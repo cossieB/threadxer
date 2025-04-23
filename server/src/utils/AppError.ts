@@ -2,7 +2,7 @@ import { TRPCError } from "@trpc/server";
 
 export default class AppError extends Error {
     public status
-    constructor(message: string, status: number) {
+    constructor(message = "Something went wrong. Please try again later", status = 500) {
         super(message);
         this.status = status
     }

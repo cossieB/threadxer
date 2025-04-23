@@ -1,4 +1,3 @@
-import { TRPCError } from "@trpc/server"
 import { isNotNull, and, eq, desc, isNull, ilike } from "drizzle-orm"
 import postgres from "postgres"
 import { postsPerPage } from "~/config/variables.js"
@@ -10,6 +9,7 @@ import { getPosts } from "~/queries/getPosts.js"
 import { getPostsAndReposts } from "~/queries/getPostsAndReposts.js"
 import { postRepliesQuery } from "~/queries/postRepliesQuery.js"
 import { TokenUser } from "~/types.js"
+import AppError from "~/utils/AppError.js"
 import { getHashtags } from "~/utils/getHashtags.js"
 
 export async function createPost(user: TokenUser, post: CreatePost) {
@@ -51,7 +51,7 @@ export async function getPost(postId: string, user: TokenUser | null) {
     }
     catch (error) {
         if (error instanceof postgres.PostgresError && error.message.includes("invalid input syntax for type uuid"))
-            return
+            return undefined
         throw error
     }
 }
@@ -66,7 +66,7 @@ export async function getAllPosts(page: number, user: TokenUser | null) {
     return query
 }
 
-export function getPostReplies(postId: string, page: number, user: TokenUser | null) {
+export async function getPostReplies(postId: string, page: number, user: TokenUser | null) {
     try {
         const query = postRepliesQuery(user?.userId)
         query
@@ -75,16 +75,16 @@ export function getPostReplies(postId: string, page: number, user: TokenUser | n
             .offset(page * postsPerPage)
             .orderBy(desc(Post.dateCreated))
 
-        return query
+        return await query
     }
     catch (error) {
         if (error instanceof postgres.PostgresError && error.message.includes("invalid input syntax for type uuid"))
-            throw new TRPCError({ code: 'BAD_REQUEST', message: "That post doesn't exist" })
+            return new AppError("That post doesn't exist", 404)
         throw error
     }
 }
 
-export function getPostQuotes(postId: string, page: number, user: TokenUser | null) {
+export async function getPostQuotes(postId: string, page: number, user: TokenUser | null) {
     try {
         const query = postRepliesQuery(user?.userId)
         query
@@ -93,18 +93,18 @@ export function getPostQuotes(postId: string, page: number, user: TokenUser | nu
             .offset(page * postsPerPage)
             .orderBy(desc(Post.dateCreated))
 
-        return query
+        return await query
     }
     catch (error) {
         if (error instanceof postgres.PostgresError && error.message.includes("invalid input syntax for type uuid"))
-            throw new TRPCError({ code: 'BAD_REQUEST', message: "That post doesn't exist" })
+            return new AppError("That post doesn't exist", 404)
         throw error
     }
 }
 
 export async function getPostLikes(postId: string, page: number, user: TokenUser | null) {
     try {
-        return db.select({
+        return await db.select({
             userId: User.userId,
             username: User.username,
             avatar: User.avatar,
@@ -120,7 +120,7 @@ export async function getPostLikes(postId: string, page: number, user: TokenUser
     }
     catch (error) {
         if (error instanceof postgres.PostgresError && error.message.includes("invalid input syntax for type uuid"))
-            throw new TRPCError({ code: 'BAD_REQUEST', message: "That post doesn't exist" })
+            return new AppError("That post doesn't exist", 404)
         throw error
     }
 }
@@ -131,7 +131,7 @@ export function getUserPosts(username: string, user: TokenUser | null, page: num
         .offset(page * postsPerPage)
 }
 
-export function getUserReplies(username: string, user: TokenUser | null, page: number) {
+export async function getUserReplies(username: string, user: TokenUser | null, page: number) {
     const query = getPosts(user?.userId);
     query
         .where(
@@ -144,17 +144,17 @@ export function getUserReplies(username: string, user: TokenUser | null, page: n
         .offset(page * postsPerPage)
         .orderBy(desc(Post.dateCreated));
 
-    return query
+    return await query
 }
 
-export function getUserLikes(username: string, user: TokenUser | null, page: number) {
-    return getLikes(username, user)
+export async function getUserLikes(username: string, user: TokenUser | null, page: number) {
+    return await getLikes(username, user)
         .limit(postsPerPage + 1)
         .offset(postsPerPage * page)
 }
 
 export async function getUserMedia(username: string, page: number) {
-    const media = await db.select({
+    return await db.select({
         url: Media.url,
         is_video: Media.isVideo,
         postId: Media.postId,
@@ -166,8 +166,21 @@ export async function getUserMedia(username: string, page: number) {
         .limit(100)
         .offset(page * postsPerPage)
         .orderBy(desc(Post.dateCreated))
+}
 
-    return media
+export async function deletePost(postId: string, user: TokenUser) {
+    const rows = await db
+        .delete(Post)
+        .where(
+            and(
+                eq(Post.postId, postId),
+                eq(Post.userId, user.userId),
+            )
+        )
+        .returning({
+            postId: Post.postId
+        })
+        return rows.length > 0
 }
 
 export async function searchPosts(user: TokenUser | null, page: number, phrase?: string, hashtag?: string,) {

@@ -26,7 +26,8 @@ export async function likeOrUnlikePost(postId: string, user: TokenUser) {
                 return -1
             }
         }
-        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' })
+        console.error(error)
+        throw error
     }
 }
 
@@ -51,7 +52,7 @@ export async function repostOrUnrepost(postId: string, user: TokenUser) {
             }
         }
         console.error(error)
-        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' })
+        throw error
     }
 }
 
