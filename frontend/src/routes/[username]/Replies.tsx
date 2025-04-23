@@ -1,4 +1,4 @@
-import type { CreateQueryResult, CreateInfiniteQueryResult, InfiniteData } from "@tanstack/solid-query"
+import type { UseQueryResult, UseInfiniteQueryResult, InfiniteData } from "@tanstack/solid-query"
 import { useReplies } from "~/data/replies"
 import { useUserLikes, useUserPosts } from "~/data/user"
 import { PostLists } from "../../components/PostLists"
@@ -12,7 +12,7 @@ export type ApiPostResponse = {
 }
 
 export type P = {
-    query: CreateInfiniteQueryResult<InfiniteData<ApiPostResponse>, Error>
+    query: UseInfiniteQueryResult<InfiniteData<ApiPostResponse>, Error>
 }
 
 export function Replies() {

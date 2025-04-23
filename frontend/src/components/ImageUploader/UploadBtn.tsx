@@ -2,7 +2,7 @@ import { createSignal, mergeProps } from "solid-js";
 import type { ChangeEvent } from "~/lib/solidTypes";
 import { UploadSvg } from "~/svgs";
 import auth from "~/globalState/auth";
-import type { CreateMutationResult, QueryKey } from "@tanstack/solid-query";
+import type { UseMutationResult, QueryKey } from "@tanstack/solid-query";
 import { Popup } from "../shared/Popup";
 import { Portal } from "solid-js/web";
 import { validateAndUpload } from "~/utils/uploadToFirebase";
@@ -10,7 +10,7 @@ import { validateAndUpload } from "~/utils/uploadToFirebase";
 type Props = {
     path: "avatar" | "banner",
     invalidate?: QueryKey
-    mutation: CreateMutationResult<{
+    mutation: UseMutationResult<{
         jwt: string;
         fb: string;
     }, Error, {

@@ -1,10 +1,9 @@
 import postgres from "postgres";
-import { TRPCError } from "@trpc/server";
 import { db } from "~/db/drizzle.js";
-import { User, VerificationCodes } from "~/db/schema.js";
-import { compare, genSalt, hash } from "bcrypt";
-import { randomInt } from "crypto";
+import { User } from "~/db/schema.js";
+import { genSalt, hash } from "bcrypt";
 import titleCase from "~/lib/titleCase.js";
+import AppError from "~/utils/AppError.js";
 
 export async function createUser(
     email: string,
@@ -37,11 +36,12 @@ export async function createUser(
     catch (error) {
         if (error instanceof postgres.PostgresError) {
             if (error.message.includes('users_username_unique'))
-                throw new TRPCError({ code: 'BAD_REQUEST', message: 'Username is not available' })
+                return new AppError('Username is not available', 400)
             if (error.message.includes("users_email_unique"))
-                throw new TRPCError({ code: 'BAD_REQUEST', message: 'Email is not available' })
+                return new AppError('Email is not available', 400)
         }
-        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong." })
+        console.error(error)
+        return new AppError("Something went wrong.", 500)
     }
 }
 

@@ -12,7 +12,7 @@ export async function handleSubmit(
     try {
         const data = await trpcClient.verify.verifyUser.mutate(code)
         auth.createUser(data.jwt)
-        data.fb && await auth.firebaseSignin(data.fb)
+        data.firebaseToken && await auth.firebaseSignin(data.firebaseToken)
         navigate("/profile")
     }
     catch (error) {
