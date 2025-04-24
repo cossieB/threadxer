@@ -6,18 +6,8 @@ import * as postService from "~/services/postService.js"
 
 describe("postService tests", () => {
     beforeAll(async () => {
-        await db.insert(User).values({
-            email: "test@testers.com",
-            passwordHash: "DSKdfsklfjakldfjsklasdf",
-            username: "tester",
-            usernameLower: "tester",
-            userId: "00000000-0000-0000-0000-000000000000"
-        })
-        await db.insert(Post).values({
-            text: "sample",
-            userId: "00000000-0000-0000-0000-000000000000",
-            postId: "00000000-0000-0000-0000-000000000000"
-        })
+
+
     })
     afterAll(async () => {
         await db.execute(`TRUNCATE users, posts CASCADE`)
@@ -51,6 +41,12 @@ describe("postService tests", () => {
             isUnverified: false
         })
         assert(deleted === false)
+        const post = await db.query.Post.findFirst({
+            where(fields, operators) {
+                return operators.eq(fields.postId, "00000000-0000-0000-0000-000000000000")
+            },
+        })
+        expect(post).toBeDefined()
     })
     test("delete post", async () => {
         const deleted = await postService.deletePost("00000000-0000-0000-0000-000000000000", {
@@ -62,5 +58,11 @@ describe("postService tests", () => {
             isUnverified: false
         })
         assert(deleted)
+        const post = await db.query.Post.findFirst({
+            where(fields, operators) {
+                return operators.eq(fields.postId, "00000000-0000-0000-0000-000000000000")
+            },
+        })
+        expect(post).toBeUndefined()
     })
 })

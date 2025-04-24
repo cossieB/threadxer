@@ -1,4 +1,3 @@
-import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
 import { randomInt } from "node:crypto";
 import postgres from "postgres";
@@ -6,6 +5,7 @@ import { db } from "~/db/drizzle.js";
 import { RefreshTokens, User, VerificationCodes } from "~/db/schema.js";
 import { redis } from "~/redis.js";
 import { TokenUser } from "~/types.js";
+import AppError from "~/utils/AppError.js";
 
 type EmailFunc = (to: string, name: string, code: string) => Promise<void>;
 
@@ -28,11 +28,12 @@ export async function createNewVerificationCode(user: Omit<TokenUser, 'isUnverif
         redis.setex(`verification:${user.userId}`, 259200 /* 3 days */, code)
             .catch()
         emailFn(user.email, user.username, code)
+        return code
     }
     catch (error) {
         if (error instanceof postgres.PostgresError) {
             if (error.message.includes("violates foreign key constraint"))
-                throw new TRPCError({ code: 'BAD_REQUEST', message: "User Not Found" })
+                throw new AppError( "User Not Found", 400)
         }
     }
 }

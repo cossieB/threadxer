@@ -5,6 +5,7 @@ import { redis } from "../redis.js";
 import * as authService from "~/services/authService.js";
 import * as verificationService from "~/services/verificationService.js";
 import * as emailService from "~/services/emailService.js";
+import AppError from "~/utils/AppError.js";
 
 export const verificationRouter = router({
     verifyUser: protectedProcedure
@@ -12,6 +13,7 @@ export const verificationRouter = router({
         .mutation(async ({ ctx, input }) => {
             if (!ctx.user.isUnverified)
                 throw new TRPCError({ code: 'BAD_REQUEST', message: "Already verified" })
+            try {
             let storedCode: string;
             const cachedCode = await redis.get(`verification:${ctx.user.userId}`)
             if (cachedCode)
@@ -27,7 +29,6 @@ export const verificationRouter = router({
                 await redis.setex(`verification:${ctx.user.userId}`, 259200, row.code)
                 storedCode = row.code
             }
-            try {
                 if (storedCode !== input)
                     throw new TRPCError({ code: 'BAD_REQUEST', message: 'Invalid Code' })
                 
@@ -38,6 +39,8 @@ export const verificationRouter = router({
                 return { jwt: newAccessToken, firebaseToken }
             } 
             catch (error) {
+                if (error instanceof AppError)
+                    throw error.toTRPCError()
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Something went wrong. Please try again later." })
             }
         }),

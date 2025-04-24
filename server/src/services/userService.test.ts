@@ -4,6 +4,7 @@ import * as userService from "~/services/userService.js";
 import AppError from "~/utils/AppError.js";
 import { User } from "~/db/schema.js";
 import { db } from "~/db/drizzle.js";
+import { createRandomUsers } from "~/__tests__/unit/setup.js";
 
 describe("userService tests", () => {
     beforeAll(async () => {
@@ -40,16 +41,3 @@ describe("userService tests", () => {
         expect(user1).toEqual(user2)
     })
 })
-
-async function createRandomUsers() {
-    const arr: Promise<any>[] = new Array(10)
-    for (let i = 0; i < 10; i++) {
-        arr.push(db.insert(User).values({
-            email: "test" + i + "@testers.com",
-            passwordHash: "" + Math.random(),
-            username: "test" + i,
-            usernameLower: "test" + i,
-        }))
-    }
-    await Promise.all(arr)
-}
