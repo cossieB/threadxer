@@ -9,7 +9,7 @@ import AppError from "~/utils/AppError.js";
 
 type EmailFunc = (to: string, name: string, code: string) => Promise<void>;
 
-export async function createNewVerificationCode(user: Omit<TokenUser, 'isUnverified'>, emailFn: EmailFunc) {
+export async function createNewVerificationCode(user: Pick<TokenUser, 'userId' | 'email' | 'username'>, emailFn: EmailFunc) {
     try {
         const code = randomInt(999999).toString().padStart(6, '0');
 
@@ -37,8 +37,9 @@ export async function createNewVerificationCode(user: Omit<TokenUser, 'isUnverif
         }
     }
 }
+type UserPartial = Pick<TokenUser, 'userId'>
 
-export async function getVerificationCode(user: TokenUser) {
+export async function getVerificationCode(user: UserPartial) {
     return db.query.VerificationCodes.findFirst({
         where(fields, operators) {
             return operators.eq(fields.userId, user.userId)
@@ -46,7 +47,7 @@ export async function getVerificationCode(user: TokenUser) {
     })
 }
 
-export async function verifyUser(user: TokenUser, refreshCookie?: string) {
+export async function verifyUser(user: UserPartial, refreshCookie?: string) {
     const now = new Date;
     await db.transaction(async tx => {
         await tx.update(User)

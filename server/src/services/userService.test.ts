@@ -1,18 +1,9 @@
-import { describe, test, expect, afterAll, beforeAll } from "vitest";
+import { describe, test, expect } from "vitest";
 import assert from "node:assert"
 import * as userService from "~/services/userService.js";
 import AppError from "~/utils/AppError.js";
-import { User } from "~/db/schema.js";
-import { db } from "~/db/drizzle.js";
-import { createRandomUsers } from "~/__tests__/unit/setup.js";
 
 describe("userService tests", () => {
-    beforeAll(async () => {
-        await createRandomUsers();
-    })
-    afterAll(async () => {
-        await db.delete(User)
-    })
     test("create a user", async () => {
         const user = await userService.createUser("test@test.com", "sdkdfjskfasksdf", "test user");
         assert(!(user instanceof AppError))
@@ -23,7 +14,7 @@ describe("userService tests", () => {
         })
     })
     test("duplicate email", async () => {
-        const error = await userService.createUser("test1@testers.com", "dvavsdfea dfsa f", "Tester")
+        const error = await userService.createUser("test1@testers.com", "dvavsdfea dfsa f", "unique username")
         assert(error instanceof AppError)
         expect(error.message).toBe("Email is not available")
         expect(error.status).toBe(400)

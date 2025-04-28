@@ -1,17 +1,10 @@
-import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 import assert from "node:assert";
 import { db } from "~/db/drizzle.js";
-import { Post, User } from "~/db/schema.js";
 import * as postService from "~/services/postService.js"
 
 describe("postService tests", () => {
-    beforeAll(async () => {
 
-
-    })
-    afterAll(async () => {
-        await db.execute(`TRUNCATE users, posts CASCADE`)
-    })
     test("create post", async () => {
         const postId = await postService.createPost({
             email: "test@testers.com",
@@ -29,7 +22,7 @@ describe("postService tests", () => {
     test("get post", async () => {
         const post = await postService.getPost("00000000-0000-0000-0000-000000000000", null)
         assert(post)
-        expect(post.post.text).toBe("sample")
+        expect(post.post.text).toBe("For testing purposes")
     })
     test("delete post forbidden", async () => {
         const deleted = await postService.deletePost("00000000-0000-0000-0000-000000000000", {

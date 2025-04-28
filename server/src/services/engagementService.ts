@@ -1,4 +1,3 @@
-import { TRPCError } from "@trpc/server"
 import { and, eq, inArray, sql } from "drizzle-orm"
 import postgres from "postgres"
 import { db } from "~/db/drizzle.js"
@@ -6,7 +5,9 @@ import { Likes, Post, Repost } from "~/db/schema.js"
 import { redis } from "~/redis.js"
 import { TokenUser } from "~/types.js"
 
-export async function likeOrUnlikePost(postId: string, user: TokenUser) {
+type UserPartial = Pick<TokenUser, 'userId'>
+
+export async function likeOrUnlikePost(postId: string, user: UserPartial) {
     try {
         await db.insert(Likes).values({
             postId: postId,
@@ -31,7 +32,7 @@ export async function likeOrUnlikePost(postId: string, user: TokenUser) {
     }
 }
 
-export async function repostOrUnrepost(postId: string, user: TokenUser) {
+export async function repostOrUnrepost(postId: string, user: UserPartial) {
     try {
         await db.insert(Repost).values({
             postId: postId,
