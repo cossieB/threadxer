@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "disableSourceOfProjectReferenceRedirect": true,
+    "esModuleInterop": true,
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
+    "composite": true,
+    "types": [
+      "vite/client"
+    ],
+    "noEmit": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "paths": {
+      "~/*": [
+        "./src/*"
+      ]
+    },
+  },
+  "references": [{"path": "../server", }],
+}
