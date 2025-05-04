@@ -1,15 +1,15 @@
 import { TRPCError } from "@trpc/server"
 import { z } from "zod";
 import { compare } from "bcrypt";
-import { rateLimiter } from "../middleware/rateLimiter.js";
 import { publicProcedure, router } from "../trpc.js";
-import * as userService from "@/services/userService.js"
-import * as authService from "@/services/authService.js";
-import { UserCreateSchema, UserLoginSchema, UserResponseSchema } from "@/models/User.js";
-import { getRedirectPath } from "@/utils/getRedirectPath.js";
-import * as verificationService from "@/services/verificationService.js";
-import * as emailService from "@/services/emailService.js";
-import AppError from "@/utils/AppError.js";
+import * as userService from "#server/services/userService.js"
+import * as authService from "#server/services/authService.js";
+import { UserCreateSchema, UserLoginSchema, UserResponseSchema } from "#server/models/User.js";
+import { getRedirectPath } from "#server/utils/getRedirectPath.js";
+import * as verificationService from "#server/services/verificationService.js";
+import * as emailService from "#server/services/emailService.js";
+import AppError from "#server/utils/AppError.js";
+import { rateLimiter } from "#server/middleware/rateLimiter.js";
 
 export const authRouter = router({
     checkAvailability: publicProcedure.input(z.object({

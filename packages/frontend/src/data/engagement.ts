@@ -1,8 +1,8 @@
 import { useParams } from "@solidjs/router";
 import { useQueryClient, useMutation, useInfiniteQuery } from "@tanstack/solid-query";
-import { errors } from "~/globalState/popups";
-import { trpcClient } from "~/trpc";
-import { modifyLikesAndRepostsInCache } from "~/utils/modifyLikesAndRepostsInCache";
+import { errors } from "#client/globalState/popups.js";
+import { trpcClient } from "#client/trpc.js";
+import { modifyLikesAndRepostsInCache } from "#client/utils/modifyLikesAndRepostsInCache.js";
 
 export function useQuotes(page?: number) {
     const params = useParams();

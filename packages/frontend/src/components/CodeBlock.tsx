@@ -1,6 +1,6 @@
 import type { Accessor } from "solid-js";
 import type { SetStoreFunction } from "solid-js/store";
-import styles from '~/styles/components/VerificationCode.module.scss';
+import styles from '#client/styles/components/VerificationCode.module.scss';
 
 export type P = {
     letter: Accessor<string>

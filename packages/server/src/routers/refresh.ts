@@ -1,7 +1,7 @@
 import jwt, { type JwtPayload } from 'jsonwebtoken'
 import { publicProcedure, router } from "../trpc.js";
 import { TRPCError } from "@trpc/server";
-import * as authService from "@/services/authService.js";
+import * as authService from "#server/services/authService.js";
 
 export const refreshRoutes = router({
     getAccessToken: publicProcedure

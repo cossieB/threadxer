@@ -1,8 +1,8 @@
 import { For, Match, Switch } from "solid-js"
-import { MediaList } from "~/components/Media"
-import Loader from "~/components/shared/Loader/Loader"
-import { useUserMedia } from "~/data/user"
-import styles from "~/styles/components/UserMedia.module.scss"
+import { MediaList } from "#client/components/Media.js"
+import Loader from "#client/components/shared/Loader/Loader.js"
+import { useUserMedia } from "#client/data/user.js"
+import styles from "#client/styles/components/UserMedia.module.scss"
 
 export function UserMedia() {
     const query = useUserMedia()

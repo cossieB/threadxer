@@ -1,6 +1,6 @@
 import { For, JSX, Show, createSignal, mergeProps } from "solid-js"
-import titleCase from "~/lib/titleCase"
-import styles from "~/styles/components/form.module.scss"
+import titleCase from "#client/lib/titleCase.js"
+import styles from "#client/styles/components/form.module.scss"
 import { CharacterCounter } from "./CharacterCounter"
 
 type Props = JSX.InputHTMLAttributes<HTMLInputElement> & {

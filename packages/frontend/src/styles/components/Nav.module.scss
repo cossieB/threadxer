@@ -1,4 +1,4 @@
-@use '~/styles/mixins';
+@use '../mixins';
 
 @mixin navItemSpace {
     @media (min-width: 768px) {

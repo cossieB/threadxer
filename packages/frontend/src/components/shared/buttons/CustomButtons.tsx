@@ -1,5 +1,5 @@
 import { splitProps, type JSX } from "solid-js";
-import styles from "~/styles/components/shared/Buttons.module.scss";
+import styles from "#client/styles/components/shared/Buttons.module.scss";
 
 type P = {
     children: JSX.Element

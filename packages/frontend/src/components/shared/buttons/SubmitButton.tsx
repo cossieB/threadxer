@@ -1,6 +1,6 @@
 import { type JSX, Match, Switch } from "solid-js"
 import Loader from "../Loader/Loader"
-import styles from "~/styles/components/form.module.scss"
+import styles from "#client/styles/components/form.module.scss"
 
 type Props = {
     text?: string

@@ -1,5 +1,5 @@
 import type { JSXElement } from "solid-js"
-import styles from "~/styles/components/PostBox.module.scss"
+import styles from "#client/styles/components/PostBox.module.scss"
 
 type Props = {
     icon: JSXElement,

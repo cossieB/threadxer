@@ -1,2 +1,1 @@
-export * from "./routers/index.js"
-
+export * from "./routers/index.js";

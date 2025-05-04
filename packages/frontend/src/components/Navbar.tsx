@@ -1,11 +1,11 @@
 import { A } from "@solidjs/router"
 import { JSX, Show, createSignal } from "solid-js"
-import styles from "~/styles/components/Nav.module.scss"
-import auth from "~/globalState/auth"
+import styles from "#client/styles/components/Nav.module.scss"
+import auth from "#client/globalState/auth.js"
 import { CompostSvg, HomeSvg, LogoutSvg, RegisterSvg, SearchSvg, SettingsSvg, UnlockSvg } from "../svgs"
 import Modal from "./Modal";
-import clickOutside from "~/lib/clickOutside"
-import { setComposerState } from "~/globalState/composer"
+import clickOutside from "#client/lib/clickOutside.js"
+import { setComposerState } from "#client/globalState/composer.js"
 false && clickOutside
 
 export default function Navbar() {

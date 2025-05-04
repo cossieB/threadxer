@@ -1,9 +1,9 @@
-import { PostLists } from "~/components/PostLists"
-import { usePostLikes, usePostReplies, useQuotes } from "~/data/engagement"
+import { PostLists } from "#client/components/PostLists.js"
+import { usePostLikes, usePostReplies, useQuotes } from "#client/data/engagement.js"
 import { For, Match, Switch } from "solid-js"
-import Loader from "~/components/shared/Loader/Loader"
-import { UserCard } from "~/components/UserCard"
-import { MoreDataBtn } from "~/components/MoreDataBtn"
+import Loader from "#client/components/shared/Loader/Loader.js"
+import { UserCard } from "#client/components/UserCard.js"
+import { MoreDataBtn } from "#client/components/MoreDataBtn.js"
 
 export function PostReplies() {
     const query = usePostReplies()

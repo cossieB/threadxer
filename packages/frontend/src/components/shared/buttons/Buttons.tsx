@@ -1,7 +1,7 @@
-import { CloseSvg } from "~/svgs"
+import { CloseSvg } from "#client/svgs.js"
 import { CustomBtn } from "./CustomButtons"
 import { JSX } from "solid-js"
-import { Require } from "~/lib/utilityTypes"
+import { Require } from "#client/lib/utilityTypes.js"
 
 type Props = Require<JSX.HTMLAttributes<HTMLButtonElement>, 'onclick'>
 

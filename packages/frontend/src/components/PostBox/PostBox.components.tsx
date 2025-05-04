@@ -1,15 +1,15 @@
 import { A, useNavigate, useParams } from "@solidjs/router"
 import { For, Switch, Match } from "solid-js"
-import type { PostResponse } from "~/routes/[username]/Replies";
-import { setComposerState } from "~/globalState/composer"
-import { formatDate } from "~/lib/formatDate"
-import styles from "~/styles/components/PostBox.module.scss"
-import { CommentSvg, LikeSvg, RepostSvg, QuoteSvg, ViewsSvg } from "~/svgs"
-import { formatPostTime } from "~/utils/formatPostTime"
+import { setComposerState } from "#client/globalState/composer.js"
+import { formatDate } from "#client/lib/formatDate.js"
+import styles from "#client/styles/components/PostBox.module.scss"
+import { CommentSvg, LikeSvg, RepostSvg, QuoteSvg, ViewsSvg } from "#client/svgs.js"
+import { formatPostTime } from "#client/utils/formatPostTime.js"
 import StatIcon from "../ActionIcon"
-import { useLike, useRepost } from "~/data/engagement"
-import auth from "~/globalState/auth";
-import { errors } from "~/globalState/popups";
+import { useLike, useRepost } from "#client/data/engagement.js"
+import auth from "#client/globalState/auth.js";
+import { errors } from "#client/globalState/popups.js";
+import type { PostResponse } from "#client/types.js"
 
 type Props = { post: PostResponse }
 

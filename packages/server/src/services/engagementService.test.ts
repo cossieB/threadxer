@@ -1,6 +1,6 @@
 import { describe, test } from "vitest";
 import assert from "node:assert";
-import * as engagementService from "@/services/engagementService.js";
+import * as engagementService from "#server/services/engagementService.js";
 
 describe("engagementService tests", () => {
     test("like and unlike", async () => {

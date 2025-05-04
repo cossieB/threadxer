@@ -1,7 +1,7 @@
 import { Switch, Match, onMount, onCleanup } from "solid-js";
-import Loader from "~/components/shared/Loader/Loader";
+import Loader from "#client/components/shared/Loader/Loader.js";
 import { CustomBtn } from "./shared/buttons/CustomButtons";
-import { DownArrow } from "~/svgs";
+import { DownArrow } from "#client/svgs.js";
 import { CreateInfiniteQueryResult } from "@tanstack/solid-query";
 
 type Props = {

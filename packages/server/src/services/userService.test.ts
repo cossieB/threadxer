@@ -1,7 +1,7 @@
 import { describe, test, expect } from "vitest";
 import assert from "node:assert"
-import * as userService from "@/services/userService.js";
-import AppError from "@/utils/AppError.js";
+import * as userService from "#server/services/userService.js";
+import AppError from "#server/utils/AppError.js";
 
 describe("userService tests", () => {
     test("create a user", async () => {

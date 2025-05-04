@@ -2,7 +2,7 @@
   "name": "threader",
   "version": "1.0.0",
   "description": "My clone of _Threads_ app which is a clone of _The App Formerly Known As Twitter_.",
-  "main": "server/src/server.ts",
+  "main": "server/src/index.ts",
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,5 +12,20 @@
   "license": "ISC",
   "workspaces": [
     "./packages/*"
-  ]
+  ],
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "typescript": "^5.8.3",
+    "vite": "^5.0.7",
+    "vitest": "^3.1.2",
+    "@types/bcrypt": "^5.0.2",
+    "@types/nodemailer": "^6.4.17",
+    "dotenv": "^16.5.0",
+    "drizzle-kit": "^0.31.0",
+    "esbuild": "^0.25.3",
+    "tsx": "^4.19.4",
+    "vite-tsconfig-paths": "^5.1.4",
+    "sass": "^1.69.3",
+    "vite-plugin-solid": "^2.8.0"
+  }
 }

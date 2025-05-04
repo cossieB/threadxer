@@ -1,16 +1,16 @@
 import { Show, createSignal, onCleanup, onMount } from "solid-js";
-import styles from "~/styles/components/Composer.module.scss"
+import styles from "#client/styles/components/Composer.module.scss"
 import { CloseBtn } from "./shared/buttons/Buttons";
 import { SubmitButton } from "./shared/buttons/SubmitButton";
-import clickOutside from "~/lib/clickOutside";
+import clickOutside from "#client/lib/clickOutside.js";
 import { CharacterCounter } from "./CharacterCounter";
 import { Portal } from "solid-js/web";
 import { Popup } from "./shared/Popup";
-import { composerState } from "~/globalState/composer";
+import { composerState } from "#client/globalState/composer.js";
 import { QuoteBox } from "./PostBox/PostBox";
-import { usePost } from "~/data/post";
+import { usePost } from "#client/data/post.js";
 import DropZone from "./DropZone";
-import { validateAndUpload } from "~/utils/uploadToFirebase";
+import { validateAndUpload } from "#client/utils/uploadToFirebase.js";
 false && clickOutside
 
 export function PostComposer() {

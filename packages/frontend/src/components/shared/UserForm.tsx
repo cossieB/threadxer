@@ -1,5 +1,5 @@
 import { type JSX } from "solid-js"
-import styles from '~/styles/components/form.module.scss'
+import styles from '#client/styles/components/form.module.scss'
 
 type P = {
     children: JSX.Element

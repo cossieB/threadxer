@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "target": "ESNext"
+  },
+  "references": [
+    { "path": "./packages/frontend" },
+    { "path": "./packages/server" }
+  ],
+  "exclude": ["node_modules"]
+}

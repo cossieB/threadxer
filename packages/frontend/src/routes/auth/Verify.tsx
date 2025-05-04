@@ -1,14 +1,14 @@
 import { Navigate, useNavigate } from "@solidjs/router";
 import { Index, Show, createEffect, createMemo, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
-import { Popup } from "~/components/shared/Popup";
-import styles from '~/styles/components/VerificationCode.module.scss'
+import { Popup } from "#client/components/shared/Popup.js";
+import styles from '#client/styles/components/VerificationCode.module.scss'
 import { CodeBlock } from "../../components/CodeBlock";
 import { handleSubmit, handleResend } from "../../data/verify";
 import { Numberpad } from "./Numberpad";
-import auth from "~/globalState/auth";
-import { PasteSvg } from "~/svgs";
-import { SubmitButton } from "~/components/shared/buttons/SubmitButton";
+import auth from "#client/globalState/auth.js";
+import { PasteSvg } from "#client/svgs.js";
+import { SubmitButton } from "#client/components/shared/buttons/SubmitButton.js";
 
 const [state, setState] = createStore({
     submitting: false,

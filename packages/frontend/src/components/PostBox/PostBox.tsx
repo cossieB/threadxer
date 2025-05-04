@@ -1,11 +1,11 @@
-import styles from "~/styles/components/PostBox.module.scss"
+import styles from "#client/styles/components/PostBox.module.scss"
 import { useNavigate } from "@solidjs/router";
 import { Show, onCleanup, onMount } from "solid-js";
 import { PostBoxButtons, PostBoxContent, PostBoxHeader } from "./PostBox.components";
-import { RepostSvg } from "~/svgs";
+import { RepostSvg } from "#client/svgs.js";
 import { MediaList } from "../Media";
-import { PostResponse } from "~/routes/[username]/Replies";
 import { viewedPosts } from "../PostLists";
+import type { PostResponse } from "#client/types.js";
 
 export function PostBox(props: { post: PostResponse }) {
     let container!: HTMLDivElement

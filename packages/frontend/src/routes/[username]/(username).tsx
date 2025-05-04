@@ -1,13 +1,13 @@
 import { useParams } from "@solidjs/router";
 import { JSX, Match, Show, Switch } from "solid-js";
-import NotFound from "~/components/404";
-import { BioIcons } from "~/components/BioIcons";
-import { Tabs } from "~/components/Tabs";
-import Loader from "~/components/shared/Loader/Loader";
-import Page from "~/components/shared/Page";
-import { useUser } from "~/data/user";
-import styles from "~/styles/routes/[username].module.scss"
-import { LinkSvg, LocationSvg } from "~/svgs";
+import NotFound from "#client/components/404.js";
+import { BioIcons } from "#client/components/BioIcons.js";
+import { Tabs } from "#client/components/Tabs.js";
+import Loader from "#client/components/shared/Loader/Loader.js";
+import Page from "#client/components/shared/Page.js";
+import { useUser } from "#client/data/user.js";
+import styles from "#client/styles/routes/[username].module.scss"
+import { LinkSvg, LocationSvg } from "#client/svgs.js";
 
 export default function UserPage(props: {children?: JSX.Element}) {
     const params = useParams();

@@ -1,4 +1,4 @@
-import styles from "~/styles/components/PostBox.module.scss"
+import styles from "#client/styles/components/PostBox.module.scss"
 import { PostBoxAvatar } from "./PostBox/PostBox.components"
 import { A } from "@solidjs/router"
 

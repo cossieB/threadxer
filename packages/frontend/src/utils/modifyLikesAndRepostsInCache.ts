@@ -1,6 +1,5 @@
 import type { InfiniteData, QueryClient } from "@tanstack/solid-query";
-import { type ApiPostResponse } from "~/routes/[username]/Replies";
-import { type Post } from "~/types";
+import type { ApiPostResponse, PostResponse } from "#client/types.js";
 
 export function modifyLikesAndRepostsInCache(field: 'likes' | 'reposts', queryClient: QueryClient) {
     return  function (data: -1 | 1, postId: string) {
@@ -9,7 +8,7 @@ export function modifyLikesAndRepostsInCache(field: 'likes' | 'reposts', queryCl
         
         queryClient.setQueriesData({
             queryKey: ['posts']
-        }, (old: InfiniteData<ApiPostResponse> | Post | undefined) => {
+        }, (old: InfiniteData<ApiPostResponse> | PostResponse | undefined) => {
             if (!old) return old;
             if ('pages' in old)
                 return {
@@ -20,7 +19,7 @@ export function modifyLikesAndRepostsInCache(field: 'likes' | 'reposts', queryCl
                             if (post.post.postId != postId)
                                 return post
 
-                            const newPost: Post = JSON.parse(JSON.stringify(post));
+                            const newPost: PostResponse = JSON.parse(JSON.stringify(post));
                             newPost[activeField] = data == 1;
                             newPost[field] += data;
                             return newPost;

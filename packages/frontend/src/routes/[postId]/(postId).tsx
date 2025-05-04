@@ -1,11 +1,11 @@
 import { useParams } from "@solidjs/router";
 import { JSX, Match, Switch } from "solid-js";
-import NotFound from "~/components/404";
-import { PostBox } from "~/components/PostBox/PostBox";
-import { Tabs } from "~/components/Tabs";
-import Loader from "~/components/shared/Loader/Loader";
-import Page from "~/components/shared/Page";
-import { usePost } from "~/data/post";
+import NotFound from "#client/components/404.js";
+import { PostBox } from "#client/components/PostBox/PostBox.js";
+import { Tabs } from "#client/components/Tabs.js";
+import Loader from "#client/components/shared/Loader/Loader.js";
+import Page from "#client/components/shared/Page.js";
+import { usePost } from "#client/data/post.js";
 
 export function PostPage(props: {children?: JSX.Element}) {
     const params = useParams()

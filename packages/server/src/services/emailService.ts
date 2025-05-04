@@ -1,6 +1,6 @@
 import { google } from "googleapis";
 import { createTransport } from "nodemailer";
-import { verificationEmailTemplate } from "@/emailTemplates/verification.js";
+import { verificationEmailTemplate } from "#server/emailTemplates/verification.js";
 
 export async function draftVerificationEmail(to: string, name: string, code: string) {
     const message = verificationEmailTemplate(name, code);

@@ -1,6 +1,6 @@
 import { For, Match, Switch, createSignal } from "solid-js"
-import styles from '~/styles/components/DropZone.module.scss'
-import { DeleteSvg } from "~/svgs"
+import styles from '#client/styles/components/DropZone.module.scss'
+import { DeleteSvg } from "#client/svgs.js"
 
 type P = {
     images: {

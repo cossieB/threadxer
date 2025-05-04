@@ -2,13 +2,13 @@ import { FormInput } from '../../components/shared/FormInput';
 import UserForm from '../../components/shared/UserForm';
 import { createStore } from 'solid-js/store';
 import { createMemo } from 'solid-js';
-import titleCase from '~/lib/titleCase';
+import titleCase from '#client/lib/titleCase.js';
 import { Validator } from '../../utils/Validator';
 import { SubmitButton } from '../../components/shared/buttons/SubmitButton';
-import { sendAuthRequest } from '~/utils/sendAuthRequest';
+import { sendAuthRequest } from '#client/utils/sendAuthRequest.js';
 import { useNavigate } from '@solidjs/router';
-import Page from '~/components/shared/Page';
-import { trpcClient } from '~/trpc';
+import Page from '#client/components/shared/Page.js';
+import { trpcClient } from '#client/trpc.js';
 
 const initialState = {
     email: "",

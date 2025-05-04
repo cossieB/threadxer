@@ -1,3 +1,10 @@
-import { type ApiPostResponse } from "./routes/[username]/Replies";
+import { AppRouter } from "threadxer-server";
+import {inferRouterOutputs} from "@trpc/server"
 
-export type Post = ApiPostResponse['posts'][number];
+export type RouterOutputs = inferRouterOutputs<AppRouter>
+export type PostResponse = RouterOutputs["posts"]["getPost"]
+
+export type ApiPostResponse = {
+    posts: PostResponse[]
+    isLastPage: boolean
+}

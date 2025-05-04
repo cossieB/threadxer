@@ -1,11 +1,11 @@
 import { eq, sql } from "drizzle-orm";
 import { randomInt } from "node:crypto";
 import postgres from "postgres";
-import { db } from "@/db/drizzle.js";
-import { RefreshTokens, User, VerificationCodes } from "@/db/schema.js";
-import { redis } from "@/redis.js";
-import { TokenUser } from "@/types.js";
-import AppError from "@/utils/AppError.js";
+import { db } from "#server/db/drizzle.js";
+import { RefreshTokens, User, VerificationCodes } from "#server/db/schema.js";
+import { redis } from "#server/redis.js";
+import { TokenUser } from "#server/types.js";
+import AppError from "#server/utils/AppError.js";
 
 type EmailFunc = (to: string, name: string, code: string) => Promise<void>;
 

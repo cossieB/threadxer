@@ -1,8 +1,8 @@
 import { JSX, Show, createEffect, createSignal, mergeProps } from "solid-js";
-import titleCase from "~/lib/titleCase";
-import styles from "~/styles/components/form.module.scss";
+import titleCase from "#client/lib/titleCase.js";
+import styles from "#client/styles/components/form.module.scss";
 import { CharacterCounter } from "./CharacterCounter";
-import type { Require } from "~/lib/utilityTypes";
+import type { Require } from "#client/lib/utilityTypes.js";
 
 type Props = JSX.InputHTMLAttributes<HTMLTextAreaElement> & {
     name: string

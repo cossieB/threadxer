@@ -21,10 +21,9 @@
     "uploadthing": "^7.6.0"
   },
   "devDependencies": {
-    "@types/node": "^22.14.1",
-    "sass": "^1.69.3",
-    "typescript": "^5.8.3",
-    "vite": "^5.0.7",
-    "vite-plugin-solid": "^2.8.0"
+
+  },
+  "imports": {
+    "#client/*": "./src/*"
   }
 }

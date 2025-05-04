@@ -1,13 +1,13 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { postsPerPage } from "@/config/variables.js";
-import * as postService from "@/services/postService.js";
-import * as authService from "@/services/authService.js";
-import * as userService from "@/services/userService.js";
-import { router, publicProcedure, protectedProcedure } from "@/trpc.js";
-import { formatPosts } from "@/utils/formatPosts.js";
+import { postsPerPage } from "#server/config/variables.js";
+import * as postService from "#server/services/postService.js";
+import * as authService from "#server/services/authService.js";
+import * as userService from "#server/services/userService.js";
+import { router, publicProcedure, protectedProcedure } from "#server/trpc.js";
+import { formatPosts } from "#server/utils/formatPosts.js";
 import jwt, { type JwtPayload } from 'jsonwebtoken'
-import { UpdateUserSchema } from "@/models/User.js";
+import { UpdateUserSchema } from "#server/models/User.js";
 
 export const userRouter = router({
 

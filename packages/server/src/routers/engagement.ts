@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { rateLimiter } from "../middleware/rateLimiter.js";
 import { protectedProcedure, publicProcedure, router } from "../trpc.js";
-import * as engagementService from "@/services/engagementService.js"
+import * as engagementService from "#server/services/engagementService.js"
 import { FastifyReply } from "fastify";
 
 export const engagementRouter = router({

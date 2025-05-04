@@ -1,11 +1,11 @@
 import { useSearchParams } from "@solidjs/router";
 import { useInfiniteQuery, createQuery } from "@tanstack/solid-query";
-import { CustomInput } from "~/components/CustomInput";
-import { PostLists } from "~/components/PostLists";
-import Page from "~/components/shared/Page";
-import UserForm from "~/components/shared/UserForm";
-import { SubmitButton } from "~/components/shared/buttons/SubmitButton";
-import { trpcClient } from "~/trpc";
+import { CustomInput } from "#client/components/CustomInput.js";
+import { PostLists } from "#client/components/PostLists.js";
+import Page from "#client/components/shared/Page.js";
+import UserForm from "#client/components/shared/UserForm.js";
+import { SubmitButton } from "#client/components/shared/buttons/SubmitButton.js";
+import { trpcClient } from "#client/trpc.js";
 
 export function SearchPage() {
     let inputElem!: HTMLInputElement

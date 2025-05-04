@@ -1,17 +1,8 @@
 import type { UseInfiniteQueryResult, InfiniteData } from "@tanstack/solid-query"
-import type { inferRouterOutputs } from '@trpc/server';
-import { useReplies } from "~/data/replies"
-import { useUserLikes, useUserPosts } from "~/data/user"
-import { PostLists } from "../../components/PostLists"
-import { type AppRouter } from "threadxer-server";
-
-type RouterOutputs = inferRouterOutputs<AppRouter>
-type PostResponse = RouterOutputs["posts"]["getPost"]
-
-export type ApiPostResponse = {
-    posts: PostResponse[]
-    isLastPage: boolean
-}
+import { useReplies } from "#client/data/replies.js"
+import { useUserLikes, useUserPosts } from "#client/data/user.js"
+import { PostLists } from "#client/components/PostLists.js"
+import { ApiPostResponse } from "#client/types.js";
 
 export type P = {
     query: UseInfiniteQueryResult<InfiniteData<ApiPostResponse>, Error>

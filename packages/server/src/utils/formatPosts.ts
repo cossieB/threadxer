@@ -9,4 +9,8 @@ export function formatPosts(post: Awaited<ReturnType<typeof getPosts>>[number] &
     }
 }
 
-export type PostResponse = ReturnType<typeof formatPosts>
+export type MyType = {
+    num: number,
+    str: string,
+    null: null
+}

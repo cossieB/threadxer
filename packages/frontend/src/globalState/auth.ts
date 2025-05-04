@@ -1,10 +1,10 @@
 import { JwtPayload, jwtDecode } from "jwt-decode";
 import { createStore } from "solid-js/store";
-import { firebaseAuth } from "../../firebase";
 import { signInWithCustomToken, signOut } from "firebase/auth";
-import { trpcClient } from "~/trpc";
+import { trpcClient } from "#client/trpc.js";
 import { TRPCClientError } from "@trpc/client";
-import { errors } from "./popups";
+import { errors } from "./popups.js";
+import { firebaseAuth } from "../../firebase.js";
 
 export type User = {
     username: string,

@@ -1,7 +1,7 @@
 import { A, useLocation } from "@solidjs/router";
 import { For, Setter, createSignal } from "solid-js";
-import titleCase from "~/lib/titleCase";
-import styles from "~/styles/components/Tabs.module.scss"
+import titleCase from "#client/lib/titleCase.js";
+import styles from "#client/styles/components/Tabs.module.scss"
 
 type O = {
     label: string,

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import assert from "node:assert";
-import { db } from "@/db/drizzle.js";
-import * as postService from "@/services/postService.js"
+import { db } from "#server/db/drizzle.js";
+import * as postService from "#server/services/postService.js"
 
 describe("postService tests", () => {
 

@@ -3,9 +3,8 @@
     "strict": true,
     "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
-    "disableSourceOfProjectReferenceRedirect": true,
     "esModuleInterop": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
@@ -16,11 +15,6 @@
     "noEmit": true,
     "isolatedModules": true,
     "skipLibCheck": true,
-    "paths": {
-      "~/*": [
-        "./src/*"
-      ]
-    },
   },
   "references": [{"path": "../server", }],
 }

@@ -5,12 +5,12 @@ import { Popup } from '../../components/shared/Popup';
 import { Validator } from '../../utils/Validator';
 import { SubmitButton } from '../../components/shared/buttons/SubmitButton';
 import { Navigate, useNavigate } from '@solidjs/router';
-import { sendAuthRequest } from '~/utils/sendAuthRequest';
+import { sendAuthRequest } from '#client/utils/sendAuthRequest.js';
 import { Show } from 'solid-js';
-import auth from '~/globalState/auth';
-import Page from '~/components/shared/Page';
+import auth from '#client/globalState/auth.js';
+import Page from '#client/components/shared/Page.js';
 import { useQueryClient } from '@tanstack/solid-query';
-import { trpcClient } from '~/trpc';
+import { trpcClient } from '#client/trpc.js';
 
 const [userState, setUserState] = createStore({
     email: "",

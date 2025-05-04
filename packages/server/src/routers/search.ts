@@ -2,7 +2,7 @@ import { z } from "zod";
 import { publicProcedure, router } from "../trpc.js";
 import { postsPerPage } from "../config/variables.js";
 import { formatPosts } from "../utils/formatPosts.js";
-import * as postService from "@/services/postService.js";
+import * as postService from "#server/services/postService.js";
 import { TRPCError } from "@trpc/server";
 
 export const searchRouter = router({

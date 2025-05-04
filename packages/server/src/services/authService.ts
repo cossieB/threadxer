@@ -5,7 +5,7 @@ import { db } from '../db/drizzle.js';
 import { RefreshTokens, User } from '../db/schema.js';
 import { TokenUser } from '../types.js';
 import { eq } from 'drizzle-orm';
-import { UserUpdate } from '@/models/User.js';
+import { UserUpdate } from '#server/models/User.js';
 
 export async function createTokens(user: TokenUser) {
     return handleTokens(user)
