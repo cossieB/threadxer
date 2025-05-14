@@ -1,7 +1,7 @@
 import { For, Show, createSignal, mergeProps } from "solid-js";
-import styles from "#client/styles/components/Media.module.scss"
+import styles from "~/styles/components/Media.module.scss"
 import { Slideshow } from "./Slideshow";
-import type { PostResponse } from "#client/types.js";
+import type { PostResponse } from "~/types.js";
 
 export type P = { media: NonNullable<PostResponse['media']> }
 

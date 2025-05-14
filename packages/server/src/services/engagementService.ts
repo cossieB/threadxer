@@ -1,9 +1,9 @@
 import { and, eq, inArray, sql } from "drizzle-orm"
 import postgres from "postgres"
-import { db } from "#server/db/drizzle.js"
-import { Likes, Post, Repost } from "#server/db/schema.js"
-import { redis } from "#server/redis.js"
-import { TokenUser } from "#server/types.js"
+import { db } from "@/db/drizzle.js"
+import { Likes, Post, Repost } from "@/db/schema.js"
+import { redis } from "@/redis.js"
+import { TokenUser } from "@/types.js"
 
 type UserPartial = Pick<TokenUser, 'userId'>
 

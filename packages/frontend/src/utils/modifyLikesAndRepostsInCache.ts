@@ -1,5 +1,5 @@
 import type { InfiniteData, QueryClient } from "@tanstack/solid-query";
-import type { ApiPostResponse, PostResponse } from "#client/types.js";
+import type { ApiPostResponse, PostResponse } from "~/types.js";
 
 export function modifyLikesAndRepostsInCache(field: 'likes' | 'reposts', queryClient: QueryClient) {
     return  function (data: -1 | 1, postId: string) {

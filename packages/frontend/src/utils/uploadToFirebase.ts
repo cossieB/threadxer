@@ -1,5 +1,5 @@
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import auth from "#client/globalState/auth.js";
+import auth from "~/globalState/auth.js";
 import { storage } from "../../firebase";
 
 export function validateAndUpload(files: File[], path: string, maxSize = 1) {

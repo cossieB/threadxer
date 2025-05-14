@@ -1,6 +1,6 @@
 import { useParams } from "@solidjs/router";
 import { useInfiniteQuery } from "@tanstack/solid-query";
-import { trpcClient } from "#client/trpc.js";
+import { trpcClient } from "~/trpc.js";
 
 export function useReplies() {
     const params = useParams()

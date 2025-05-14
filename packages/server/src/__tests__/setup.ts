@@ -1,5 +1,5 @@
-import { db } from "#server/db/drizzle.js"
-import { Post, User } from "#server/db/schema.js"
+import { db } from "@/db/drizzle.js"
+import { Post, User } from "@/db/schema.js"
 import { afterAll, beforeAll } from "vitest"
 
 beforeAll(async () => {

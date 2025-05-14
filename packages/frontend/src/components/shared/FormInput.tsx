@@ -1,8 +1,8 @@
 import { For, type JSX, mergeProps, Show } from "solid-js";
-import styles from "#client/styles/components/form.module.scss"
-import titleCase from "#client/lib/titleCase.js";
-import { type Require } from "#client/lib/utilityTypes.js";
-import { type ChangeEvent } from "#client/lib/solidTypes.js";
+import styles from "~/styles/components/form.module.scss"
+import titleCase from "~/lib/titleCase.js";
+import { type Require } from "~/lib/utilityTypes.js";
+import { type ChangeEvent } from "~/lib/solidTypes.js";
 import { type SetStoreFunction } from "solid-js/store";
 
 function getOnChange<UserInputElement extends INPUTS>(props: Pick<Props<UserInputElement>, 'name' | 'setter'>) {

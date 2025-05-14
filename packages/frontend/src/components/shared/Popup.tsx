@@ -1,6 +1,6 @@
 import { Show, createSignal, onCleanup } from "solid-js";
 import { Transition } from "solid-transition-group";
-import styles from "#client/styles/components/Popup.module.scss"
+import styles from "~/styles/components/Popup.module.scss"
 
 type Props = {
     text: string,

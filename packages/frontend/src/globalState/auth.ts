@@ -1,7 +1,7 @@
 import { JwtPayload, jwtDecode } from "jwt-decode";
 import { createStore } from "solid-js/store";
 import { signInWithCustomToken, signOut } from "firebase/auth";
-import { trpcClient } from "#client/trpc.js";
+import { trpcClient } from "~/trpc.js";
 import { TRPCClientError } from "@trpc/client";
 import { errors } from "./popups.js";
 import { firebaseAuth } from "../../firebase.js";

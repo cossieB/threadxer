@@ -1,6 +1,6 @@
 import { For, createMemo, onCleanup } from "solid-js";
-import { errors, setErrors } from "#client/globalState/popups.js";
-import styles from "#client/styles/components/ErrorPopups.module.scss"
+import { errors, setErrors } from "~/globalState/popups.js";
+import styles from "~/styles/components/ErrorPopups.module.scss"
 import { TransitionGroup } from "solid-transition-group";
 
 export function Toast() {

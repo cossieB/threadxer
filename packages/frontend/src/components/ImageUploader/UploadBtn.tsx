@@ -1,11 +1,11 @@
 import { createSignal, mergeProps } from "solid-js";
-import type { ChangeEvent } from "#client/lib/solidTypes.js";
-import { UploadSvg } from "#client/svgs.js";
-import auth from "#client/globalState/auth.js";
+import type { ChangeEvent } from "~/lib/solidTypes.js";
+import { UploadSvg } from "~/svgs.js";
+import auth from "~/globalState/auth.js";
 import type { UseMutationResult, QueryKey } from "@tanstack/solid-query";
 import { Popup } from "../shared/Popup";
 import { Portal } from "solid-js/web";
-import { validateAndUpload } from "#client/utils/uploadToFirebase.js";
+import { validateAndUpload } from "~/utils/uploadToFirebase.js";
 
 type Props = {
     path: "avatar" | "banner",

@@ -1,10 +1,10 @@
 import { Switch, Match, For, Show, onMount, onCleanup } from "solid-js";
-import { PostBox } from "#client/components/PostBox/PostBox.js";
-import Loader from "#client/components/shared/Loader/Loader.js";
+import { PostBox } from "~/components/PostBox/PostBox.js";
+import Loader from "~/components/shared/Loader/Loader.js";
 import { P } from "../routes/[username]/Replies";
 import { MoreDataBtn } from "./MoreDataBtn";
-import { useViewPost } from "#client/data/engagement.js";
-import { filterMap } from "#client/lib/filterMap.js";
+import { useViewPost } from "~/data/engagement.js";
+import { filterMap } from "~/lib/filterMap.js";
 
 /** key is postId and value is whether the view has been sent to the backend */
 export const viewedPosts: Record<string, boolean> = {}

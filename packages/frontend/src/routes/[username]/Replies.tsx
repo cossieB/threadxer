@@ -1,8 +1,8 @@
 import type { UseInfiniteQueryResult, InfiniteData } from "@tanstack/solid-query"
-import { useReplies } from "#client/data/replies.js"
-import { useUserLikes, useUserPosts } from "#client/data/user.js"
-import { PostLists } from "#client/components/PostLists.js"
-import { ApiPostResponse } from "#client/types.js";
+import { useReplies } from "~/data/replies.js"
+import { useUserLikes, useUserPosts } from "~/data/user.js"
+import { PostLists } from "~/components/PostLists.js"
+import { ApiPostResponse } from "~/types.js";
 
 export type P = {
     query: UseInfiniteQueryResult<InfiniteData<ApiPostResponse>, Error>

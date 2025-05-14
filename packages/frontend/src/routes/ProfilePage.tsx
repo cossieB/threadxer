@@ -1,20 +1,20 @@
 import { Navigate } from "@solidjs/router";
 import { Switch, Match, createEffect, createMemo } from "solid-js";
 import { createStore } from "solid-js/store";
-import Loader from "#client/components/shared/Loader/Loader.js";
-import Page from "#client/components/shared/Page.js";
-import UserForm from "#client/components/shared/UserForm.js";
-import auth from "#client/globalState/auth.js";
-import { validateUrl } from "#client/lib/validateUrl.js";
-import styles from "#client/styles/routes/ProfilePage.module.scss"
-import { DeleteSvg } from "#client/svgs.js";
-import { UploadBtn } from "#client/components/ImageUploader/UploadBtn.js";
-import { Popup } from "#client/components/shared/Popup.js";
-import { useUser, useUserMutation } from "#client/data/user.js";
-import { SubmitButton } from "#client/components/shared/buttons/SubmitButton.js";
-import { FormInput, FormTextarea } from "#client/components/shared/FormInput.js";
+import Loader from "~/components/shared/Loader/Loader.js";
+import Page from "~/components/shared/Page.js";
+import UserForm from "~/components/shared/UserForm.js";
+import auth from "~/globalState/auth.js";
+import { validateUrl } from "~/lib/validateUrl.js";
+import styles from "~/styles/routes/ProfilePage.module.scss"
+import { DeleteSvg } from "~/svgs.js";
+import { UploadBtn } from "~/components/ImageUploader/UploadBtn.js";
+import { Popup } from "~/components/shared/Popup.js";
+import { useUser, useUserMutation } from "~/data/user.js";
+import { SubmitButton } from "~/components/shared/buttons/SubmitButton.js";
+import { FormInput, FormTextarea } from "~/components/shared/FormInput.js";
 import { compareObjects } from "../utils/compareObjects.js";
-import { CharacterCounter } from "#client/components/CharacterCounter.js";
+import { CharacterCounter } from "~/components/CharacterCounter.js";
 
 type NewType = Parameters<ReturnType<typeof useUserMutation>['mutate']>[0];
 

@@ -2,10 +2,10 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { protectedProcedure, router } from "../trpc.js";
 import { redis } from "../redis.js";
-import * as authService from "#server/services/authService.js";
-import * as verificationService from "#server/services/verificationService.js";
-import * as emailService from "#server/services/emailService.js";
-import AppError from "#server/utils/AppError.js";
+import * as authService from "@/services/authService.js";
+import * as verificationService from "@/services/verificationService.js";
+import * as emailService from "@/services/emailService.js";
+import AppError from "@/utils/AppError.js";
 
 export const verificationRouter = router({
     verifyUser: protectedProcedure

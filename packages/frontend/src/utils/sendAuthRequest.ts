@@ -2,8 +2,8 @@ import { type Navigator } from '@solidjs/router';
 import { QueryClient, useQueryClient } from '@tanstack/solid-query';
 import { TRPCClientError } from '@trpc/client';
 import type { SetStoreFunction } from 'solid-js/store';
-import auth from '#client/globalState/auth.js';
-import { errors } from '#client/globalState/popups.js';
+import auth from '~/globalState/auth.js';
+import { errors } from '~/globalState/popups.js';
 
 export async function sendAuthRequest(
     mutateFn: () => Promise<{

@@ -1,6 +1,6 @@
 import { TRPCClientError } from "@trpc/client";
-import auth from "#client/globalState/auth.js"
-import { trpcClient } from "#client/trpc.js";
+import auth from "~/globalState/auth.js"
+import { trpcClient } from "~/trpc.js";
 import { type AppRouter } from 'threadxer-server'
 
 type U = Parameters<typeof fetch>[0]

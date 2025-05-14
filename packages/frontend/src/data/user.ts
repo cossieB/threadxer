@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/solid-query";
-import auth from "#client/globalState/auth.js";
+import auth from "~/globalState/auth.js";
 import { useParams } from "@solidjs/router";
-import { trpcClient } from "#client/trpc.js";
+import { trpcClient } from "~/trpc.js";
 
 export function useUser(username: string) {
 

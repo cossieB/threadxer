@@ -1,8 +1,8 @@
 import { InfiniteData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/solid-query";
 import { useNavigate, useParams } from "@solidjs/router";
-import { composerState } from "#client/globalState/composer.js";
-import { trpcClient } from "#client/trpc.js";
-import type { ApiPostResponse } from "#client/routes/[username]/Replies.js";
+import { composerState } from "~/globalState/composer.js";
+import { trpcClient } from "~/trpc.js";
+import type { ApiPostResponse } from "~/routes/[username]/Replies.js";
 
 export function usePost() {
     const params = useParams()

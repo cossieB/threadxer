@@ -1,7 +1,7 @@
 import { describe, expect, test, vi } from "vitest";
 import assert from "node:assert";
-import * as verificationService from "#server/services/verificationService.js";
-import { db } from "#server/db/drizzle.js";
+import * as verificationService from "@/services/verificationService.js";
+import { db } from "@/db/drizzle.js";
 
 describe("verification tests", () => {
     test("create code for invalid user", async () => {

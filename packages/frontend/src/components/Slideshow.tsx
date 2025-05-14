@@ -1,11 +1,11 @@
 import { For, Show, onMount } from "solid-js";
 import { Portal } from "solid-js/web";
-import styles from "#client/styles/components/Media.module.scss";
+import styles from "~/styles/components/Media.module.scss";
 import { CustomBtn } from "./shared/buttons/CustomButtons";
 import { Transition, TransitionGroup } from "solid-transition-group";
 import { P, Media } from "./Media";
-import clickOutside from "#client/lib/clickOutside.js";
-import { useTouch } from "#client/hooks/useTouchEnd.js";
+import clickOutside from "~/lib/clickOutside.js";
+import { useTouch } from "~/hooks/useTouchEnd.js";
 false && clickOutside
 
 type P2 = {

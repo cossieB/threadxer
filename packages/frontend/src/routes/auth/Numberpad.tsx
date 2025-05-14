@@ -1,5 +1,5 @@
 import { For, onCleanup, onMount } from "solid-js";
-import styles from '#client/styles/components/Numberpad.module.scss';
+import styles from '~/styles/components/Numberpad.module.scss';
 
 type P = {
     enterNumber: (num: string) => void

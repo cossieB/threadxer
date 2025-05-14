@@ -1,5 +1,5 @@
 import { createStore } from "solid-js/store";
-import type { PostResponse } from "#client/types.js";
+import type { PostResponse } from "~/types.js";
 
 export const [composerState, setComposerState] = createStore({
     isOpen: false,

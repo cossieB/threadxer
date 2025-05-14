@@ -3,10 +3,10 @@ import { TRPCError } from "@trpc/server";
 import { postsPerPage } from "../config/variables.js";
 import { protectedProcedure, publicProcedure, router } from "../trpc.js";
 import { formatPosts } from "../utils/formatPosts.js";
-import { CreatePostSchema } from "#server/models/Post.js";
-import * as postService from "#server/services/postService.js";
-import AppError from "#server/utils/AppError.js";
-import { TokenUser } from "#server/types.js";
+import { CreatePostSchema } from "@/models/Post.js";
+import * as postService from "@/services/postService.js";
+import AppError from "@/utils/AppError.js";
+import { TokenUser } from "@/types.js";
 
 export const postRouter = router({
     createPost: protectedProcedure

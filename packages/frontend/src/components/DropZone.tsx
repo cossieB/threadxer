@@ -1,8 +1,8 @@
 import { For, type JSXElement, type Setter, createSignal, onCleanup } from "solid-js"
-import styles from '#client/styles/components/DropZone.module.scss'
-import { UploadSvg } from "#client/svgs.js"
+import styles from '~/styles/components/DropZone.module.scss'
+import { UploadSvg } from "~/svgs.js"
 import { MediaPreview } from "./MediaPreview"
-import { errors } from "#client/globalState/popups.js"
+import { errors } from "~/globalState/popups.js"
 
 type P = {
     images: {

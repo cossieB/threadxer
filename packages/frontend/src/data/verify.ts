@@ -1,8 +1,8 @@
 import { SetStoreFunction } from "solid-js/store";
 import { Navigator } from "@solidjs/router";
-import auth from "#client/globalState/auth.js";
-import { errors } from "#client/globalState/popups.js";
-import { trpcClient } from "#client/trpc.js";
+import auth from "~/globalState/auth.js";
+import { errors } from "~/globalState/popups.js";
+import { trpcClient } from "~/trpc.js";
 import { TRPCClientError } from "@trpc/client";
 
 export async function handleSubmit(

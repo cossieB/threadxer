@@ -1,9 +1,9 @@
 import postgres from "postgres";
-import { db } from "#server/db/drizzle.js";
-import { User } from "#server/db/schema.js";
+import { db } from "@/db/drizzle.js";
+import { User } from "@/db/schema.js";
 import { genSalt, hash } from "bcrypt";
-import titleCase from "#server/lib/titleCase.js";
-import AppError from "#server/utils/AppError.js";
+import titleCase from "@/lib/titleCase.js";
+import AppError from "@/utils/AppError.js";
 
 export async function createUser(
     email: string,

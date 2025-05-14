@@ -1,24 +1,22 @@
 FROM node:22-alpine
 
-WORKDIR /app
+COPY /packages/server/package.json /server/package.json
 
-COPY /server/package.json package.json
-
-COPY /frontend/package.prod.json /frontend/package.json
+COPY /packages/frontend/package.prod.json /frontend/package.json
 
 RUN cd /frontend/ && npm install
 
-RUN cd /app/ && npm install
+RUN cd /server/ && npm install
 
-COPY /frontend /frontend
+COPY /packages/frontend /frontend
 
-COPY /server .
+COPY /packages/server /server
 
 RUN cd /frontend && npm run build
 
-RUN cd /app && npm run build
+RUN cd /server && npm run build
 
-RUN mv /frontend/dist/ /app/public && rm -rf /frontend
+RUN mv /frontend/dist/ /server/public && rm -rf /frontend
 
 EXPOSE 8080
 
@@ -33,5 +31,7 @@ ENV DATABASE_URL=${DATABASE_URL} \
     REDIS_PRIVATE_URL=${REDIS_PRIVATE_URL} \
     NODE_ENV="production" \
     DOMAIN="https://threadxer.cossie.dev"
+
+WORKDIR /server
 
 CMD ["npm", "run", "start:railway"]
