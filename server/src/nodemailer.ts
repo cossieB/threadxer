@@ -1,6 +1,6 @@
 import { google } from "googleapis";
 import { createTransport } from "nodemailer";
-import { type Options } from "nodemailer/lib/mailer";
+
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -34,7 +34,7 @@ export async function sendMail(subject: string, to: string, message: string) {
             accessToken
         }
     })
-    const options: Options = {
+    const options = {
         from: {
             address: process.env.FROM!,
             name: "Threadxer"
