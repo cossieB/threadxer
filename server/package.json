@@ -2,7 +2,7 @@
   "name": "threadxer-server",
   "version": "1.0.0",
   "scripts": {
-    "build": "tsc",
+    "build": "npx tsc",
     "dev": "tsx watch src/server.ts",
     "test": "vitest",
     "start": "node dist/server.js",

@@ -4,16 +4,21 @@ RUN npm install
 COPY /frontend/ .
 RUN npm run build
 
+FROM node:24-alpine AS builder
+WORKDIR /app
+COPY /server/package*.json ./
+RUN npm ci
+COPY /server/ .
+RUN npm run build
 
 FROM node:24-alpine AS backend
 WORKDIR /app
-ENV PORT=8080
-COPY --from=frontend /dist /app/public
-COPY /server/package.json package.json
-RUN cd /app/ && npm install
-COPY /server .
-RUN cd /app && npm run build
-EXPOSE ${PORT}
+COPY --from=frontend /dist public/
+COPY --from=builder /app/dist/ dist/
+COPY /server/package*.json ./
+RUN npm ci --omit=dev
 ENV NODE_ENV="production" \
-    DOMAIN="https://threadxer.cossie.dev"
+    DOMAIN="https://threadxer.cossie.dev" \
+    PORT=8080
+EXPOSE ${PORT}
 CMD ["npm", "run", "start:railway"]
